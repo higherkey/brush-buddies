@@ -106,8 +106,8 @@
         const average=difference/current.length;
         const threshold=MOTION_THRESHOLDS[$("motion-sensitivity").value]||MOTION_THRESHOLDS.medium;
         if(average>threshold){
-          lastMotionAt=performance.now();setDancing(true);resumeForMotion();
-          setMotionStatus("Movement detected — your buddy is dancing!");
+          lastMotionAt=performance.now();resumeForMotion();setDancing(phase==="running");
+          setMotionStatus(phase==="running"?"Movement detected — your buddy is dancing!":"Camera ready — press Start when you're ready to brush.");
         }else if(phase==="running" && performance.now()-lastMotionAt>MOTION_GRACE_MS){
           setDancing(false);pauseForNoMotion();
           setMotionStatus("No brushing movement detected — timer paused.");
@@ -180,7 +180,7 @@
     const showingBreak=phase==="break"||(phase==="paused"&&pausedFrom==="break");
     const display=showingBreak?breakRemaining:segmentRemaining;
     $("time").textContent=formatTime(display);
-    $("time-caption").textContent=showingBreak?(phase==="paused"?"BREAK PAUSED":"TINY BREAK"):phase==="done"?"ALL DONE!":phase==="ready"?"READY TO BRUSH":phase==="paused"?"PAUSED":"THIS TURN";
+    $("time-caption").textContent=showingBreak?(phase==="paused"?"BREAK PAUSED":"TINY BREAK"):phase==="done"?"ALL DONE!":phase==="ready"?"READY TO BRUSH":phase==="motion-wait"?"WAITING FOR MOVEMENT":phase==="motion-paused"?"PAUSED — NO MOVEMENT":phase==="paused"?"PAUSED":"THIS TURN";
     $("total-time").textContent=formatTime(totalRemaining)+" left";
     $("status-text").textContent="Your adventure is "+formatTime(settings.duration);
     const progress=(settings.duration-totalRemaining)/settings.duration;
