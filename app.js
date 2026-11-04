@@ -31,6 +31,12 @@
   let settings = loadSettings();
   let selectedTheme = settings.theme === "random" ? randomTheme() : settings.theme;
   let totalRemaining = settings.duration, segmentRemaining = 30, breakRemaining = 0, phase = "ready", pausedFrom = "running", interval = null, zoneIndex = 0, audioContext = null, lastSpokenLine = -1;
+  // Camera processing is entirely local: frames are sampled into a tiny canvas and compared in memory.
+  let cameraStream = null, motionVideo = $("motion-preview"), motionCanvas = document.createElement("canvas");
+  let motionContext = motionCanvas.getContext("2d", {willReadFrequently:true}), previousFrame = null;
+  let motionLoop = null, lastMotionAt = 0, motionActive = false, motionModeEnabled = false;
+  const MOTION_SAMPLE_WIDTH = 64, MOTION_SAMPLE_HEIGHT = 48, MOTION_GRACE_MS = 1600;
+  const MOTION_THRESHOLDS = {low:22, medium:14, high:9};
 
   function loadSettings(){
     try { return {...DEFAULTS,...JSON.parse(localStorage.getItem(STORAGE_KEY)||"{}")}; }
@@ -48,9 +54,87 @@
     $("buddy").setAttribute("aria-label",animal.name);
     app.classList.toggle("animations-on",settings.animations);
     app.classList.toggle("reduced-motion",settings.reducedMotion);
+    if(settings.reducedMotion||!settings.animations)$("buddy").classList.remove("is-dancing");
+    else if(motionActive)$("buddy").classList.add("is-dancing");
     document.querySelector('meta[name="theme-color"]').content=getComputedStyle(app).getPropertyValue("--buddy-bg").trim()||"#fff5f7";
   }
   function setMessage(text){$("message").textContent=text;$("announcer").textContent=text;}
+  function setMotionStatus(text){$("motion-status").textContent=text;}
+  function setDancing(active){
+    motionActive=active;
+    $("buddy").classList.toggle("is-dancing",active && settings.animations && !settings.reducedMotion);
+  }
+  function stopMotionLoop(){
+    if(motionLoop!==null)cancelAnimationFrame(motionLoop);
+    motionLoop=null;previousFrame=null;
+  }
+  function stopCamera(){
+    stopMotionLoop();setDancing(false);
+    if(cameraStream){cameraStream.getTracks().forEach(track=>track.stop());cameraStream=null;}
+    if(motionVideo)motionVideo.srcObject=null;
+    motionModeEnabled=false;
+    $("motion-enable").disabled=false;$("motion-disable").disabled=true;
+    setMotionStatus("Camera is off. Nothing is being watched.");
+    if(phase==="motion-wait"||phase==="motion-paused"){
+      phase="paused";pausedFrom="running";setMessage("Camera motion mode is off. Press start to continue without it.");render();
+    }
+  }
+  function pauseForNoMotion(){
+    if(phase==="running"){
+      pausedFrom="running";stopClock();phase="motion-paused";setDancing(false);
+      setMessage("I can't see brushing movement. Your timer is paused—let's get brushing again!");
+      render();
+    }
+  }
+  function resumeForMotion(){
+    if(phase==="motion-wait"||phase==="motion-paused"){
+      phase="running";setMessage("There you go! Keep those brushing moves going!");
+      if(interval===null)interval=setInterval(tick,1000);
+      render();
+    }
+  }
+  function sampleMotion(){
+    if(!cameraStream || !motionModeEnabled)return;
+    if(motionVideo.readyState>=2){
+      motionContext.drawImage(motionVideo,0,0,MOTION_SAMPLE_WIDTH,MOTION_SAMPLE_HEIGHT);
+      const pixels=motionContext.getImageData(0,0,MOTION_SAMPLE_WIDTH,MOTION_SAMPLE_HEIGHT).data;
+      const current=new Uint8Array(MOTION_SAMPLE_WIDTH*MOTION_SAMPLE_HEIGHT);
+      for(let p=0,i=0;p<pixels.length;p+=4,i++)current[i]=(pixels[p]*.299+pixels[p+1]*.587+pixels[p+2]*.114)|0;
+      if(previousFrame){
+        let difference=0;
+        for(let i=0;i<current.length;i++)difference+=Math.abs(current[i]-previousFrame[i]);
+        const average=difference/current.length;
+        const threshold=MOTION_THRESHOLDS[$("motion-sensitivity").value]||MOTION_THRESHOLDS.medium;
+        if(average>threshold){
+          lastMotionAt=performance.now();setDancing(true);resumeForMotion();
+          setMotionStatus("Movement detected — your buddy is dancing!");
+        }else if(phase==="running" && performance.now()-lastMotionAt>MOTION_GRACE_MS){
+          setDancing(false);pauseForNoMotion();
+          setMotionStatus("No brushing movement detected — timer paused.");
+        }else if(phase==="running"){
+          setDancing(true);
+        }
+      }
+      previousFrame=current;
+    }
+    motionLoop=requestAnimationFrame(sampleMotion);
+  }
+  async function startCamera(){
+    if(!navigator.mediaDevices?.getUserMedia){setMotionStatus("Camera access is not available in this browser. Use a secure HTTPS page.");return;}
+    $("motion-enable").disabled=true;setMotionStatus("Waiting for camera permission…");
+    try{
+      cameraStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:"user",width:{ideal:320},height:{ideal:240}},audio:false});
+      motionVideo.srcObject=cameraStream;await motionVideo.play();
+      motionCanvas.width=MOTION_SAMPLE_WIDTH;motionCanvas.height=MOTION_SAMPLE_HEIGHT;
+      motionModeEnabled=true;lastMotionAt=0;previousFrame=null;
+      $("motion-disable").disabled=false;setMotionStatus("Camera on — waiting for brushing movement.");
+      if(phase==="ready"||phase==="paused"){phase="motion-wait";pausedFrom="running";setMessage("Show me your brushing moves to start the timer!");render();}
+      motionLoop=requestAnimationFrame(sampleMotion);
+    }catch(error){
+      stopCamera();
+      setMotionStatus(error?.name==="NotAllowedError"?"Camera permission was denied. You can still use the regular timer.":"Couldn't start the camera. Check browser permissions and try again.");
+    }
+  }
   function playTone(frequency,duration=0.13,type="sine",volume=0.045,slide=0){
     if(!settings.uiSounds)return;
     try{
@@ -107,7 +191,7 @@
     if(showingBreak){$("zone-title").textContent="Paws up! A tiny breather…";}
     else if(phase==="done"){$("zone-title").textContent="You did it! Sparkling smile!";}
     else $("zone-title").textContent=ZONES[zoneIndex].title;
-    $("start-button").innerHTML=phase==="running"||phase==="break"?'<span aria-hidden="true">Ⅱ</span> Pause':phase==="paused"?'<span aria-hidden="true">▶</span> Keep going':phase==="done"?'<span aria-hidden="true">↻</span> Brush again':'<span aria-hidden="true">▶</span> Start brushing';
+    $("start-button").innerHTML=phase==="running"||phase==="break"?'<span aria-hidden="true">Ⅱ</span> Pause':phase==="paused"||phase==="motion-paused"?'<span aria-hidden="true">▶</span> Keep going':phase==="done"?'<span aria-hidden="true">↻</span> Brush again':phase==="motion-wait"?'<span aria-hidden="true">◉</span> Waiting for movement':'<span aria-hidden="true">▶</span> Start brushing';
     $("start-button").setAttribute("aria-label",phase==="running"||phase==="break"?"Pause brushing":"Start or resume brushing");
   }
   function stopClock(){if(interval!==null)clearInterval(interval);interval=null;}
@@ -151,10 +235,14 @@
   }
   function startClock(){
     if(phase==="done")resetTimer();
-    if(phase==="ready"||phase==="paused"){
-      if(phase==="ready"){phase="running";speakZone();playTone(440,.12,"sine",.03);}
-      else {phase=pausedFrom;setMessage("Welcome back! You've got this!");}
-      render();interval=setInterval(tick,1000);
+    if(phase==="ready"||phase==="paused"||phase==="motion-paused"||phase==="motion-wait"){
+      if(motionModeEnabled){
+        phase="motion-wait";setMessage("Show me your brushing moves to start or resume the timer!");render();
+      }else{
+        if(phase==="ready"){phase="running";speakZone();playTone(440,.12,"sine",.03);}
+        else {phase=pausedFrom;setMessage("Welcome back! You've got this!");}
+        render();interval=setInterval(tick,1000);
+      }
     }else if(phase==="running"||phase==="break"){
       pausedFrom=phase;stopClock();phase="paused";setMessage("Taking a tiny break? Press start when you're ready.");render();
     }
@@ -175,9 +263,13 @@
   form.addEventListener("submit",(event)=>{event.preventDefault();applySettingsFromForm();dialog.close();});
   $("settings-reset").addEventListener("click",()=>{settings={...DEFAULTS};selectedTheme=randomTheme();saveSettings();populateSettings();applyTheme();resetTimer();});
   $("start-button").addEventListener("click",startClock);
-  $("reset-button").addEventListener("click",()=>{resetTimer();playTone(440,.09,"sine",.025);});
+  $("reset-button").addEventListener("click",()=>{resetTimer();if(motionModeEnabled){phase="motion-wait";setMessage("Ready! Show me your brushing moves to start.");render();}playTone(440,.09,"sine",.025);});
+  $("motion-enable").addEventListener("click",startCamera);
+  $("motion-disable").addEventListener("click",stopCamera);
   dialog.addEventListener("click",(event)=>{if(event.target===dialog)dialog.close();});
-  document.addEventListener("visibilitychange",()=>{if(document.hidden&&(phase==="running"||phase==="break")){pausedFrom=phase;stopClock();phase="paused";render();setMessage("Paused while you were away. Ready when you are!");}});
+  document.addEventListener("visibilitychange",()=>{if(document.hidden&&(phase==="running"||phase==="break")){pausedFrom=phase;stopClock();phase="paused";setDancing(false);render();setMessage("Paused while you were away. Ready when you are!");}});
+  window.addEventListener("pagehide",stopCamera);
   // A random buddy is selected at startup whenever Surprise me is the saved preference.
   applyTheme();populateSettings();render();setMessage(buddy().lines[0]);
+  if(!navigator.mediaDevices?.getUserMedia)$("motion-enable").disabled=true;
 })();
