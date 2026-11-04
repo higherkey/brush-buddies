@@ -30,7 +30,7 @@
   const controls = {theme:$("theme-select"),duration:$("duration-select"),breakSeconds:$("break-select"),animalSounds:$("animal-sounds"),uiSounds:$("ui-sounds"),animations:$("animations"),reducedMotion:$("reduced-motion")};
   let settings = loadSettings();
   let selectedTheme = settings.theme === "random" ? randomTheme() : settings.theme;
-  let totalRemaining = settings.duration, segmentRemaining = 30, breakRemaining = 0, phase = "ready", interval = null, zoneIndex = 0, audioContext = null, lastSpokenLine = -1;
+  let totalRemaining = settings.duration, segmentRemaining = 30, breakRemaining = 0, phase = "ready", pausedFrom = "running", interval = null, zoneIndex = 0, audioContext = null, lastSpokenLine = -1;
 
   function loadSettings(){
     try { return {...DEFAULTS,...JSON.parse(localStorage.getItem(STORAGE_KEY)||"{}")}; }
@@ -151,11 +151,11 @@
   function startClock(){
     if(phase==="done")resetTimer();
     if(phase==="ready"||phase==="paused"){
-      if(phase==="ready"){phase="running";speakZone();playAnimal();}
-      else {phase="running";setMessage("Welcome back! You've got this!");}
+      if(phase==="ready"){phase="running";speakZone();playTone(440,.12,"sine",.03);}
+      else {phase=pausedFrom;setMessage("Welcome back! You've got this!");}
       render();interval=setInterval(tick,1000);
     }else if(phase==="running"||phase==="break"){
-      stopClock();phase="paused";setMessage("Taking a tiny break? Press start when you're ready.");render();
+      pausedFrom=phase;stopClock();phase="paused";setMessage("Taking a tiny break? Press start when you're ready.");render();
     }
   }
   function applySettingsFromForm(){
@@ -172,11 +172,11 @@
   }
   $("settings-open").addEventListener("click",()=>{populateSettings();dialog.showModal();});
   form.addEventListener("submit",(event)=>{event.preventDefault();applySettingsFromForm();dialog.close();});
-  $("settings-reset").addEventListener("click",()=>{settings={...DEFAULTS};populateSettings();});
+  $("settings-reset").addEventListener("click",()=>{settings={...DEFAULTS};selectedTheme=randomTheme();saveSettings();populateSettings();applyTheme();resetTimer();});
   $("start-button").addEventListener("click",startClock);
   $("reset-button").addEventListener("click",()=>{resetTimer();playTone(440,.09,"sine",.025);});
   dialog.addEventListener("click",(event)=>{if(event.target===dialog)dialog.close();});
-  document.addEventListener("visibilitychange",()=>{if(document.hidden&&phase==="running"||document.hidden&&phase==="break"){stopClock();phase="paused";render();setMessage("Paused while you were away. Ready when you are!");}});
+  document.addEventListener("visibilitychange",()=>{if(document.hidden&&(phase==="running"||phase==="break")){pausedFrom=phase;stopClock();phase="paused";render();setMessage("Paused while you were away. Ready when you are!");}});
   // A random buddy is selected at startup whenever Surprise me is the saved preference.
   applyTheme();populateSettings();render();setMessage(buddy().lines[0]);
 })();
