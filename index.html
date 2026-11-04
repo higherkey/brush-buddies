@@ -119,6 +119,23 @@
         <label class="toggle-row"><span><strong>Buddy animations</strong><small>Bounces, wiggles and sparkles</small></span><input type="checkbox" id="animations" checked><span class="toggle" aria-hidden="true"></span></label>
         <label class="toggle-row"><span><strong>Reduced motion</strong><small>Keep movement extra gentle</small></span><input type="checkbox" id="reduced-motion"><span class="toggle" aria-hidden="true"></span></label>
       </div>
+      <div class="setting-group motion-settings">
+        <p class="setting-label">Brush-motion buddy mode</p>
+        <p class="setting-help">Optional camera motion detection makes your buddy dance while you brush. If movement stops, the timer pauses too.</p>
+        <div class="motion-actions">
+          <button class="secondary-button motion-enable" type="button" id="motion-enable">Enable camera</button>
+          <button class="text-button" type="button" id="motion-disable" disabled>Turn off</button>
+        </div>
+        <p class="motion-status" id="motion-status" role="status">Camera is off. Nothing is being watched.</p>
+        <video id="motion-preview" class="motion-preview" autoplay muted playsinline aria-label="Local camera preview for motion detection"></video>
+        <label class="setting-label sensitivity-label" for="motion-sensitivity">Motion sensitivity</label>
+        <select id="motion-sensitivity" class="select-control">
+          <option value="low">Low — ignore small movements</option>
+          <option value="medium" selected>Medium</option>
+          <option value="high">High — notice small movements</option>
+        </select>
+        <p class="setting-help">Video is analyzed on this device only. No video or motion data is uploaded or sent to a server. Camera access ends when you turn this off or close the page.</p>
+      </div>
       <div class="settings-actions">
         <button class="text-button" type="button" id="settings-reset">Reset settings</button>
         <button class="primary-button save-button" value="save">Save settings</button>
