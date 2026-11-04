@@ -11,6 +11,8 @@ A kid-friendly animal-themed toothbrushing timer hosted as a static site on GitH
 - Configurable breaks between stages and independent sound toggles
 - Optional local camera motion mode: the buddy dances while movement is detected and the timer pauses after movement stops
 - Preferences and stage definitions are saved locally in the browser
+- A paper-and-field-guide inspired layout with clear, squared-off panels and large kid-friendly controls
+- Motion sampling only analyzes newly delivered camera frames to reduce unnecessary work on phones
 - No build step or runtime dependencies
 
 ## Motion detection research and approach
@@ -29,7 +31,7 @@ The current implementation deliberately avoids downloading OpenCV, MediaPipe, mo
 
 ## Privacy
 
-The camera feature uses browser camera permission and processes frames in memory on the user's device. It does not send images, video, landmarks, or motion measurements to a server. No remote model, CDN script, analytics endpoint, or external vision API is used. The camera stream is stopped when the user turns motion mode off or leaves the page. Camera access requires HTTPS (GitHub Pages) or localhost.
+The camera feature uses browser camera permission and processes frames in memory on the user's device. It does not send images, video, landmarks, or motion measurements to a server. Frame analysis is skipped when the camera has not delivered a new frame. No remote model, CDN script, analytics endpoint, or external vision API is used. The camera stream is stopped when the user turns motion mode off or leaves the page. Camera access requires HTTPS (GitHub Pages) or localhost.
 
 Motion tracking measures movement in the selected image region; it does not identify a toothbrush. Other movement in view may keep the timer active, and lighting, camera placement, and background texture can affect tracking.
 
