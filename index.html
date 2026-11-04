@@ -1,147 +1,16 @@
 <!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#fff5f7">
-  <meta name="description" content="A playful, customizable animal-themed toothbrushing timer for kids.">
-  <title>Brush Buddies — A Little Brushing Adventure</title>
-  <link rel="stylesheet" href="styles.css">
-  <script src="app.js" defer></script>
-</head>
-<body>
-  <main class="app" id="app" data-theme="cat">
-    <header class="topbar">
-      <div class="brand"><span class="brand-mark" aria-hidden="true">✦</span><span>BRUSH BUDDIES</span></div>
-      <button class="icon-button settings-button" id="settings-open" type="button" aria-label="Open settings" title="Settings">⚙</button>
-    </header>
-
-    <section class="intro" aria-labelledby="app-title">
-      <p class="eyebrow">YOUR DAILY BRUSHING ADVENTURE</p>
-      <h1 id="app-title">Let's make those teeth sparkle!</h1>
-      <p class="subtitle">A little brushing, a lot of happy smiles.</p>
-    </section>
-
-    <section class="buddy-area" aria-label="Your brushing buddy">
-      <span class="floaty floaty-one" aria-hidden="true">✦</span>
-      <span class="floaty floaty-two" aria-hidden="true">♥</span>
-      <div class="buddy" id="buddy" role="img" aria-label="A cute cat">
-        <span class="buddy-emoji" id="buddy-emoji" aria-hidden="true">🐱</span>
-        <span class="buddy-cheeks" aria-hidden="true"><i></i><i></i></span>
-      </div>
-      <div class="speech" id="message" aria-live="polite">Ready, little superstar? Pick up your toothbrush!</div>
-      <div class="buddy-name" id="buddy-name">Kitty the Cat</div>
-    </section>
-
-    <section class="timer-card" aria-label="Brushing timer">
-      <div class="timer-ring">
-        <svg viewBox="0 0 220 220" aria-hidden="true">
-          <circle class="ring-track" cx="110" cy="110" r="99"></circle>
-          <circle class="ring-progress" id="progress" cx="110" cy="110" r="99"></circle>
-        </svg>
-        <div class="timer-readout">
-          <span class="timer-time" id="time" role="timer" aria-live="off">0:30</span>
-          <span class="timer-caption" id="time-caption">READY TO BRUSH</span>
-        </div>
-      </div>
-      <div class="zone-title" id="zone-title">First up: Top teeth!</div>
-      <div class="zone-track" id="zone-track" aria-label="Brushing sections">
-        <div class="zone active" data-zone="0"><span class="zone-icon">🌸</span><span>Top</span></div>
-        <div class="zone" data-zone="1"><span class="zone-icon">🌷</span><span>Bottom</span></div>
-        <div class="zone" data-zone="2"><span class="zone-icon">😁</span><span>Front</span></div>
-        <div class="zone" data-zone="3"><span class="zone-icon">👅</span><span>Tongue</span></div>
-      </div>
-      <div class="total-row"><span id="status-text">Your adventure is 2 minutes</span><span id="total-time">2:00 left</span></div>
-      <div class="controls">
-        <button class="primary-button" id="start-button" type="button"><span aria-hidden="true">▶</span> Start brushing</button>
-        <button class="secondary-button" id="reset-button" type="button" aria-label="Reset timer">↺</button>
-      </div>
-    </section>
-
-    <footer class="footer"><span>Little circles, gentle brushes, big smiles.</span><span aria-hidden="true">✧</span></footer>
-  </main>
-
-  <dialog class="settings-dialog" id="settings-dialog" aria-labelledby="settings-title">
-    <form method="dialog" class="settings-shell" id="settings-form">
-      <div class="settings-header">
-        <div><p class="eyebrow">MAKE IT YOURS</p><h2 id="settings-title">Buddy settings</h2></div>
-        <button class="icon-button close-button" value="close" aria-label="Close settings">×</button>
-      </div>
-
-      <div class="setting-group">
-        <label class="setting-label" for="theme-select">Brushing buddy</label>
-        <select id="theme-select" class="select-control">
-          <option value="random">🎲 Surprise me every time!</option>
-          <option value="cat">🐱 Kitty the Cat</option>
-          <option value="bunny">🐰 Bubbles the Bunny</option>
-          <option value="koala">🐨 Koko the Koala</option>
-          <option value="dog">🐶 Scout the Puppy</option>
-          <option value="fox">🦊 Finn the Fox</option>
-          <option value="bear">🐻 Benny the Bear</option>
-          <option value="panda">🐼 Pippa the Panda</option>
-          <option value="penguin">🐧 Pebble the Penguin</option>
-          <option value="owl">🦉 Ollie the Owl</option>
-          <option value="lion">🦁 Leo the Lion</option>
-          <option value="frog">🐸 Freddie the Frog</option>
-          <option value="tiger">🐯 Tilly the Tiger</option>
-          <option value="elephant">🐘 Ellie the Elephant</option>
-          <option value="unicorn">🦄 Star the Unicorn</option>
-        </select>
-        <p class="setting-help">Surprise me picks a different buddy when you open the app.</p>
-      </div>
-
-      <div class="setting-group">
-        <label class="setting-label" for="duration-select">Brushing time</label>
-        <select id="duration-select" class="select-control">
-          <option value="60">1 minute</option><option value="90">1 minute 30 seconds</option>
-          <option value="120" selected>2 minutes (recommended)</option><option value="150">2 minutes 30 seconds</option>
-          <option value="180">3 minutes</option><option value="240">4 minutes</option><option value="300">5 minutes</option>
-        </select>
-        <p class="setting-help">Your time is split into 30-second brushing turns.</p>
-      </div>
-
-      <div class="setting-group">
-        <label class="setting-label" for="break-select">Tiny breaks between turns</label>
-        <select id="break-select" class="select-control">
-          <option value="0">No break</option><option value="3" selected>3 seconds (just a little breather)</option>
-          <option value="5">5 seconds</option><option value="10">10 seconds</option>
-        </select>
-      </div>
-
-      <div class="setting-group">
-        <p class="setting-label">Sounds</p>
-        <label class="toggle-row"><span><strong>Animal sounds</strong><small>Meows, woofs, hoots and more</small></span><input type="checkbox" id="animal-sounds" checked><span class="toggle" aria-hidden="true"></span></label>
-        <label class="toggle-row"><span><strong>Fun sound effects</strong><small>Start, sparkle and finish sounds</small></span><input type="checkbox" id="ui-sounds" checked><span class="toggle" aria-hidden="true"></span></label>
-      </div>
-
-      <div class="setting-group">
-        <p class="setting-label">Movement</p>
-        <label class="toggle-row"><span><strong>Buddy animations</strong><small>Bounces, wiggles and sparkles</small></span><input type="checkbox" id="animations" checked><span class="toggle" aria-hidden="true"></span></label>
-        <label class="toggle-row"><span><strong>Reduced motion</strong><small>Keep movement extra gentle</small></span><input type="checkbox" id="reduced-motion"><span class="toggle" aria-hidden="true"></span></label>
-      </div>
-      <div class="setting-group motion-settings">
-        <p class="setting-label">Brush-motion buddy mode</p>
-        <p class="setting-help">Optional camera motion detection makes your buddy dance while you brush. If movement stops, the timer pauses too.</p>
-        <div class="motion-actions">
-          <button class="secondary-button motion-enable" type="button" id="motion-enable">Enable camera</button>
-          <button class="text-button" type="button" id="motion-disable" disabled>Turn off</button>
-        </div>
-        <p class="motion-status" id="motion-status" role="status">Camera is off. Nothing is being watched.</p>
-        <video id="motion-preview" class="motion-preview" autoplay muted playsinline aria-label="Local camera preview for motion detection"></video>
-        <label class="setting-label sensitivity-label" for="motion-sensitivity">Motion sensitivity</label>
-        <select id="motion-sensitivity" class="select-control">
-          <option value="low">Low — ignore small movements</option>
-          <option value="medium" selected>Medium</option>
-          <option value="high">High — notice small movements</option>
-        </select>
-        <p class="setting-help">Video is analyzed on this device only. No video or motion data is uploaded or sent to a server. Camera access ends when you turn this off or close the page.</p>
-      </div>
-      <div class="settings-actions">
-        <button class="text-button" type="button" id="settings-reset">Reset settings</button>
-        <button class="primary-button save-button" value="save">Save settings</button>
-      </div>
-    </form>
-  </dialog>
-  <div class="sr-only" id="announcer" aria-live="polite"></div>
-</body>
-</html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#fff5f7"><meta name="description" content="A playful, customizable animal-themed toothbrushing timer for kids."><title>Brush Buddies</title><link rel="stylesheet" href="styles.css"><script src="app.js" defer></script></head>
+<body><main class="app" id="app" data-theme="cat">
+<header class="topbar"><div class="brand"><span class="brand-mark">✦</span><span>BRUSH BUDDIES</span></div><div class="top-actions">
+<button class="quick-button buddy-quick" id="buddy-quick" type="button"><span id="quick-buddy-emoji">🐱</span><span>Buddy</span></button><button class="quick-button motion-quick" id="motion-toggle" type="button" aria-pressed="false"><span class="motion-dot"></span><span id="motion-toggle-label">Motion off</span></button><button class="icon-button" id="settings-open" type="button" aria-label="Settings">⚙</button></div></header>
+<section class="intro"><p class="eyebrow">YOUR DAILY BRUSHING ADVENTURE</p><h1>Let's make those teeth sparkle!</h1><p class="subtitle">A little brushing, a lot of happy smiles.</p></section>
+<section class="buddy-area" id="buddy-area" aria-label="Your brushing buddy"><span class="floaty floaty-one">✦</span><span class="floaty floaty-two">♥</span><div class="buddy" id="buddy" role="img" aria-label="A cute animal"><span class="buddy-emoji" id="buddy-emoji">🐱</span><span class="buddy-cheeks"><i></i><i></i></span></div><div class="speech" id="message" aria-live="polite"></div><div class="buddy-name" id="buddy-name"></div></section>
+<section class="timer-card" aria-label="Brushing timer"><div class="timer-ring"><svg viewBox="0 0 220 220" aria-hidden="true"><circle class="ring-track" cx="110" cy="110" r="99"></circle><circle class="ring-progress" id="progress" cx="110" cy="110" r="99"></circle></svg><div class="timer-readout"><span class="timer-time" id="time">0:30</span><span class="timer-caption" id="time-caption">READY TO BRUSH</span></div></div><div class="zone-title" id="zone-title"></div><div class="stage-hint">Tap a stage to jump · Touch and hold to move it</div><div class="zone-track" id="zone-track" aria-label="Brushing stages"></div><div class="total-row"><span id="status-text"></span><span id="total-time"></span></div><div class="controls"><button class="primary-button" id="start-button" type="button">▶ Start brushing</button><button class="secondary-button" id="reset-button" type="button" aria-label="Reset timer">↺</button></div></section>
+<footer class="footer"><span>Little circles, gentle brushes, big smiles.</span><span>✧</span></footer></main>
+<dialog class="settings-dialog" id="settings-dialog" aria-labelledby="settings-title"><div class="settings-shell"><div class="settings-header"><div><p class="eyebrow">MAKE IT YOURS</p><h2 id="settings-title">Buddy settings</h2></div><button class="icon-button close-button" id="settings-close" type="button" aria-label="Close settings">×</button></div>
+<nav class="settings-tabs" aria-label="Settings sections"><button class="settings-tab active" data-panel="buddy-panel" type="button">Buddy</button><button class="settings-tab" data-panel="stages-panel" type="button">Stages</button><button class="settings-tab" data-panel="timer-panel" type="button">Timer & sounds</button><button class="settings-tab" data-panel="motion-panel" type="button">Motion</button></nav>
+<section class="settings-panel active" id="buddy-panel"><div class="setting-group"><label class="setting-label" for="theme-select">Brushing buddy</label><select id="theme-select" class="select-control"><option value="random">🎲 Surprise me</option><option value="cat">🐱 Kitty the Cat</option><option value="bunny">🐰 Bubbles the Bunny</option><option value="koala">🐨 Koko the Koala</option><option value="dog">🐶 Scout the Puppy</option><option value="fox">🦊 Finn the Fox</option><option value="bear">🐻 Benny the Bear</option><option value="panda">🐼 Pippa the Panda</option><option value="penguin">🐧 Pebble the Penguin</option><option value="owl">🦉 Ollie the Owl</option><option value="lion">🦁 Leo the Lion</option><option value="frog">🐸 Freddie the Frog</option><option value="tiger">🐯 Tilly the Tiger</option><option value="elephant">🐘 Ellie the Elephant</option><option value="unicorn">🦄 Star the Unicorn</option></select><p class="setting-help">Surprise me picks a different buddy when you open the app.</p></div><div class="setting-group"><p class="setting-label">Movement & look</p><label class="toggle-row"><span><strong>Buddy animations</strong><small>Bounces, wiggles and sparkles</small></span><input type="checkbox" id="animations" checked><span class="toggle"></span></label><label class="toggle-row"><span><strong>Reduced motion</strong><small>Keep movement extra gentle</small></span><input type="checkbox" id="reduced-motion"><span class="toggle"></span></label></div></section>
+<section class="settings-panel" id="stages-panel"><p class="panel-intro">Rename each stage, change its picture and reminder, and set how long it lasts. Hold a stage on the main screen to reorder it.</p><div id="stage-editor" class="stage-editor"></div><button class="secondary-button add-stage" id="add-stage" type="button">＋ Add a stage</button></section>
+<section class="settings-panel" id="timer-panel"><div class="setting-group"><label class="setting-label" for="break-select">Tiny breaks between stages</label><select id="break-select" class="select-control"><option value="0">No break</option><option value="3" selected>3 seconds</option><option value="5">5 seconds</option><option value="10">10 seconds</option></select></div><div class="setting-group"><p class="setting-label">Sounds</p><label class="toggle-row"><span><strong>Animal sounds</strong><small>Meows, woofs, hoots and more</small></span><input type="checkbox" id="animal-sounds" checked><span class="toggle"></span></label><label class="toggle-row"><span><strong>Fun sound effects</strong><small>Start, sparkle and finish sounds</small></span><input type="checkbox" id="ui-sounds" checked><span class="toggle"></span></label></div><p class="setting-help">Total brushing time is the sum of all stage times.</p></section>
+<section class="settings-panel" id="motion-panel"><div class="setting-group"><p class="setting-label">Brush-motion buddy mode</p><p class="setting-help">Your buddy dances when movement is detected. If movement stops, the timer pauses.</p><button class="primary-button camera-action" id="motion-enable" type="button">Enable camera</button><button class="text-button" id="motion-disable" type="button" disabled>Turn camera off</button><p class="motion-status" id="motion-status" role="status">Camera is off. Nothing is being watched.</p><video id="motion-preview" class="motion-preview" autoplay muted playsinline></video></div><div class="setting-group"><label class="setting-label" for="motion-sensitivity">Motion sensitivity</label><select id="motion-sensitivity" class="select-control"><option value="low">Low</option><option value="medium" selected>Medium</option><option value="high">High</option></select><label class="setting-label threshold-label" for="motion-region">Area to watch</label><select id="motion-region" class="select-control"><option value="center">Center — focus on brushing hand</option><option value="wide">Wide — include more of the picture</option></select><p class="setting-help">Frames are analyzed locally. No video or motion data is uploaded. Camera access requires permission and ends when switched off or when you leave.</p></div></section>
+<div class="settings-actions"><button class="text-button" id="settings-reset" type="button">Reset settings</button><button class="primary-button save-button" id="settings-save" type="button">Save settings</button></div></div></dialog><div class="sr-only" id="announcer" aria-live="polite"></div></body></html>
