@@ -54,3 +54,102 @@ button,select{font:inherit}button{cursor:pointer}.app{width:min(100%,470px);padd
 #buddy.is-dancing .buddy-emoji{animation:brushDance .42s ease-in-out infinite alternate}
 @keyframes brushDance{from{transform:translateY(-3px) rotate(-13deg) scale(1.02)}to{transform:translateY(2px) rotate(13deg) scale(1.08)}}
 @media(max-width:380px){.app{padding:14px 12px}.top-actions{gap:4px}.quick-button{padding:7px 8px;font-size:.65rem}.settings-tab{font-size:.62rem}.stage-fields{grid-template-columns:52px 1fr 65px}}
+
+
+/* Brush Buddies — playful field-guide layout */
+:root{
+ --ink:#263b3a;--muted:#71817b;--accent:#e77b55;--accent-dark:#a84e32;
+ --accent-soft:#fff0e7;--accent-shadow:#c76543;--surface:#fffdf7;
+ --line:#e5e2d5;--ring:#eee9dc;--buddy-bg:#f7f0dc;--buddy-glow:#f3e8c6;
+ font-family:"Trebuchet MS",ui-rounded,system-ui,sans-serif;
+}
+body{
+ display:block;min-height:100vh;padding:0;background:#f6f3e9;color:var(--ink);
+ background-image:linear-gradient(90deg,#e9e4d6 1px,transparent 1px),linear-gradient(#e9e4d6 1px,transparent 1px);
+ background-size:28px 28px;
+}
+.app{
+ width:min(100%,980px);min-height:100vh;margin:0 auto;padding:24px 30px 18px;
+ border:0;border-radius:0;background:#fffdf7;box-shadow:0 0 0 1px #e9e4d8;
+ overflow:visible;display:grid;grid-template-columns:minmax(260px,.88fr) minmax(390px,1.12fr);
+ grid-template-areas:"top top" "intro timer" "buddy timer" "footer footer";
+ column-gap:34px;row-gap:12px;align-content:start;
+}
+.topbar{grid-area:top;padding-bottom:14px;border-bottom:2px solid var(--line)}
+.brand{color:var(--ink);font-size:.78rem;letter-spacing:.13em}
+.brand-mark{display:grid;place-items:center;width:34px;height:34px;border:2px solid var(--accent);color:var(--accent);font-size:1.1rem}
+.top-actions{display:flex;align-items:center;gap:8px}
+.quick-button{border:2px solid var(--line);border-radius:7px;background:#fffdf7;color:var(--ink);padding:8px 11px;min-height:40px;font-size:.78rem;font-weight:900;display:flex;align-items:center;gap:7px}
+.quick-button:hover,.icon-button:hover{background:var(--accent-soft);transform:translateY(-1px)}
+.icon-button{border:2px solid var(--line);border-radius:7px;background:#fffdf7;color:var(--ink);width:42px;height:42px}
+.intro{grid-area:intro;text-align:left;align-self:end;margin:24px 0 0;padding:8px 4px 0}
+.eyebrow{color:var(--accent-dark);letter-spacing:.13em}
+.intro h1{max-width:420px;font-size:clamp(2rem,4vw,3rem);letter-spacing:-.055em;line-height:1.02}
+.subtitle{font-size:1rem;max-width:330px;line-height:1.5}
+.buddy-area{
+ grid-area:buddy;align-self:start;margin-top:8px;min-height:250px;padding:18px 14px 14px;
+ border:2px solid #e8e2d1;border-radius:12px;background:#f8f4e8;
+ display:flex;flex-direction:column;align-items:center;justify-content:center;
+}
+.buddy{width:164px;height:148px;background:radial-gradient(circle,var(--buddy-bg),transparent 70%)}
+.buddy-emoji{font-size:108px}
+.buddy-cheeks{top:83px;padding:0 30px}
+.speech{width:min(100%,310px);border:2px solid #e9ddc5;border-radius:8px;background:#fffdf7;padding:11px 14px}
+.speech:before{display:none}
+.buddy-name{margin-top:9px;text-transform:uppercase;letter-spacing:.1em;font-size:.72rem}
+.floaty-one{left:calc(50% - 112px)}.floaty-two{right:calc(50% - 116px)}
+.timer-card{
+ grid-area:timer;align-self:stretch;margin:18px 0 0;padding:24px 24px 22px;
+ border:2px solid #e5dfce;border-radius:12px;background:#fbf8ef;
+ display:flex;flex-direction:column;justify-content:center;
+}
+.timer-ring{width:220px;height:220px;margin:0 auto 10px}
+.timer-time{font-size:4rem;color:var(--ink)}
+.timer-caption{color:var(--muted)}
+.zone-title{font-size:1.2rem;margin:8px 0 14px}
+.stage-hint{text-align:center;color:var(--muted);font-size:.7rem;margin:-5px 0 10px}
+.zone-track{gap:8px}
+.zone{min-height:83px;border:2px solid #e4dfd2;border-radius:8px;background:#fffdf8;color:#6e7c75;padding:9px 3px}
+.zone.active{border-color:var(--accent);background:#fff0e7;color:var(--accent-dark);transform:translateY(-2px)}
+.zone.done{border-color:#b9d6c1;background:#edf5e9;color:#4d8060}
+.zone-icon{font-size:1.45rem}
+.total-row{font-size:.78rem;margin:15px 2px 16px}
+.primary-button,.secondary-button{border-radius:8px;box-shadow:none}
+.primary-button{background:var(--accent);box-shadow:0 3px 0 #bf6241;padding:16px 18px;font-size:1rem}
+.primary-button:active{box-shadow:0 1px 0 #bf6241;transform:translateY(2px)}
+.secondary-button{width:58px;border-radius:8px;border:2px solid #ded9ca;background:#fffdf7}
+.footer{grid-area:footer;border-top:1px solid var(--line);padding-top:12px;margin-top:12px;color:#8b9184}
+.settings-dialog{border-radius:12px;border:2px solid #e5dfce}
+.settings-shell{padding:24px}
+.settings-tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;padding:5px;background:#f1eee4;border-radius:8px}
+.settings-tab{border:0;border-radius:5px;background:transparent;color:#69776f;padding:10px 5px;font-weight:900}
+.settings-tab.active{background:#fffdf7;color:var(--accent-dark);box-shadow:0 1px 3px #3332}
+.setting-group{border-top:1px solid #e8e3d6}
+.select-control,.stage-edit-card input,.stage-edit-card textarea{border-radius:7px}
+.toggle{border-radius:7px}.toggle:after{border-radius:5px}
+.stage-edit-card{border-radius:8px}
+@media(min-width:700px){
+ .timer-card{min-height:600px}
+ .timer-ring{width:240px;height:240px}
+}
+@media(max-width:699px){
+ body{padding:0;background:#f6f3e9}
+ .app{width:100%;min-height:100vh;padding:14px 16px 16px;grid-template-columns:1fr;grid-template-areas:"top" "intro" "buddy" "timer" "footer";gap:8px}
+ .topbar{padding-bottom:10px}
+ .intro{margin:8px 0 0;text-align:center;padding:0 6px}
+ .intro h1{font-size:clamp(1.8rem,8vw,2.4rem);margin:0 auto}
+ .subtitle{margin:7px auto 0;font-size:.88rem}
+ .buddy-area{min-height:215px;margin-top:4px;padding:10px}
+ .buddy{width:142px;height:126px}.buddy-emoji{font-size:94px}
+ .buddy-cheeks{top:71px;padding:0 24px}
+ .timer-card{margin:4px 0 0;padding:15px 13px 17px}
+ .timer-ring{width:190px;height:190px}
+ .timer-time{font-size:3.4rem}
+ .footer{margin-top:7px}
+}
+@media(max-width:380px){
+ .app{padding:12px 11px}
+ .quick-button{padding:7px 8px;font-size:.7rem}
+ .zone{min-height:74px}
+ .settings-shell{padding:16px}
+}
