@@ -93,9 +93,10 @@
     }catch{}
   }
   function render(){
-    const display=phase==="break"?breakRemaining:segmentRemaining;
+    const showingBreak=phase==="break"||(phase==="paused"&&pausedFrom==="break");
+    const display=showingBreak?breakRemaining:segmentRemaining;
     $("time").textContent=formatTime(display);
-    $("time-caption").textContent=phase==="break"?"TINY BREAK":phase==="done"?"ALL DONE!":phase==="ready"?"READY TO BRUSH":"THIS TURN";
+    $("time-caption").textContent=showingBreak?(phase==="paused"?"BREAK PAUSED":"TINY BREAK"):phase==="done"?"ALL DONE!":phase==="ready"?"READY TO BRUSH":phase==="paused"?"PAUSED":"THIS TURN";
     $("total-time").textContent=formatTime(totalRemaining)+" left";
     $("status-text").textContent="Your adventure is "+formatTime(settings.duration);
     const progress=(settings.duration-totalRemaining)/settings.duration;
@@ -103,7 +104,7 @@
     $("progress").style.strokeDashoffset=CIRCUMFERENCE*(1-progress);
     const zones=[...document.querySelectorAll(".zone")];
     zones.forEach((el,i)=>{el.classList.toggle("active",i===zoneIndex&&phase!=="done");el.classList.toggle("done",i<zoneIndex||phase==="done");});
-    if(phase==="break"){$("zone-title").textContent="Paws up! A tiny breather…";}
+    if(showingBreak){$("zone-title").textContent="Paws up! A tiny breather…";}
     else if(phase==="done"){$("zone-title").textContent="You did it! Sparkling smile!";}
     else $("zone-title").textContent=ZONES[zoneIndex].title;
     $("start-button").innerHTML=phase==="running"||phase==="break"?'<span aria-hidden="true">Ⅱ</span> Pause':phase==="paused"?'<span aria-hidden="true">▶</span> Keep going':phase==="done"?'<span aria-hidden="true">↻</span> Brush again':'<span aria-hidden="true">▶</span> Start brushing';
