@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#fff5f7">
+  <meta name="description" content="A cute two-minute toothbrushing timer with four easy brushing zones.">
+  <title>Kitty's Clean Teeth Club</title>
+  <style>
+    :root{color-scheme:light;--ink:#493b50;--muted:#887b8e;--pink:#ff8eae;--pink-dark:#ed6f96;--cream:#fffaf4;--lav:#f0eaff;--mint:#e2f7ed;--line:#f2dce5}
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;background:radial-gradient(circle at 12% 8%,#ffe4ed 0,transparent 30%),radial-gradient(circle at 90% 85%,#e7e1ff 0,transparent 32%),#fff8f7;color:var(--ink);font-family:ui-rounded,"Trebuchet MS",system-ui,sans-serif;display:grid;place-items:center;padding:20px}
+    button{font:inherit;cursor:pointer}
+    .app{width:min(100%,460px);background:#fffdfd;border:3px solid #fff;box-shadow:0 18px 55px #9b6a8322;border-radius:32px;padding:24px 22px 22px;text-align:center;position:relative;overflow:hidden}
+    .app:before,.app:after{content:"✦";position:absolute;color:#ffd1df;font-size:25px}.app:before{left:18px;top:16px}.app:after{right:20px;top:28px;color:#d9ccff}
+    .eyebrow{font-size:.76rem;letter-spacing:.14em;text-transform:uppercase;font-weight:800;color:var(--pink-dark);margin:2px 0 6px}
+    h1{font-size:clamp(1.65rem,7vw,2.15rem);margin:0 0 4px;letter-spacing:-.04em}
+    .subtitle{color:var(--muted);font-size:.94rem;margin:0 0 16px}
+    .kitty{width:148px;height:130px;margin:0 auto 4px;display:grid;place-items:center;position:relative}
+    .kitty .face{font-size:106px;line-height:1;filter:drop-shadow(0 7px 1px #f7dce6)}
+    .spark{position:absolute;font-size:24px;color:#f7b84d}.s1{top:10px;left:5px}.s2{right:4px;top:26px}
+    .speech{background:var(--lav);border-radius:18px;padding:10px 14px;margin:0 auto 17px;max-width:310px;font-weight:700;font-size:.94rem;min-height:43px;display:grid;place-items:center}
+    .timer-wrap{width:214px;height:214px;margin:0 auto 18px;position:relative;display:grid;place-items:center}
+    .timer-wrap svg{position:absolute;inset:0;transform:rotate(-90deg)}
+    .track{fill:none;stroke:#f7e8ee;stroke-width:10}.progress{fill:none;stroke:var(--pink);stroke-width:10;stroke-linecap:round;stroke-dasharray:578;stroke-dashoffset:0;transition:stroke-dashoffset .35s linear}
+    .time{font-size:3.35rem;font-weight:900;letter-spacing:-.07em;font-variant-numeric:tabular-nums;line-height:1}
+    .time-label{font-size:.78rem;color:var(--muted);font-weight:800;letter-spacing:.12em;text-transform:uppercase;margin-top:7px}
+    .zone-label{font-size:1.05rem;font-weight:900;margin:0 0 12px}
+    .zones{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin:0 0 18px}
+    .zone{border:2px solid var(--line);background:#fff;border-radius:15px;padding:10px 3px 9px;color:var(--muted);font-size:.76rem;font-weight:800;transition:.2s}
+    .zone .emoji{display:block;font-size:1.35rem;margin-bottom:4px}
+    .zone.active{background:#fff0f5;border-color:var(--pink);color:#b94c73;transform:translateY(-2px)}
+    .zone.done{background:var(--mint);border-color:#b9e8d1;color:#398263}
+    .controls{display:flex;gap:10px}
+    .primary{flex:1;border:0;border-radius:17px;padding:15px;background:var(--pink);color:#fff;font-weight:900;font-size:1rem;box-shadow:0 5px 0 #dc6e91}
+    .primary:active{transform:translateY(3px);box-shadow:0 2px 0 #dc6e91}
+    .secondary{border:2px solid var(--line);background:#fff;border-radius:17px;padding:13px 17px;color:var(--ink);font-weight:800}
+    .hint{color:#a497a7;font-size:.75rem;margin:17px 0 0}
+    .finish .face{animation:bounce .65s ease-in-out infinite alternate}
+    @keyframes bounce{to{transform:translateY(-8px) rotate(5deg)}}
+    @media(max-width:370px){.app{padding:20px 14px}.timer-wrap{width:190px;height:190px}.time{font-size:3rem}.zone{font-size:.68rem}}
+    @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}
+  </style>
+</head>
+<body>
+  <main class="app" aria-label="Two minute toothbrushing timer">
+    <p class="eyebrow">your daily brushing buddy</p>
+    <h1>Kitty's Clean Teeth Club</h1>
+    <p class="subtitle">Brush along for two minutes. Meow-velous!</p>
+    <div class="kitty" id="kitty"><span class="spark s1">✦</span><span class="face" id="face" aria-hidden="true">🐱</span><span class="spark s2">♥</span></div>
+    <div class="speech" id="message" aria-live="polite">Ready, little superstar? Let's make those teeth sparkle!</div>
+    <div class="timer-wrap" role="timer" aria-label="2 minutes remaining">
+      <svg viewBox="0 0 200 200" aria-hidden="true"><circle class="track" cx="100" cy="100" r="92"/><circle class="progress" id="progress" cx="100" cy="100" r="92"/></svg>
+      <div><div class="time" id="time">2:00</div><div class="time-label">time to sparkle</div></div>
+    </div>
+    <p class="zone-label" id="zone-label">First up: Top teeth!</p>
+    <div class="zones" aria-label="Brushing zones">
+      <div class="zone active" data-zone="0"><span class="emoji">🌸</span>Top</div>
+      <div class="zone" data-zone="1"><span class="emoji">🌷</span>Bottom</div>
+      <div class="zone" data-zone="2"><span class="emoji">😁</span>Front</div>
+      <div class="zone" data-zone="3"><span class="emoji">👅</span>Tongue</div>
+    </div>
+    <div class="controls"><button class="primary" id="start">▶ Start brushing</button><button class="secondary" id="reset">↺ Reset</button></div>
+    <p class="hint">30 seconds for each spot · 2 minutes total</p>
+  </main>
+<script>
+(() => {
+  const zones=[{name:"Top teeth",lead:"First up: Top teeth!",talk:"Reach those top teeth. Little circles make them shine!"},{name:"Bottom teeth",lead:"Now: Bottom teeth!",talk:"Great brushing! Let's clean those bottom teeth too."},{name:"Front teeth",lead:"Next: Front teeth!",talk:"Show those front teeth some extra love. Gently, gently!"},{name:"Tongue",lead:"Last stop: Tongue!",talk:"Almost there! Give your tongue a gentle brush."}];
+  const cheers=["You're doing purr-fectly!","Keep going, superstar!","What a bright smile you're making!","Kitty is so proud of you!"];
+  const timeEl=document.getElementById("time"),message=document.getElementById("message"),zoneLabel=document.getElementById("zone-label"),start=document.getElementById("start"),reset=document.getElementById("reset"),progress=document.getElementById("progress"),zonesEls=[...document.querySelectorAll(".zone")],kitty=document.getElementById("kitty"),face=document.getElementById("face");
+  let remaining=120,interval=null,running=false,lastZone=-1;
+  const circumference=2*Math.PI*92;
+  progress.style.strokeDasharray=circumference;
+  function render(){
+    const m=Math.floor(remaining/60),s=remaining%60;timeEl.textContent=m+":"+String(s).padStart(2,"0");
+    progress.style.strokeDashoffset=circumference*(1-remaining/120);
+    document.querySelector('[role="timer"]').setAttribute("aria-label",m+" minutes "+s+" seconds remaining");
+    const idx=remaining===0?4:Math.min(3,Math.floor((120-remaining)/30));
+    zonesEls.forEach((el,i)=>{el.classList.toggle("active",i===idx&&remaining>0);el.classList.toggle("done",i<idx||remaining===0)});
+    if(remaining===0){zoneLabel.textContent="You did it! Sparkling smile!";message.textContent="Hooray! You brushed for two whole minutes. High paw!";face.textContent="😻";kitty.classList.add("finish");}
+    else{zoneLabel.textContent=zones[idx].lead;if(idx!==lastZone){message.textContent=zones[idx].talk;lastZone=idx;}}
+  }
+  function stop(){if(interval!==null)clearInterval(interval);interval=null;running=false;start.textContent="▶ Keep brushing";}
+  function tick(){if(remaining>0){remaining--;if(remaining===0){stop();start.textContent="↻ Brush again";}render();if(remaining>0&&remaining%15===0)message.textContent=cheers[Math.floor(Math.random()*cheers.length)];}}
+  start.addEventListener("click",()=>{if(remaining===0){resetAll();}if(running){stop();message.textContent="Taking a tiny break? Press start when you're ready!";return;}running=true;start.textContent="Ⅱ Pause";message.textContent="Let's go! You've got this!";interval=setInterval(tick,1000);});
+  function resetAll(){stop();remaining=120;lastZone=-1;face.textContent="🐱";kitty.classList.remove("finish");start.textContent="▶ Start brushing";message.textContent="Ready, little superstar? Let's make those teeth sparkle!";render();}
+  reset.addEventListener("click",resetAll);
+  render();
+})();
+</script>
+</body>
+</html>
