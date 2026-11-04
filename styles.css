@@ -153,3 +153,99 @@ body{
  .zone{min-height:74px}
  .settings-shell{padding:16px}
 }
+
+
+/* Hard-edged compact redesign: no pills, no cards, no rounded containers */
+*,*::before,*::after{border-radius:0!important}
+body{padding:0!important;background:#f2efe5!important;background-image:linear-gradient(90deg,#e7e1d4 1px,transparent 1px),linear-gradient(#e7e1d4 1px,transparent 1px)!important;background-size:24px 24px!important}
+.app{
+ width:min(100%,900px)!important;min-height:100vh!important;padding:12px 22px 10px!important;
+ border:0!important;border-radius:0!important;box-shadow:none!important;
+ grid-template-columns:minmax(220px,.78fr) minmax(380px,1.22fr)!important;
+ grid-template-areas:"top top" "intro timer" "buddy timer" "footer footer"!important;
+ column-gap:24px!important;row-gap:4px!important;
+}
+.topbar{padding:0 0 7px!important;border-bottom:2px solid #d9d4c7!important}
+.brand{gap:8px!important}.brand-mark{width:27px!important;height:27px!important;border:1px solid var(--accent)!important}
+.top-actions{gap:5px!important}
+.quick-button,.icon-button,.secondary-button,.primary-button,.settings-tab,.settings-dialog,.stage-edit-card,.speech,.buddy-area,.timer-card,.zone,.select-control,.stage-fields input,.tip-field textarea,.toggle,.motion-enable,.settings-shell{border-radius:0!important}
+.quick-button{min-height:34px!important;padding:5px 8px!important;border:1px solid #d9d4c7!important;background:transparent!important}
+.icon-button{width:34px!important;height:34px!important;border:1px solid #d9d4c7!important}
+.intro{margin:10px 0 0!important;padding:0!important;align-self:center!important}
+.intro .eyebrow{margin:0 0 4px!important;font-size:.62rem!important}
+.intro h1{font-size:clamp(1.65rem,3vw,2.35rem)!important;line-height:1.02!important;margin:0 0 5px!important}
+.subtitle{font-size:.83rem!important;line-height:1.3!important;margin:0!important}
+.buddy-area{
+ min-height:0!important;height:auto!important;margin:3px 0 0!important;padding:8px 8px 6px!important;
+ border:0!important;border-top:1px solid #ded8c9!important;border-bottom:1px solid #ded8c9!important;
+ background:transparent!important;gap:0!important;
+}
+.buddy{width:118px!important;height:108px!important;background:none!important}
+.buddy-emoji{font-size:82px!important}
+.buddy-cheeks{top:61px!important}
+.speech{width:100%!important;max-width:290px!important;padding:6px 9px!important;border:0!important;border-left:3px solid var(--accent)!important;background:#f7f2e6!important;font-size:.78rem!important}
+.buddy-name{margin-top:5px!important;font-size:.64rem!important}
+.timer-card{
+ min-height:0!important;margin:5px 0 0!important;padding:10px 14px 12px!important;
+ border:0!important;border-left:1px solid #ded8c9!important;background:transparent!important;
+ justify-content:flex-start!important;
+}
+.timer-ring{width:170px!important;height:170px!important;margin:0 auto 0!important}
+.timer-time{font-size:3.1rem!important}
+.timer-caption{font-size:.62rem!important}
+.zone-title{font-size:1rem!important;margin:3px 0 5px!important}
+.stage-hint{font-size:.62rem!important;margin:0 0 5px!important}
+.zone-track{gap:3px!important}
+.zone{min-height:57px!important;padding:5px 2px!important;border:1px solid #dcd6c8!important;background:transparent!important}
+.zone.active{border:2px solid var(--accent)!important;background:var(--accent-soft)!important;transform:none!important}
+.zone.done{border:1px solid #9bbba0!important;background:#edf4e9!important}
+.zone-icon{font-size:1.2rem!important}
+.zone-name{font-size:.67rem!important}
+.zone-time{font-size:.55rem!important}
+.total-row{margin:7px 1px 8px!important;font-size:.68rem!important}
+.controls{gap:5px!important}
+.primary-button{padding:10px 12px!important;box-shadow:none!important;border:0!important;font-size:.86rem!important}
+.primary-button:active{transform:translateY(1px)!important;box-shadow:none!important}
+.secondary-button{width:42px!important;min-height:38px!important;border:1px solid #d9d4c7!important;background:transparent!important}
+.footer{margin-top:4px!important;padding-top:6px!important;font-size:.62rem!important}
+.settings-dialog{padding:0!important;border:2px solid #cfc8b8!important;box-shadow:0 8px 35px #25251f33!important}
+.settings-shell{padding:14px!important}
+.settings-header{margin-bottom:8px!important}
+.settings-tabs{gap:0!important;padding:0!important;margin:0 0 8px!important;background:#eee9dd!important;border:1px solid #d8d1c2!important}
+.settings-tab{padding:8px 3px!important;border-right:1px solid #d8d1c2!important;font-size:.68rem!important}
+.settings-tab.active{background:#fffaf0!important;box-shadow:inset 0 -3px 0 var(--accent)!important}
+.settings-panel{max-height:52vh!important}
+.stage-edit-card{padding:7px 0!important;margin:0!important;border:0!important;border-top:1px solid #ded8c9!important;background:transparent!important}
+.stage-edit-heading{margin-bottom:5px!important}
+.stage-fields{gap:5px!important}
+.stage-fields input,.tip-field textarea,.select-control{padding:6px!important;border:1px solid #d6d0c3!important;background:#fffdf7!important}
+.setting-group{padding:7px 0!important}
+.motion-preview{max-height:105px!important;border:1px solid #d6d0c3!important}
+.settings-actions{margin-top:8px!important;padding-top:8px!important;border-top:1px solid #ded8c9!important}
+@media(max-width:699px){
+ .app{padding:8px 12px 8px!important;grid-template-columns:1fr!important;grid-template-areas:"top" "intro" "buddy" "timer" "footer"!important;row-gap:2px!important}
+ .topbar{padding-bottom:6px!important}
+ .intro{text-align:center!important;margin:5px 0 0!important}
+ .intro h1{font-size:1.7rem!important}
+ .subtitle{font-size:.78rem!important}
+ .buddy-area{min-height:0!important;margin:1px 0 0!important;padding:4px 6px!important;display:grid!important;grid-template-columns:110px 1fr;grid-template-rows:auto auto;column-gap:8px!important;align-items:center!important}
+ .buddy{grid-column:1;grid-row:1/3;width:105px!important;height:92px!important}
+ .buddy-emoji{font-size:72px!important}
+ .buddy-cheeks{top:53px!important}
+ .speech{grid-column:2;grid-row:1;align-self:end!important;text-align:left!important}
+ .buddy-name{grid-column:2;grid-row:2;align-self:start!important;text-align:left!important;margin:3px 0 0!important}
+ .timer-card{border-left:0!important;border-top:1px solid #ded8c9!important;margin:3px 0 0!important;padding:6px 4px 8px!important}
+ .timer-ring{width:146px!important;height:146px!important;margin-bottom:0!important}
+ .timer-time{font-size:2.7rem!important}
+ .zone-title{margin:1px 0 3px!important}
+ .zone{min-height:51px!important}
+ .footer{margin-top:2px!important;padding-top:4px!important}
+}
+@media(max-width:380px){
+ .app{padding:7px 9px!important}
+ .quick-button{padding:4px 6px!important;font-size:.62rem!important}
+ .timer-ring{width:132px!important;height:132px!important}
+ .timer-time{font-size:2.4rem!important}
+ .zone-name{font-size:.61rem!important}
+ .settings-shell{padding:10px!important}
+}
