@@ -33,3 +33,16 @@ button,select{font:inherit}button{cursor:pointer}.app{width:min(100%,470px);padd
 @keyframes bob{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-7px) rotate(2deg)}}@keyframes float{0%,100%{transform:translateY(0) rotate(-5deg);opacity:.7}50%{transform:translateY(-10px) rotate(8deg);opacity:1}}@keyframes celebrate{0%,100%{transform:scale(1) rotate(0)}35%{transform:scale(1.18) rotate(-10deg)}70%{transform:scale(1.12) rotate(10deg)}}
 @media(max-width:380px){body{padding:8px}.app{padding:16px 14px 14px;border-radius:26px}.timer-card{padding:12px 10px}.timer-ring{width:175px;height:175px}.timer-time{font-size:3rem}.zone{font-size:.65rem}.intro h1{font-size:1.55rem}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+
+/* Optional local camera-motion feedback */
+.motion-actions{display:flex;align-items:center;gap:14px;margin:10px 0 6px}
+.motion-enable{width:auto;height:auto;padding:10px 14px;font-size:.78rem;background:var(--accent-soft);border:1px solid var(--line);color:var(--accent-dark)}
+.motion-enable:disabled{opacity:.5;cursor:not-allowed}
+#motion-disable:disabled{opacity:.4;cursor:not-allowed}
+.motion-status{font-size:.74rem;font-weight:800;color:var(--accent-dark);margin:8px 0}
+.motion-preview{display:block;width:100%;max-height:150px;object-fit:cover;border-radius:13px;background:#f4eef2;transform:scaleX(-1);margin:8px 0}
+.motion-preview:not([src]){min-height:0}
+.sensitivity-label{margin-top:12px}
+#buddy.is-dancing .buddy-emoji{animation:brushDance .42s ease-in-out infinite alternate}
+#app.reduced-motion #buddy.is-dancing .buddy-emoji{animation:none}
+@keyframes brushDance{from{transform:translateY(-3px) rotate(-13deg) scale(1.02)}to{transform:translateY(2px) rotate(13deg) scale(1.08)}}
