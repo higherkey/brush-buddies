@@ -64,6 +64,11 @@ $("buddy-quick").addEventListener("click",()=>{const keys=Object.keys(ANIMALS);s
 $("start-button").addEventListener("click",start);$("reset-button").addEventListener("click",reset);$("motion-toggle").addEventListener("click",()=>motionOn?stopCamera(true):startCamera());$("motion-enable").addEventListener("click",startCamera);$("motion-disable").addEventListener("click",()=>stopCamera(true));
 $("settings-dialog").addEventListener("click",e=>{if(e.target===$("settings-dialog"))$("settings-dialog").close();});
 document.addEventListener("visibilitychange",()=>{if(document.hidden&&["running","break"].includes(phase)){pausedFrom=phase;stopClock();phase="paused";dance(false);render();say("Paused while you were away. Ready when you are!");}});
-window.addEventListener("pagehide",stopCamera);gestures();if(!navigator.mediaDevices?.getUserMedia)$("motion-enable").disabled=true;
+window.addEventListener("pagehide",stopCamera);
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js").catch(() => {});
+  });
+}gestures();if(!navigator.mediaDevices?.getUserMedia)$("motion-enable").disabled=true;
 applyTheme();renderStages();stageLeft=settings.stages[0].seconds;populate();render();say("Ready, little superstar? Pick up your toothbrush!");
 })();
