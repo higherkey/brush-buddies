@@ -25,7 +25,49 @@ function save(){try{localStorage.setItem(KEY,JSON.stringify(settings));}catch{}}
 function say(t){$("message").textContent=t;$("announcer").textContent=t;}
 function tone(f,d=.13,type="sine",v=.04){if(!settings.uiSounds)return;try{audio ||= new(window.AudioContext||window.webkitAudioContext)();if(audio.state==="suspended")audio.resume();const o=audio.createOscillator(),g=audio.createGain(),t=audio.currentTime;o.type=type;o.frequency.value=f;g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g);g.connect(audio.destination);o.start(t);o.stop(t+d);}catch{}}
 function chord(){[523,659,784,1047].forEach((f,i)=>setTimeout(()=>tone(f,.2),i*90));}
-function animalSound(){if(!settings.animalSounds)return;const patterns={meow:[650,520,390],squeak:[900,1150,850],koala:[180,230,160],woof:[190,125,205],yip:[500,780,590],growl:[115,90,130],chirp:[800,1050,930],hoot:[360,300,360],roar:[125,95,145],ribbit:[240,180,250],trumpet:[260,390,310],magic:[660,880,1100]};try{audio ||= new(window.AudioContext||window.webkitAudioContext)();if(audio.state==="suspended")audio.resume();const t=audio.currentTime;(patterns[animal()[2]]||patterns.meow).forEach((f,i)=>{const o=audio.createOscillator(),g=audio.createGain();o.type=["woof","growl","roar"].includes(animal()[2])?"sawtooth":"triangle";o.frequency.setValueAtTime(f,t+i*.13);g.gain.setValueAtTime(.0001,t+i*.13);g.gain.exponentialRampToValueAtTime(.05,t+i*.13+.02);g.gain.exponentialRampToValueAtTime(.0001,t+i*.13+.15);o.connect(g);g.connect(audio.destination);o.start(t+i*.13);o.stop(t+i*.13+.17);});}catch{}}
+function animalSound(){
+ if(!settings.animalSounds)return;
+ try{
+  audio ||= new(window.AudioContext||window.webkitAudioContext)();
+  if(audio.state==="suspended")audio.resume();
+  const now=audio.currentTime,kind=animal()[2];
+  const voice=(start,duration,from,to,wave="triangle",volume=.055,filter=2400)=>{
+   const osc=audio.createOscillator(),gain=audio.createGain(),toneFilter=audio.createBiquadFilter();
+   osc.type=wave;osc.frequency.setValueAtTime(Math.max(35,from),start);
+   osc.frequency.exponentialRampToValueAtTime(Math.max(35,to),start+duration);
+   toneFilter.type="lowpass";toneFilter.frequency.setValueAtTime(filter,start);
+   toneFilter.frequency.exponentialRampToValueAtTime(Math.max(180,filter*.55),start+duration);
+   gain.gain.setValueAtTime(.0001,start);gain.gain.exponentialRampToValueAtTime(volume,start+.025);
+   gain.gain.exponentialRampToValueAtTime(.0001,start+duration);
+   osc.connect(toneFilter);toneFilter.connect(gain);gain.connect(audio.destination);
+   osc.start(start);osc.stop(start+duration+.02);
+  };
+  const chirp=(f1,f2,d=.12,delay=0,wave="triangle",v=.045)=>voice(now+delay,d,f1,f2,wave,v);
+  const noise=(delay,duration,volume=.025,cutoff=1100)=>{
+   const length=Math.ceil(audio.sampleRate*duration),buffer=audio.createBuffer(1,length,audio.sampleRate),data=buffer.getChannelData(0);
+   for(let i=0;i<length;i++)data[i]=(Math.random()*2-1)*(1-i/length);
+   const src=audio.createBufferSource(),filter=audio.createBiquadFilter(),gain=audio.createGain(),start=now+delay;
+   filter.type="bandpass";filter.frequency.value=cutoff;filter.Q.value=.7;
+   gain.gain.setValueAtTime(.0001,start);gain.gain.exponentialRampToValueAtTime(volume,start+.025);
+   gain.gain.exponentialRampToValueAtTime(.0001,start+duration);
+   src.buffer=buffer;src.connect(filter);filter.connect(gain);gain.connect(audio.destination);src.start(start);src.stop(start+duration);
+  };
+  switch(kind){
+   case "meow": voice(now,.34,780,360,"sawtooth",.035,1500);voice(now+.12,.22,1050,520,"triangle",.018,2100);break;
+   case "squeak": chirp(1150,1750,.09,0);chirp(1450,980,.12,.1);chirp(1050,1500,.08,.24);break;
+   case "koala": voice(now,.42,210,145,"sawtooth",.035,650);voice(now+.22,.25,165,230,"triangle",.025,850);break;
+   case "woof": noise(0,.12,.035,520);chirp(185,105,.14,.01,"sawtooth",.04);noise(.17,.1,.025,420);break;
+   case "yip": chirp(520,980,.1);chirp(760,1180,.09,.13);chirp(620,850,.13,.26);break;
+   case "growl": voice(now,.34,145,72,"sawtooth",.045,420);voice(now+.18,.28,105,68,"square",.018,300);break;
+   case "chirp": chirp(900,1450,.08);chirp(1250,1750,.07,.1);chirp(1000,1550,.1,.2);break;
+   case "hoot": voice(now,.3,430,300,"sine",.055,900);voice(now+.24,.32,350,245,"sine",.05,800);break;
+   case "roar": noise(0,.34,.045,360);voice(now,.4,155,75,"sawtooth",.045,500);noise(.3,.22,.03,520);break;
+   case "ribbit": voice(now,.12,190,310,"square",.035,900);voice(now+.14,.1,260,170,"square",.03,850);voice(now+.29,.13,190,285,"square",.035,900);break;
+   case "trumpet": voice(now,.2,260,520,"sawtooth",.04,1200);voice(now+.16,.24,410,680,"sawtooth",.035,1500);noise(.02,.28,.012,1700);break;
+   case "magic": chirp(660,990,.18);chirp(990,1320,.18,.13);chirp(1320,1760,.22,.26,"sine",.035);break;
+  }
+ }catch{}
+}
 function applyTheme(){const a=animal();$("buddy-emoji").textContent=a[0];$("quick-buddy-emoji").textContent=a[0];$("buddy-name").textContent=a[1];$("app").dataset.theme=selected;$("buddy").setAttribute("aria-label",a[1]);$("app").classList.toggle("animations-on",settings.animations);$("app").classList.toggle("reduced-motion",settings.reducedMotion);if(!settings.animations||settings.reducedMotion)$("buddy").classList.remove("is-dancing");else if(motionActive)$("buddy").classList.add("is-dancing");}
 function dance(on){motionActive=on;$("buddy").classList.toggle("is-dancing",on&&settings.animations&&!settings.reducedMotion);}
 function renderStages(){const host=$("zone-track");host.innerHTML="";settings.stages.forEach((s,i)=>{const b=document.createElement("button");b.type="button";b.className="zone"+(i===stageIndex?" active":"")+(i<stageIndex?" done":"");b.dataset.index=i;b.innerHTML='<span class="zone-icon"></span><span class="zone-name"></span><span class="zone-time"></span>';b.querySelector(".zone-icon").textContent=s.icon;b.querySelector(".zone-name").textContent=s.name;b.querySelector(".zone-time").textContent=fmt(s.seconds);b.setAttribute("aria-label",s.name+", "+fmt(s.seconds));host.appendChild(b);});}
