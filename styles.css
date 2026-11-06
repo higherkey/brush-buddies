@@ -276,6 +276,7 @@ body{padding:0!important;background:#f2efe5!important;background-image:linear-gr
 
 
 /* Main-screen camera target: preview exists only while camera mode is active */
+.app{grid-template-areas:"top top" "intro timer" "buddy timer" "camera timer" "footer footer"!important}
 .camera-view{grid-area:camera;min-width:0;margin:4px 0 0;padding:8px 0 5px;border-top:1px solid #ded8c9;border-bottom:1px solid #ded8c9}
 .camera-view[hidden]{display:none!important}
 .camera-heading{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:6px;color:var(--accent-dark);font-size:.66rem;letter-spacing:.08em}
@@ -301,6 +302,7 @@ body{padding:0!important;background:#f2efe5!important;background-image:linear-gr
 .camera-view[data-region="wide"] .target-corner.bottom-left{bottom:5%;left:5%}
 .camera-view[data-region="wide"] .target-corner.bottom-right{bottom:5%;right:5%}
 @media(max-width:699px){
+ .app{grid-template-areas:"top" "intro" "buddy" "camera" "timer" "footer"!important}
  .camera-view{margin:2px 0 0;padding:6px 0 4px}
  .camera-frame{width:min(100%,360px)}
  .camera-frame .motion-preview{max-height:210px}
