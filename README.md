@@ -42,3 +42,12 @@ Animal calls and interface sounds are synthesized locally with the Web Audio API
 ## Run locally
 
 Open `index.html` in a modern browser or serve the folder with a static web server. Camera access requires localhost or HTTPS.
+
+
+## Install as an app (PWA)
+
+Brush Buddies is a Progressive Web App. On a supported browser, use the browser's **Install app** or **Add to Home Screen** command to put it on your device's home screen. The standalone display mode opens without the normal browser chrome.
+
+A service worker precaches the app shell so the timer can load offline after the first successful visit. App navigation is network-first when online and falls back to the cached page when offline. The worker only handles same-origin GET requests; it does not intercept camera streams or external requests. Camera motion detection continues to process frames locally and still requires camera permission.
+
+The web app manifest and SVG icon provide the app name, launch location, colors, and install icon. Service worker registration requires HTTPS (GitHub Pages provides this) or localhost.
