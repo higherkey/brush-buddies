@@ -166,5 +166,5 @@ if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("./sw.js").catch(() => {});
   });
 }gestures();if(!navigator.mediaDevices?.getUserMedia)$("motion-toggle").disabled=true;
-sessionTotal=Number(settings.totalSeconds)||total();settings.totalSeconds=sessionTotal;applyTheme();renderStages();stageLeft=settings.stages[0].seconds;populate();render();renderMusicButton();settings.musicEnabled=false;save();say("Ready, little superstar? Pick up your toothbrush!");
+sessionTotal=Number(settings.totalSeconds)||total();settings.totalSeconds=sessionTotal;applyTheme();renderStages();stageLeft=settings.stages[0].seconds;populate();render();settings.musicEnabled=false;renderMusicButton();save();say("Ready, little superstar? Pick up your toothbrush!");
 })();
