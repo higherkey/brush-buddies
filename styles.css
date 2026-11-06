@@ -309,3 +309,21 @@ body{padding:0!important;background:#f2efe5!important;background-image:linear-gr
  .camera-heading{font-size:.62rem}
  .camera-heading span{font-size:.58rem}
 }
+
+
+/* Music toggle and large, reliable touch controls */
+button,select,input:not([type="hidden"]),textarea{min-height:44px}
+button{touch-action:manipulation}
+.quick-button,.icon-button,.secondary-button,.settings-tab,.text-button,.remove-stage,.add-stage{min-height:44px!important}
+.icon-button{width:44px!important;height:44px!important}
+.zone{min-height:60px!important}
+.stage-fields input,.tip-field textarea,.select-control{min-height:44px!important}
+.toggle-row{min-height:52px}
+.toggle-row .toggle{width:48px;height:28px}
+.toggle-row input{width:44px;height:44px}
+.timer-readout{position:absolute;inset:0;width:100%;height:100%;min-height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:0;border:0;background:transparent;color:inherit;cursor:pointer}
+.timer-readout:focus-visible{outline:4px solid var(--accent);outline-offset:-12px}
+.timer-readout .timer-time,.timer-readout .timer-caption{pointer-events:none}
+.controls{justify-content:center}
+#music-toggle.enabled{background:#fff0bd!important;border-color:#d69a25!important;color:#684b08!important}
+@media(max-width:699px){.top-actions{gap:4px!important;flex-wrap:wrap}.quick-button{padding:5px 7px!important;font-size:.68rem!important}.icon-button{flex:0 0 44px}}
