@@ -344,3 +344,21 @@ button{touch-action:manipulation}
 .camera-frame{width:100%!important;max-width:520px!important;min-height:150px;background:#172321!important}
 .camera-frame .motion-preview{width:100%!important;height:auto!important;min-height:150px;max-height:320px!important;aspect-ratio:4/3;object-fit:cover;display:block!important}
 @media(max-width:699px){.camera-frame{max-width:100%!important}.camera-frame .motion-preview{min-height:130px;max-height:240px!important}}
+
+
+/* Keep the home header clean and readable on narrow screens */
+.brand{white-space:nowrap;flex:0 0 auto}
+.topbar{min-width:0;gap:12px}
+.top-actions{min-width:0;flex-wrap:nowrap;justify-content:flex-end}
+@media(max-width:699px){
+ .topbar{display:grid!important;grid-template-columns:1fr auto;grid-template-rows:auto auto;align-items:center;row-gap:7px!important}
+ .top-actions{grid-column:1/-1;display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px!important;width:100%}
+ .quick-button{justify-content:center;min-width:0;padding:5px 3px!important;white-space:nowrap}
+ .quick-button span:last-child{overflow:hidden;text-overflow:ellipsis}
+ .icon-button{justify-self:stretch;width:100%!important}
+}
+@media(max-width:360px){
+ .brand{font-size:.66rem!important;letter-spacing:.12em!important}
+ .top-actions{gap:3px!important}
+ .quick-button{font-size:.61rem!important}
+}
