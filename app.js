@@ -200,7 +200,7 @@ function gestures(){
  let activeContainer=null,activeItem=null,activePointer=null,startX=0,startY=0,dragStarted=false,suppressClick=false;
  const begin=(e,container,item)=>{
   if(e.button!==undefined&&e.button!==0)return;
-  activeContainer=container;activeItem=item;activePointer=e.pointerId;startX=e.clientX;startY=e.clientY;dragStarted=false;
+  activeContainer=container;activeItem=item;activePointer=e.pointerId;startX=e.clientX;startY=e.clientY;dragStarted=false;try{container.setPointerCapture(e.pointerId);}catch{}
   dragIndex=Number(item.dataset.index);clearTimeout(hold);
  };
  const reorderAt=e=>{
