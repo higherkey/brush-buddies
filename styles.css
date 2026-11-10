@@ -711,14 +711,27 @@ button, select, input:not([type="hidden"]), textarea {
   margin-top: 4px;
   display: flex;
   justify-content: center;
-  gap: 9px;
+  flex-wrap: wrap;
+  gap: 4px 9px;
   align-items: center;
   color: #8b9184;
   font-size: 0.62rem;
 }
 
-.footer span:last-child {
+.footer-sparkle {
   color: var(--accent);
+}
+
+.footer-link {
+  color: #5f6656;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.footer-link:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 2px;
 }
 
 /* Settings Dialog */
