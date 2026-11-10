@@ -250,6 +250,9 @@
     const ctx = getAudioContext();
     if (!ctx) return;
 
+    // Declared outside try so the tempo calculation at the end of the function can use it.
+    const isBreak = phase === "break" || (phase === "paused" && pausedFrom === "break");
+
     try {
       const activeSong = SONGS[settings.song] || SONGS.sparkle;
       const step = musicStep % activeSong.melody.length;
@@ -261,7 +264,6 @@
       // Stage 2 (Front): Transposed +2 semitones + bouncy high arpeggios
       // Stage 3 (Tongue): Transposed +4 semitones + syncopated sparkles
       // Break: Gentle mellow tempo & muted octave
-      const isBreak = phase === "break" || (phase === "paused" && pausedFrom === "break");
       const semitoneShift = isBreak ? -2 : (stageIndex % 4 === 2 ? 2 : stageIndex % 4 === 3 ? 4 : 0);
       const pitchRatio = Math.pow(2, semitoneShift / 12);
 
