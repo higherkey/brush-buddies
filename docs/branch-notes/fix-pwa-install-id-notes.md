@@ -16,3 +16,7 @@
 
 ## 4. Deferred Items (4c)
 - Screenshots in the manifest for the richer install dialog.
+
+## 5. Correction (fix/pwa-install-id-2)
+- #16 merged with only the notes and icon files: the manifest, `index.html` and `sw.js` edits were un-staged by a stash and never committed. The live manifest still had `id: "./"`. This follow-up applies those edits for real (new id, PNG icons in the manifest, `apple-touch-icon`, icon precache, cache `v6`) and bumps the footer and `?v=` to `0.5.2`.
+- Lesson: check `git show --stat` of the commit before opening the PR.
