@@ -4,8 +4,8 @@ const CACHE_NAME = "brush-buddies-shell-v5";
 const APP_SHELL = [
   "./",
   "./index.html",
-  "./styles.css?v=0.4.3",
-  "./app.js?v=0.4.3",
+  "./styles.css?v=0.4.4",
+  "./app.js?v=0.4.4",
   "./manifest.webmanifest",
   "./icon.svg"
 ];

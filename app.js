@@ -675,6 +675,7 @@
 
     const canPause = ["running", "break", "motion-wait"].includes(phase);
     $("pause-button-icon").textContent = canPause ? "Ⅱ" : "▶";
+    $("pause-button-label").textContent = canPause ? "Pause" : "Resume";
     $("timer-ring").setAttribute("aria-label",
       canPause ? "Pause brushing" : ["ready", "done"].includes(phase) ? "Start brushing" : "Resume brushing");
     $("pause-button").setAttribute("aria-label", canPause ? "Pause brushing" : "Resume brushing");
