@@ -1,11 +1,11 @@
 "use strict";
 
-const CACHE_NAME = "brush-buddies-shell-v3";
+const CACHE_NAME = "brush-buddies-shell-v5";
 const APP_SHELL = [
   "./",
   "./index.html",
-  "./styles.css",
-  "./app.js",
+  "./styles.css?v=0.4.2",
+  "./app.js?v=0.4.2",
   "./manifest.webmanifest",
   "./icon.svg"
 ];
@@ -38,7 +38,7 @@ self.addEventListener("fetch", event => {
   if (request.method !== "GET" || url.origin !== self.location.origin) return;
 
   event.respondWith(
-    fetch(request)
+    fetch(request, { cache: "no-cache" })
       .then(response => {
         if (response.ok) {
           const copy = response.clone();
