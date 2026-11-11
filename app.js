@@ -611,6 +611,17 @@
     $("buddy").classList.toggle("is-dancing", on && settings.animations && !settings.reducedMotion);
   }
 
+  /* Touching the buddy makes it bounce and make its sound. */
+  function pokeBuddy() {
+    const buddy = $("buddy");
+    if (settings.animations) {
+      buddy.classList.remove("poked");
+      void buddy.offsetWidth; // restart the animation on rapid taps
+      buddy.classList.add("poked");
+    }
+    animalSound();
+  }
+
   function renderStages() {
     const host = $("zone-track");
     host.innerHTML = "";
@@ -1263,6 +1274,10 @@
   $("pause-button").addEventListener("click", start);
   $("reset-button").addEventListener("click", reset);
   $("music-toggle").addEventListener("click", toggleMusic);
+  $("buddy").addEventListener("pointerdown", pokeBuddy);
+  $("buddy").addEventListener("animationend", e => {
+    if (e.target === e.currentTarget) e.currentTarget.classList.remove("poked");
+  });
   $("motion-toggle").addEventListener("click", () => (motionOn ? stopCamera(true) : startCamera()));
 
   $("settings-dialog").addEventListener("click", e => {

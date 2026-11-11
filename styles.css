@@ -261,6 +261,13 @@ button, select, input:not([type="hidden"]), textarea {
   background: none;
 }
 
+.buddy {
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
 .buddy-emoji {
   font-size: 82px;
   line-height: 1;
@@ -1242,6 +1249,15 @@ button, select, input:not([type="hidden"]), textarea {
   animation: buddyVictory 0.48s cubic-bezier(0.3, 0.8, 0.3, 1) 5;
 }
 
+/* Tap/touch reaction lives on the wrapper so it never fights the idle animation. */
+#app.animations-on #buddy.poked {
+  animation: buddyPoke 0.55s cubic-bezier(0.3, 0.8, 0.3, 1);
+}
+
+#app.animations-on.reduced-motion #buddy.poked {
+  animation: buddyPokeGentle 0.4s ease-out;
+}
+
 #buddy.is-dancing .buddy-emoji {
   animation: brushGroove 0.34s ease-in-out infinite alternate;
 }
@@ -1252,6 +1268,20 @@ button, select, input:not([type="hidden"]), textarea {
 
 .floaty-two {
   animation-delay: 0.5s;
+}
+
+@keyframes buddyPoke {
+  0% { transform: translateY(0) scale(1, 1); }
+  18% { transform: translateY(2px) scale(1.1, 0.88); }
+  42% { transform: translateY(-16px) scale(0.94, 1.1) rotate(-4deg); }
+  62% { transform: translateY(0) scale(1.08, 0.92) rotate(3deg); }
+  80% { transform: translateY(-5px) scale(0.98, 1.03) rotate(-1deg); }
+  100% { transform: translateY(0) scale(1, 1) rotate(0); }
+}
+
+@keyframes buddyPokeGentle {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
 }
 
 @keyframes catIdle {
