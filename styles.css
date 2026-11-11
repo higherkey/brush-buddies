@@ -8,14 +8,27 @@
 
 :root {
   font-family: "Trebuchet MS", ui-rounded, Nunito, system-ui, sans-serif;
-  color: #263b3a;
-  background: #f2efe5;
+  color: var(--ink);
+  background: var(--page);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   box-sizing: border-box;
 
   /* Theme color defaults */
+  color-scheme: light;
   --ink: #263b3a;
+  --page: #f2efe5;
+  --grid: #e7e1d4;
+  --panel: #f7f2e6;
+  --line-strong: #d6d0c3;
+  --toggle-off: #ddd4df;
+  --hl-bg: #fff0bd;
+  --hl-line: #d69a25;
+  --hl-ink: #684b08;
+  --done-bg: #edf4e9;
+  --done-line: #9bbba0;
+  --done-ink: #2f6444;
+  --error: #b3261e;
   --muted: #4f5f59;
   --accent: #e77b55;
   --accent-dark: #a84e32;
@@ -40,10 +53,10 @@ body {
   margin: 0;
   min-height: 100vh;
   padding: 0;
-  background-color: #f2efe5;
+  background-color: var(--page);
   background-image:
-    linear-gradient(90deg, #e7e1d4 1px, transparent 1px),
-    linear-gradient(#e7e1d4 1px, transparent 1px);
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px),
+    linear-gradient(var(--grid) 1px, transparent 1px);
   background-size: 24px 24px;
   color: var(--ink);
   display: block;
@@ -68,7 +81,7 @@ button, select, input:not([type="hidden"]), textarea {
   min-height: 100vh;
   margin: 0 auto;
   padding: 12px 22px 10px;
-  background: #fffdf7;
+  background: var(--surface);
   position: relative;
   overflow: visible;
   display: grid;
@@ -93,7 +106,7 @@ button, select, input:not([type="hidden"]), textarea {
   gap: 12px;
   min-width: 0;
   padding: 0 0 7px;
-  border-bottom: 2px solid #d9d4c7;
+  border-bottom: 2px solid var(--line-strong);
 }
 
 .brand {
@@ -130,7 +143,7 @@ button, select, input:not([type="hidden"]), textarea {
 .quick-button {
   min-height: 44px;
   padding: 5px 8px;
-  border: 1px solid #d9d4c7;
+  border: 1px solid var(--line-strong);
   background: transparent;
   color: var(--ink);
   font-size: 0.75rem;
@@ -153,9 +166,9 @@ button, select, input:not([type="hidden"]), textarea {
 }
 
 #music-toggle.enabled {
-  background: #fff0bd;
-  border-color: #d69a25;
-  color: #684b08;
+  background: var(--hl-bg);
+  border-color: var(--hl-line);
+  color: var(--hl-ink);
 }
 
 .motion-quick {
@@ -179,7 +192,7 @@ button, select, input:not([type="hidden"]), textarea {
   width: 44px;
   height: 44px;
   min-height: 44px;
-  border: 1px solid #d9d4c7;
+  border: 1px solid var(--line-strong);
   background: transparent;
   color: var(--ink);
   font-size: 1.35rem;
@@ -227,8 +240,8 @@ button, select, input:not([type="hidden"]), textarea {
   height: auto;
   margin: 3px 0 0;
   padding: 8px 8px 6px;
-  border-top: 1px solid #ded8c9;
-  border-bottom: 1px solid #ded8c9;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
   background: transparent;
   position: relative;
   text-align: center;
@@ -298,7 +311,7 @@ button, select, input:not([type="hidden"]), textarea {
   margin: 0 auto;
   padding: 6px 9px;
   border-left: 3px solid var(--accent);
-  background: #f7f2e6;
+  background: var(--panel);
   font-size: 0.78rem;
   font-weight: 800;
   color: var(--ink);
@@ -319,8 +332,8 @@ button, select, input:not([type="hidden"]), textarea {
   min-width: 0;
   margin: 4px 0 0;
   padding: 8px 0 5px;
-  border-top: 1px solid #ded8c9;
-  border-bottom: 1px solid #ded8c9;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
   display: block;
   visibility: visible;
 }
@@ -496,7 +509,7 @@ button, select, input:not([type="hidden"]), textarea {
   min-height: 0;
   margin: 5px 0 0;
   padding: 10px 14px 12px;
-  border-left: 1px solid #ded8c9;
+  border-left: 1px solid var(--line);
   background: transparent;
   display: flex;
   flex-direction: column;
@@ -591,9 +604,9 @@ button, select, input:not([type="hidden"]), textarea {
   min-height: 60px;
   min-width: 0;
   padding: 5px 2px;
-  border: 1px solid #dcd6c8;
+  border: 1px solid var(--line-strong);
   background: transparent;
-  color: #4f5f59;
+  color: var(--muted);
   font-size: 0.7rem;
   font-weight: 900;
   display: flex;
@@ -618,9 +631,9 @@ button, select, input:not([type="hidden"]), textarea {
 }
 
 .zone.done {
-  border: 1px solid #9bbba0;
-  background: #edf4e9;
-  color: #2f6444;
+  border: 1px solid var(--done-line);
+  background: var(--done-bg);
+  color: var(--done-ink);
 }
 
 .zone.dragging,
@@ -693,7 +706,7 @@ button, select, input:not([type="hidden"]), textarea {
   width: auto;
   min-width: 64px;
   padding: 8px 12px;
-  border: 1px solid #d9d4c7;
+  border: 1px solid var(--line-strong);
   background: transparent;
   font-size: 1.1rem;
   color: var(--ink);
@@ -714,7 +727,7 @@ button, select, input:not([type="hidden"]), textarea {
   flex-wrap: wrap;
   gap: 4px 9px;
   align-items: center;
-  color: #4f5f59;
+  color: var(--muted);
   font-size: 0.75rem;
 }
 
@@ -723,7 +736,7 @@ button, select, input:not([type="hidden"]), textarea {
 }
 
 .footer-link {
-  color: #4a5a54;
+  color: var(--muted);
   text-decoration: underline;
   text-underline-offset: 2px;
 }
@@ -736,7 +749,7 @@ button, select, input:not([type="hidden"]), textarea {
 
 /* Settings Dialog */
 .settings-dialog {
-  border: 2px solid #cfc8b8;
+  border: 2px solid var(--line-strong);
   padding: 0;
   width: min(94vw, 440px);
   max-height: min(88vh, 800px);
@@ -774,7 +787,7 @@ button, select, input:not([type="hidden"]), textarea {
   width: 44px;
   height: 44px;
   min-height: 44px;
-  border: 1px solid #d9d4c7;
+  border: 1px solid var(--line-strong);
   background: transparent;
   display: grid;
   place-items: center;
@@ -786,15 +799,15 @@ button, select, input:not([type="hidden"]), textarea {
   gap: 0;
   padding: 0;
   margin: 0 0 8px;
-  background: #eee9dd;
-  border: 1px solid #d8d1c2;
+  background: var(--panel);
+  border: 1px solid var(--line-strong);
 }
 
 .settings-tab {
   border: 0;
-  border-right: 1px solid #d8d1c2;
+  border-right: 1px solid var(--line-strong);
   background: transparent;
-  color: #4f5f59;
+  color: var(--muted);
   padding: 8px 3px;
   min-height: 44px;
   font-size: 0.75rem;
@@ -806,7 +819,7 @@ button, select, input:not([type="hidden"]), textarea {
 }
 
 .settings-tab.active {
-  background: #fffaf0;
+  background: var(--surface);
   color: var(--accent-text);
   box-shadow: inset 0 -3px 0 var(--accent);
 }
@@ -823,7 +836,7 @@ button, select, input:not([type="hidden"]), textarea {
 
 .setting-group {
   padding: 7px 0;
-  border-top: 1px solid #ded8c9;
+  border-top: 1px solid var(--line);
 }
 
 .setting-label {
@@ -837,8 +850,8 @@ button, select, input:not([type="hidden"]), textarea {
   width: 100%;
   min-height: 44px;
   padding: 6px;
-  border: 1px solid #d6d0c3;
-  background: #fffdf7;
+  border: 1px solid var(--line-strong);
+  background: var(--surface);
   color: var(--ink);
   font-weight: 800;
   outline-color: var(--accent);
@@ -887,7 +900,7 @@ button, select, input:not([type="hidden"]), textarea {
   flex: 0 0 48px;
   width: 48px;
   height: 28px;
-  background: #ddd4df;
+  background: var(--toggle-off);
   position: relative;
   transition: background 0.2s;
 }
@@ -933,7 +946,7 @@ button, select, input:not([type="hidden"]), textarea {
   position: relative;
   padding: 7px 0;
   margin: 0;
-  border-top: 1px solid #ded8c9;
+  border-top: 1px solid var(--line);
   background: transparent;
   touch-action: pan-y;
 }
@@ -955,8 +968,8 @@ button, select, input:not([type="hidden"]), textarea {
   font-size: 1.55rem;
   font-weight: 900;
   color: var(--accent-text);
-  background: #fff0e7;
-  border: 1px solid #d9d4c7;
+  background: var(--accent-soft);
+  border: 1px solid var(--line-strong);
   cursor: grab;
   touch-action: none;
   user-select: none;
@@ -994,8 +1007,8 @@ button, select, input:not([type="hidden"]), textarea {
   min-width: 0;
   min-height: 44px;
   padding: 6px;
-  border: 1px solid #d6d0c3;
-  background: #fffdf7;
+  border: 1px solid var(--line-strong);
+  background: var(--surface);
   font: inherit;
   color: var(--ink);
 }
@@ -1010,7 +1023,7 @@ button, select, input:not([type="hidden"]), textarea {
 }
 
 .error-text {
-  color: #b3261e;
+  color: var(--error);
   font-weight: 800;
 }
 
@@ -1033,7 +1046,7 @@ button, select, input:not([type="hidden"]), textarea {
   width: 100%;
   min-height: 44px;
   margin-top: 8px;
-  border: 1px solid #d9d4c7;
+  border: 1px solid var(--line-strong);
   background: var(--accent-soft);
   color: var(--accent-text);
   font-size: 0.8rem;
@@ -1047,7 +1060,7 @@ button, select, input:not([type="hidden"]), textarea {
   gap: 10px;
   margin-top: 8px;
   padding-top: 8px;
-  border-top: 1px solid #ded8c9;
+  border-top: 1px solid var(--line);
 }
 
 .save-button {
@@ -1055,7 +1068,7 @@ button, select, input:not([type="hidden"]), textarea {
   padding: 10px 20px;
   font-size: 0.85rem;
   font-weight: 900;
-  background: var(--accent);
+  background: var(--accent-strong);
   color: #ffffff;
   border: 0;
 }
@@ -1073,7 +1086,7 @@ button, select, input:not([type="hidden"]), textarea {
 }
 
 /* Buddy Color Themes */
-#app {
+:root, #app {
   --accent-text: color-mix(in srgb, var(--accent-dark) 60%, var(--ink));
   --accent-strong: color-mix(in srgb, var(--accent-dark) 70%, var(--ink));
 }
@@ -1453,7 +1466,7 @@ button, select, input:not([type="hidden"]), textarea {
 
   .timer-card {
     border-left: 0;
-    border-top: 1px solid #ded8c9;
+    border-top: 1px solid var(--line);
     margin: 3px 0 0;
     padding: 6px 4px 8px;
   }
@@ -1532,4 +1545,35 @@ button, select, input:not([type="hidden"]), textarea {
   .settings-shell {
     padding: 10px;
   }
+}
+
+/* Dark appearance: bright, high-contrast surfaces (set by data-scheme on <html>). */
+html[data-scheme="dark"] {
+  color-scheme: dark;
+  --ink: #f4f8f5;
+  --muted: #c9d6d0;
+  --page: #172625;
+  --grid: #1e3130;
+  --surface: #213533;
+  --panel: #2d4644;
+  --line: #456461;
+  --line-strong: #5d7d79;
+  --toggle-off: #566f6c;
+  --hl-bg: #4f4421;
+  --hl-line: #e6b94d;
+  --hl-ink: #ffeab0;
+  --done-bg: #254a37;
+  --done-line: #56946f;
+  --done-ink: #c4f2d6;
+  --error: #ffb4ab;
+}
+
+html[data-scheme="dark"],
+html[data-scheme="dark"] #app {
+  --accent-soft: color-mix(in srgb, var(--accent) 22%, var(--surface));
+  --buddy-bg: color-mix(in srgb, var(--accent) 24%, var(--surface));
+  --buddy-glow: color-mix(in srgb, var(--accent) 36%, var(--surface));
+  --ring: color-mix(in srgb, var(--accent) 22%, var(--surface));
+  --accent-text: color-mix(in srgb, var(--accent) 55%, #ffffff);
+  --accent-strong: color-mix(in srgb, var(--accent-dark) 72%, #000000);
 }
