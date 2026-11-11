@@ -14,3 +14,6 @@
 
 ## 4. Deferred Items (4c)
 - Pre-paint inline script to avoid a light flash in dark mode.
+
+## 5. Clock as play/pause (follow-up)
+- The timer ring is now a play/pause control (`role="button"`, tap, Enter, Space) that calls the same `start()` as the buttons, so it covers start, pause, resume and restart-after-done, including camera mode. The `aria-label` follows the state. Verified in Chrome: tap and keyboard toggle, time freezes while paused. Footer and `?v=` bumped to `0.4.3`.

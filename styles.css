@@ -530,6 +530,20 @@ button, select, input:not([type="hidden"]), textarea {
   position: relative;
   display: grid;
   place-items: center;
+  border-radius: 50%;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+.timer-ring:active {
+  transform: scale(0.98);
+}
+
+.timer-ring:focus-visible {
+  outline: 3px solid var(--accent-text);
+  outline-offset: 4px;
 }
 
 .timer-ring svg {

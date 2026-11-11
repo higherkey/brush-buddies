@@ -675,6 +675,8 @@
 
     const canPause = ["running", "break", "motion-wait"].includes(phase);
     $("pause-button-icon").textContent = canPause ? "Ⅱ" : "▶";
+    $("timer-ring").setAttribute("aria-label",
+      canPause ? "Pause brushing" : ["ready", "done"].includes(phase) ? "Start brushing" : "Resume brushing");
     $("pause-button").setAttribute("aria-label", canPause ? "Pause brushing" : "Resume brushing");
 
     $("motion-toggle").classList.toggle("enabled", motionOn);
@@ -1272,6 +1274,14 @@
 
   $("start-button").addEventListener("click", start);
   $("pause-button").addEventListener("click", start);
+  /* The clock itself is a play/pause control, same as the buttons. */
+  $("timer-ring").addEventListener("click", start);
+  $("timer-ring").addEventListener("keydown", e => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      start();
+    }
+  });
   $("reset-button").addEventListener("click", reset);
   $("music-toggle").addEventListener("click", toggleMusic);
   $("buddy").addEventListener("pointerdown", pokeBuddy);
