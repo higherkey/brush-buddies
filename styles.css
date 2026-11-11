@@ -1004,6 +1004,16 @@ button, select, input:not([type="hidden"]), textarea {
   margin-top: 6px;
 }
 
+.melody-input {
+  resize: vertical;
+  font-family: ui-monospace, Consolas, monospace;
+}
+
+.error-text {
+  color: #b3261e;
+  font-weight: 800;
+}
+
 .tip-field textarea {
   resize: vertical;
   font-weight: 600;
