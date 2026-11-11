@@ -657,6 +657,12 @@ button, select, input:not([type="hidden"]), textarea {
   color: var(--done-ink);
 }
 
+.zone,
+.stage-drag-handle {
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
 .zone.dragging,
 .stage-edit-card.dragging {
   opacity: 0.55;
