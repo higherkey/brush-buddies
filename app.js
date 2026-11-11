@@ -205,6 +205,7 @@
   let clock = null;
   let audio = null;
   let sessionElapsed = 0;
+  const stageProgress = {}; // seconds left per stage id, so switching stages never loses progress
   let musicTimer = null;
   let musicStep = 0;
 
@@ -259,8 +260,33 @@
     return settings.stages.reduce((n, s) => n + s.seconds, 0);
   }
 
+  /* Seconds left in stage i: its saved progress, or its full time if untouched. */
+  function leftOf(i) {
+    const s = settings.stages[i];
+    const saved = stageProgress[s.id];
+    return saved === undefined ? s.seconds : Math.min(saved, s.seconds);
+  }
+
+  function saveStageLeft() {
+    const s = settings.stages[stageIndex];
+    if (!s) return;
+    // A finished stage that was revisited but not brushed stays finished.
+    if (stageProgress[s.id] === 0 && stageLeft === s.seconds) return;
+    stageProgress[s.id] = stageLeft;
+  }
+
+  /* Next stage, in order and wrapping around, that still has time left (-1 if none). */
+  function nextPending() {
+    const n = settings.stages.length;
+    for (let k = 1; k < n; k++) {
+      const i = (stageIndex + k) % n;
+      if (leftOf(i) > 0) return i;
+    }
+    return -1;
+  }
+
   function remaining() {
-    return settings.stages.slice(stageIndex).reduce((n, s, i) => n + (i === 0 ? stageLeft : s.seconds), 0);
+    return settings.stages.reduce((n, s, i) => n + (i === stageIndex ? stageLeft : leftOf(i)), 0);
   }
 
   function fmt(n) {
@@ -667,7 +693,7 @@
 
     document.querySelectorAll(".zone").forEach((b, i) => {
       b.classList.toggle("active", i === stageIndex && phase !== "done");
-      b.classList.toggle("done", i < stageIndex || phase === "done");
+      b.classList.toggle("done", phase === "done" || (i !== stageIndex && stageProgress[settings.stages[i].id] === 0));
     });
 
     $("start-button").hidden = !["ready", "done"].includes(phase);
@@ -696,6 +722,7 @@
   function reset() {
     stopClock();
     sessionElapsed = 0;
+    Object.keys(stageProgress).forEach(k => delete stageProgress[k]);
     stageIndex = 0;
     stageLeft = settings.stages[0].seconds;
     breakLeft = 0;
@@ -727,7 +754,7 @@
   }
 
   function advance() {
-    if (stageIndex >= settings.stages.length - 1) {
+    if (nextPending() < 0) {
       finish();
       return;
     }
@@ -742,8 +769,13 @@
   }
 
   function nextStage() {
-    stageIndex++;
-    stageLeft = settings.stages[stageIndex].seconds;
+    const next = nextPending();
+    if (next < 0) {
+      finish();
+      return;
+    }
+    stageIndex = next;
+    stageLeft = leftOf(next);
     phase = "running";
     speakStage();
     render();
@@ -755,8 +787,9 @@
     }
     if (phase === "running") {
       stageLeft--;
-      if (stageLeft <= 0) {
-        stageLeft = 0;
+      if (stageLeft <= 0) stageLeft = 0;
+      saveStageLeft();
+      if (stageLeft === 0) {
         advance();
       } else {
         render();
@@ -815,15 +848,17 @@
     if (i < 0 || i >= settings.stages.length) return;
     const was = phase === "running";
     stopClock();
+    saveStageLeft();
     stageIndex = i;
-    stageLeft = settings.stages[i].seconds;
+    stageLeft = leftOf(i) > 0 ? leftOf(i) : settings.stages[i].seconds;
     breakLeft = 0;
     phase = motionOn ? "motion-wait" : was ? "running" : "ready";
     if (was && !motionOn) {
       speakStage();
       clock = setInterval(tick, 1000);
     } else {
-      say("Jumped to " + settings.stages[i].name + ".");
+      const partial = stageLeft < settings.stages[i].seconds;
+      say("Jumped to " + settings.stages[i].name + (partial ? ". " + fmt(stageLeft) + " left to go." : "."));
     }
     render();
   }
@@ -876,6 +911,7 @@
       });
       sec.addEventListener("change", e => {
         s.seconds = Math.max(5, Math.min(180, Number(e.target.value) || 30));
+        delete stageProgress[s.id];
         e.target.value = s.seconds;
         persistStagePlan();
       });
