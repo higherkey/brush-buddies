@@ -62,12 +62,97 @@
         587, 740, 880, 740, 587, 880, 1047, 880,
         784, 698, 659, 587, 659, 784, 880, 1047
       ]
+    },
+    moonlight: {
+      name: "Moonlight Mellow",
+      tempo: 210,
+      bassRoot: [110, 87, 131, 98], // A2, F2, C3, G2
+      melody: [
+        659, 0, 784, 659, 523, 0, 659, 523,
+        698, 0, 880, 698, 587, 0, 698, 587,
+        784, 0, 988, 784, 659, 0, 784, 659,
+        587, 659, 698, 659, 587, 523, 494, 523
+      ]
+    },
+    robot: {
+      name: "Robo Groove",
+      tempo: 145,
+      bassRoot: [82, 82, 98, 110], // E2, E2, G2, A2
+      melody: [
+        330, 330, 659, 330, 494, 330, 659, 494,
+        330, 330, 659, 330, 587, 330, 659, 587,
+        392, 392, 784, 392, 587, 392, 784, 587,
+        440, 440, 880, 440, 659, 494, 440, 330
+      ]
     }
   };
+
+  /* Custom melody: note names like "C5 E5 G5 - E5" (`-` is a rest). A4 = 440 Hz. */
+  const CUSTOM_TEMPOS = { slow: 220, normal: 175, fast: 140 };
+  const SEMITONES = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
+
+  function parseMelody(text) {
+    const tokens = String(text || "").trim().split(/[\s,]+/).filter(Boolean);
+    if (tokens.length < 4) return { error: "Add at least 4 notes, like C5 E5 G5 E5." };
+    if (tokens.length > 64) return { error: "Use 64 notes or fewer." };
+    const melody = [];
+    for (const t of tokens) {
+      if (t === "-" || t === "_") {
+        melody.push(0);
+        continue;
+      }
+      const m = /^([A-Ga-g])([#b]?)([1-7])$/.exec(t);
+      if (!m) return { error: "'" + t.slice(0, 8) + "' isn't a note. Try C5, F#4, Bb3 or - for a rest." };
+      const midi = 12 * (Number(m[3]) + 1) + SEMITONES[m[1].toUpperCase()] + (m[2] === "#" ? 1 : m[2] === "b" ? -1 : 0);
+      melody.push(Math.round(440 * Math.pow(2, (midi - 69) / 12) * 100) / 100);
+    }
+    if (!melody.some(Boolean)) return { error: "Add at least one note, not only rests." };
+    return { melody };
+  }
+
+  function customSong() {
+    const parsed = parseMelody(settings.customMelody);
+    if (parsed.error) return null;
+    const roots = [];
+    for (let i = 0; i < parsed.melody.length; i += 8) {
+      const f = parsed.melody.slice(i, i + 8).find(Boolean);
+      if (f) roots.push(Math.max(40, f / 4));
+    }
+    return {
+      name: "My Melody",
+      tempo: CUSTOM_TEMPOS[settings.customTempo] || CUSTOM_TEMPOS.normal,
+      bassRoot: roots.length ? roots : [131],
+      melody: parsed.melody
+    };
+  }
+
+  function getSong(key) {
+    if (key === "custom") return customSong() || SONGS.sparkle;
+    return SONGS[key] || SONGS.sparkle;
+  }
+
+  /* A stage may override the default music: "" = default, "silent" = none, or a song key. */
+  function stageSongKey() {
+    const o = settings.stages[stageIndex]?.sound || "";
+    return o && o !== "silent" ? o : settings.song;
+  }
+
+  function stageIsSilent() {
+    return settings.stages[stageIndex]?.sound === "silent";
+  }
+
+  function songOptions() {
+    const list = [["", "Use default music"], ["silent", "🔇 No music this stage"]];
+    Object.keys(SONGS).forEach(k => list.push([k, SONGS[k].name]));
+    list.push(["custom", "🎹 My Melody"]);
+    return list;
+  }
 
   const DEFAULTS = {
     theme: "random",
     song: "sparkle",
+    customMelody: "C5 E5 G5 E5 C5 E5 G5 C6",
+    customTempo: "normal",
     breakSeconds: 3,
     animalSounds: true,
     uiSounds: true,
@@ -91,7 +176,8 @@
       name: String(s.name || "Stage " + (i + 1)),
       icon: String(s.icon || "✨"),
       tip: String(s.tip || "Keep going!"),
-      seconds: Math.max(5, Math.min(180, Number(s.seconds) || 30))
+      seconds: Math.max(5, Math.min(180, Number(s.seconds) || 30)),
+      sound: String(s.sound || "")
     }));
   }
 
@@ -246,7 +332,7 @@
 
   /* Dynamic Chiptune Engine with Stage Awareness */
   function shouldPlayMusic() {
-    return settings.musicOn && (phase === "running" || phase === "break");
+    return settings.musicOn && !stageIsSilent() && (phase === "running" || phase === "break");
   }
 
   function stopMusic() {
@@ -278,7 +364,7 @@
     const isBreak = phase === "break" || (phase === "paused" && pausedFrom === "break");
 
     try {
-      const activeSong = SONGS[settings.song] || SONGS.sparkle;
+      const activeSong = getSong(stageSongKey());
       const step = musicStep % activeSong.melody.length;
       const now = ctx.currentTime;
 
@@ -292,6 +378,7 @@
       const pitchRatio = Math.pow(2, semitoneShift / 12);
 
       const baseMelody = activeSong.melody[step];
+      const rest = !baseMelody;
       const melodyFreq = isBreak ? baseMelody * 0.5 : baseMelody * pitchRatio;
       const bassRoots = activeSong.bassRoot;
       const bassFreq = bassRoots[Math.floor(step / 8) % bassRoots.length] * (isBreak ? 0.75 : 1);
@@ -314,10 +401,10 @@
 
       // Main melody line
       const vol = isBreak ? 0.018 : 0.026;
-      note(melodyFreq, 0.145, isBreak ? "sine" : "square", vol);
+      if (!rest) note(melodyFreq, 0.145, isBreak ? "sine" : "square", vol);
 
       // Harmony note every other beat (stage variations add octave or thirds)
-      if (step % 2 === 0 && !isBreak) {
+      if (step % 2 === 0 && !isBreak && !rest) {
         const harmonyMult = stageIndex % 2 === 1 ? 1.25 : 2; // Major third or octave
         note(melodyFreq * harmonyMult, 0.075, "triangle", 0.012, 0.018);
       }
@@ -335,7 +422,8 @@
     } catch {}
 
     musicStep++;
-    const currentTempo = isBreak ? (SONGS[settings.song]?.tempo || 175) + 50 : (SONGS[settings.song]?.tempo || 175);
+    const baseTempo = getSong(stageSongKey()).tempo || 175;
+    const currentTempo = isBreak ? baseTempo + 50 : baseTempo;
     musicTimer = setTimeout(musicTick, currentTempo);
   }
 
@@ -708,13 +796,17 @@
       card.innerHTML =
         '<div class="stage-edit-heading"><span class="stage-drag-handle" role="button" tabindex="0" aria-label="Drag to reorder stage">⠿</span><span class="stage-edit-number"></span><button class="text-button remove-stage" type="button">Remove</button></div>' +
         '<div class="stage-fields"><label>Picture<input class="stage-icon-input" maxlength="4"></label><label>Stage name<input class="stage-name-input" maxlength="28"></label><label>Seconds<input class="stage-seconds-input" type="number" min="5" max="180" step="5"></label></div>' +
-        '<label class="tip-field">Reminder<textarea class="stage-tip-input" rows="2" maxlength="140"></textarea></label>';
+        '<label class="tip-field">Reminder<textarea class="stage-tip-input" rows="2" maxlength="140"></textarea></label>' +
+        '<label class="tip-field">Music for this stage<select class="select-control stage-sound-input"></select></label>';
       card.querySelector(".stage-edit-number").textContent = "Stage " + (i + 1);
 
       const icon = card.querySelector(".stage-icon-input");
       const name = card.querySelector(".stage-name-input");
       const sec = card.querySelector(".stage-seconds-input");
       const tip = card.querySelector(".stage-tip-input");
+      const sound = card.querySelector(".stage-sound-input");
+      songOptions().forEach(([value, label]) => sound.appendChild(new Option(label, value)));
+      sound.value = songOptions().some(o => o[0] === s.sound) ? s.sound : "";
 
       icon.value = s.icon;
       name.value = s.name;
@@ -738,6 +830,10 @@
         s.tip = e.target.value;
         persistStagePlan();
       });
+      sound.addEventListener("change", e => {
+        s.sound = e.target.value;
+        persistStagePlan();
+      });
       card.querySelector(".remove-stage").addEventListener("click", () => {
         if (settings.stages.length < 2) return;
         settings.stages.splice(i, 1);
@@ -752,6 +848,9 @@
   function populate() {
     $("theme-select").value = settings.theme;
     $("song-select").value = settings.song || "sparkle";
+    $("custom-melody").value = settings.customMelody;
+    $("custom-tempo").value = settings.customTempo;
+    checkCustomMelody();
     $("break-select").value = String(settings.breakSeconds);
     $("animal-sounds").checked = settings.animalSounds;
     $("ui-sounds").checked = settings.uiSounds;
@@ -762,10 +861,20 @@
     renderEditor();
   }
 
+  function checkCustomMelody() {
+    const r = parseMelody($("custom-melody").value);
+    const help = $("custom-melody-help");
+    help.textContent = r.error || "Looks good! " + r.melody.length + " steps. Pick My Melody as your music or for a stage.";
+    help.classList.toggle("error-text", Boolean(r.error));
+    return !r.error;
+  }
+
   function saveUI() {
     const old = settings.theme;
     settings.theme = $("theme-select").value;
     settings.song = $("song-select").value;
+    if (checkCustomMelody()) settings.customMelody = $("custom-melody").value.trim();
+    settings.customTempo = $("custom-tempo").value;
     settings.breakSeconds = Number($("break-select").value);
     settings.animalSounds = $("animal-sounds").checked;
     settings.uiSounds = $("ui-sounds").checked;
@@ -1067,13 +1176,25 @@
     reset();
   });
 
+  $("custom-melody").addEventListener("input", () => {
+    if (checkCustomMelody()) {
+      settings.customMelody = $("custom-melody").value.trim();
+      save();
+    }
+  });
+  $("custom-tempo").addEventListener("change", () => {
+    settings.customTempo = $("custom-tempo").value;
+    save();
+  });
+
   $("add-stage").addEventListener("click", () => {
     settings.stages.push({
       id: "new-" + Date.now(),
       name: "New stage",
       icon: "✨",
       tip: "You're doing great! Keep going!",
-      seconds: 30
+      seconds: 30,
+      sound: ""
     });
     persistStagePlan();
     renderEditor();
