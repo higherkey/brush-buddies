@@ -331,6 +331,22 @@
   }
 
   /* Dynamic Chiptune Engine with Stage Awareness */
+  const MUSIC_CEILING = 880;
+  let musicBus = null;
+
+  /* One shared low-pass filter keeps the square-wave highs from getting piercing. */
+  function getMusicBus(ctx) {
+    if (!musicBus || musicBus.context !== ctx) {
+      const filter = ctx.createBiquadFilter();
+      filter.type = "lowpass";
+      filter.frequency.value = 2000;
+      filter.Q.value = 0.4;
+      filter.connect(ctx.destination);
+      musicBus = filter;
+    }
+    return musicBus;
+  }
+
   function shouldPlayMusic() {
     return settings.musicOn && !stageIsSilent() && (phase === "running" || phase === "break");
   }
@@ -368,21 +384,29 @@
       const step = musicStep % activeSong.melody.length;
       const now = ctx.currentTime;
 
-      // Stage-based variations:
-      // Stage 0 (Top): Pure natural melody
-      // Stage 1 (Bottom): Lower octave accent + rich bass drive
-      // Stage 2 (Front): Transposed +2 semitones + bouncy high arpeggios
-      // Stage 3 (Tongue): Transposed +4 semitones + syncopated sparkles
-      // Break: Gentle mellow tempo & muted octave
-      const semitoneShift = isBreak ? -2 : (stageIndex % 4 === 2 ? 2 : stageIndex % 4 === 3 ? 4 : 0);
-      const pitchRatio = Math.pow(2, semitoneShift / 12);
+      // Everything (melody, bass, harmony, percussion) shares one key shift so the
+      // parts stay in tune with each other. Stages move the key up a little; breaks drop it.
+      const semitoneShift = isBreak ? -2 : [0, 0, 2, 4][stageIndex % 4];
+      const keyRatio = Math.pow(2, semitoneShift / 12);
+
+      // Loop number and variation: the arrangement changes each pass so it never gets stale.
+      const loop = Math.floor(musicStep / activeSong.melody.length);
+      const variation = loop % 4;
 
       const baseMelody = activeSong.melody[step];
       const rest = !baseMelody;
-      const melodyFreq = isBreak ? baseMelody * 0.5 : baseMelody * pitchRatio;
+      // Fold high notes down an octave so the lead never gets piercing.
+      const fold = f => {
+        let x = f;
+        while (x > MUSIC_CEILING) x /= 2;
+        return x;
+      };
+      const melodyFreq = fold(baseMelody * keyRatio * (isBreak ? 0.5 : 1));
       const bassRoots = activeSong.bassRoot;
-      const bassFreq = bassRoots[Math.floor(step / 8) % bassRoots.length] * (isBreak ? 0.75 : 1);
+      const bassBase = bassRoots[Math.floor(step / 8) % bassRoots.length] * keyRatio;
+      const bassFreq = variation % 2 === 1 ? bassBase * 2 : bassBase;
 
+      const bus = getMusicBus(ctx);
       const note = (freq, duration, wave, volume, delay = 0) => {
         const o = ctx.createOscillator();
         const g = ctx.createGain();
@@ -390,34 +414,38 @@
         o.type = wave;
         o.frequency.setValueAtTime(freq, at);
         g.gain.setValueAtTime(0.0001, at);
-        g.gain.exponentialRampToValueAtTime(volume, at + 0.008);
+        g.gain.exponentialRampToValueAtTime(volume, at + 0.012);
         g.gain.setValueAtTime(volume * 0.72, at + duration * 0.55);
         g.gain.exponentialRampToValueAtTime(0.0001, at + duration);
         o.connect(g);
-        g.connect(ctx.destination);
+        g.connect(bus);
         o.start(at);
         o.stop(at + duration + 0.01);
       };
 
-      // Main melody line
-      const vol = isBreak ? 0.018 : 0.026;
-      if (!rest) note(melodyFreq, 0.145, isBreak ? "sine" : "square", vol);
+      // Lead voice: softer timbres on alternate passes.
+      const leadWave = isBreak ? "sine" : variation === 1 ? "triangle" : "square";
+      const leadVol = isBreak ? 0.016 : variation === 1 ? 0.034 : variation === 3 ? 0.02 : 0.022;
+      if (!rest) note(melodyFreq, 0.145, leadWave, leadVol);
 
-      // Harmony note every other beat (stage variations add octave or thirds)
-      if (step % 2 === 0 && !isBreak && !rest) {
-        const harmonyMult = stageIndex % 2 === 1 ? 1.25 : 2; // Major third or octave
-        note(melodyFreq * harmonyMult, 0.075, "triangle", 0.012, 0.018);
+      // Variation 3 doubles the lead with a warm triangle an octave below.
+      if (variation === 3 && !rest && !isBreak) note(melodyFreq / 2, 0.145, "triangle", 0.02);
+
+      // Harmony on even beats: a fifth or an octave, both consonant with any note.
+      if (step % 2 === 0 && !isBreak && !rest && variation !== 2) {
+        const harmonyMult = loop % 2 === 0 ? 2 : 1.5;
+        note(fold(melodyFreq * harmonyMult), 0.075, "triangle", 0.011, 0.018);
       }
 
-      // Bass beat on chord changes
-      if (step % 4 === 0) {
-        note(bassFreq, isBreak ? 0.35 : 0.25, "triangle", isBreak ? 0.025 : 0.035);
+      // Bass on chord changes, busier on variation 2.
+      const bassEvery = variation === 2 ? 2 : 4;
+      if (step % bassEvery === 0) {
+        note(bassFreq, isBreak ? 0.35 : 0.25, "triangle", isBreak ? 0.024 : 0.032);
       }
 
-      // Snappy high percussion sparkle on backbeats
-      if (step % 8 === 4 && !isBreak) {
-        const percPitch = stageIndex % 4 === 2 ? 2340 : 1960;
-        note(percPitch, 0.045, "square", 0.009, 0.025);
+      // Soft, low percussion tick on backbeats (skipped on variations 1 and 2 for breathing room).
+      if (step % 8 === 4 && !isBreak && (variation === 0 || variation === 3)) {
+        note(bassBase * 4, 0.05, "triangle", 0.012, 0.025);
       }
     } catch {}
 
