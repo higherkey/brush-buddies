@@ -233,13 +233,6 @@ button, select, input:not([type="hidden"]), textarea {
   margin: 0;
 }
 
-/* Twemoji Mozilla draws the buddy without the thick black outline some system emoji fonts add. */
-@font-face {
-  font-family: "Buddy Emoji";
-  src: url("fonts/twemoji-mozilla.ttf") format("truetype");
-  font-display: swap;
-}
-
 /* Buddy Presentation Area */
 .buddy-area {
   grid-area: buddy;
@@ -266,11 +259,6 @@ button, select, input:not([type="hidden"]), textarea {
   place-items: center;
   position: relative;
   background: none;
-}
-
-.buddy-emoji,
-#quick-buddy-emoji {
-  font-family: "Buddy Emoji", "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif;
 }
 
 .buddy-emoji {
