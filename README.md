@@ -51,3 +51,7 @@ Brush Buddies is a Progressive Web App. On a supported browser, use the browser'
 A service worker precaches the app shell so the timer can load offline after the first successful visit. App navigation is network-first when online and falls back to the cached page when offline. The worker only handles same-origin GET requests; it does not intercept camera streams or external requests. Camera motion detection continues to process frames locally and still requires camera permission.
 
 The web app manifest and SVG icon provide the app name, launch location, colors, and install icon. Service worker registration requires HTTPS (GitHub Pages provides this) or localhost.
+
+## Credits
+
+Buddy emoji are drawn with the [Twemoji Mozilla](https://github.com/mozilla/twemoji-colr) font (Apache 2.0), which contains [Twemoji](https://github.com/jdecked/twemoji) artwork by Twitter, Inc. and other contributors, licensed under [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/).

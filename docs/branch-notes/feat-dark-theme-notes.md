@@ -18,3 +18,9 @@ Stacked on `fix/text-visibility` (#9). Retarget to `main` after #9 merges.
 
 ## 4. Deferred Items (4c)
 - Pre-paint inline script to avoid a light flash on load in dark mode.
+
+## 5. Buddy outline (follow-up)
+- The thick black border around the buddy is part of the system emoji font (Segoe UI Emoji style), not CSS, so no border or filter rule could thin it.
+- Bundled Twemoji Mozilla (`fonts/twemoji-mozilla.ttf`, 1.4 MB, loaded with `font-display: swap`) and applied it to the buddy and the Buddy quick button only. Falls back to the system emoji if it fails to load. Added README credits (Apache 2.0 font, CC-BY 4.0 artwork).
+- Cached the font in the service worker (cache `v4`). Verified all 14 buddies render from the font with no outline. Footer `v0.4.1`.
+- Deferred: subset the font to the 14 buddies to cut about 1.4 MB.

@@ -1,13 +1,14 @@
 "use strict";
 
-const CACHE_NAME = "brush-buddies-shell-v3";
+const CACHE_NAME = "brush-buddies-shell-v4";
 const APP_SHELL = [
   "./",
   "./index.html",
   "./styles.css",
   "./app.js",
   "./manifest.webmanifest",
-  "./icon.svg"
+  "./icon.svg",
+  "./fonts/twemoji-mozilla.ttf"
 ];
 
 self.addEventListener("install", event => {
