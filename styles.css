@@ -693,7 +693,9 @@ button, select, input:not([type="hidden"]), textarea {
   font-weight: 900;
 }
 
-.timer-controls .start-button {
+/* Start and pause share one size so the controls never jump when the state changes. */
+.timer-controls .start-button,
+.timer-controls .pause-button {
   flex: 1;
   max-width: 280px;
   font-size: 1rem;
@@ -707,20 +709,9 @@ button, select, input:not([type="hidden"]), textarea {
   gap: 6px;
 }
 
-.timer-controls .start-button:active {
+.timer-controls .start-button:active,
+.timer-controls .pause-button:active {
   transform: translateY(1px);
-}
-
-.timer-controls .pause-button {
-  flex: 0 0 64px;
-  width: 64px;
-  min-width: 64px;
-  font-size: 1.65rem;
-  padding: 8px;
-  display: grid;
-  place-items: center;
-  background: var(--accent-strong);
-  color: #ffffff;
 }
 
 .timer-controls .secondary-button {
@@ -1541,15 +1532,9 @@ button, select, input:not([type="hidden"]), textarea {
     min-height: 60px;
   }
 
-  .timer-controls .start-button {
-    font-size: 0.94rem;
-  }
-
+  .timer-controls .start-button,
   .timer-controls .pause-button {
-    flex-basis: 68px;
-    width: 68px;
-    min-width: 68px;
-    font-size: 1.8rem;
+    font-size: 0.94rem;
   }
 
   .footer {
