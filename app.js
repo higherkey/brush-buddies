@@ -71,7 +71,7 @@
     breakSeconds: 3,
     animalSounds: true,
     uiSounds: true,
-    musicEnabled: false,
+    musicOn: true,
     animations: true,
     reducedMotion: false,
     motionSensitivity: "medium",
@@ -239,14 +239,38 @@
   function renderMusicButton() {
     const b = $("music-toggle");
     if (!b) return;
-    b.setAttribute("aria-pressed", String(settings.musicEnabled));
-    b.textContent = settings.musicEnabled ? "♫ Music on" : "♫ Music off";
-    b.classList.toggle("enabled", settings.musicEnabled);
+    b.setAttribute("aria-pressed", String(settings.musicOn));
+    b.textContent = settings.musicOn ? "♫ Music on" : "♫ Music off";
+    b.classList.toggle("enabled", settings.musicOn);
   }
 
   /* Dynamic Chiptune Engine with Stage Awareness */
+  function shouldPlayMusic() {
+    return settings.musicOn && (phase === "running" || phase === "break");
+  }
+
+  function stopMusic() {
+    if (musicTimer !== null) clearTimeout(musicTimer);
+    musicTimer = null;
+  }
+
+  /* Music follows the timer: plays while brushing or on a break, silent otherwise. */
+  function syncMusic() {
+    if (shouldPlayMusic()) {
+      if (musicTimer === null) {
+        musicStep = 0;
+        musicTick();
+      }
+    } else {
+      stopMusic();
+    }
+  }
+
   function musicTick() {
-    if (!settings.musicEnabled) return;
+    if (!shouldPlayMusic()) {
+      musicTimer = null;
+      return;
+    }
     const ctx = getAudioContext();
     if (!ctx) return;
 
@@ -316,18 +340,11 @@
   }
 
   function toggleMusic() {
-    settings.musicEnabled = !settings.musicEnabled;
+    settings.musicOn = !settings.musicOn;
     save();
     renderMusicButton();
-    if (settings.musicEnabled) {
-      musicStep = 0;
-      musicTick();
-      say("♪ Let's brush to a happy little tune!");
-    } else {
-      if (musicTimer !== null) clearTimeout(musicTimer);
-      musicTimer = null;
-      say("Music off. Nice and quiet!");
-    }
+    syncMusic();
+    say(settings.musicOn ? "♪ Music will play while you brush!" : "Music off. Nice and quiet!");
   }
 
   function animalSound() {
@@ -527,6 +544,7 @@
     $("motion-toggle-label").textContent = motionOn ? "Camera on" : "Camera off";
     $("camera-view").hidden = !motionOn;
     $("camera-view").dataset.region = settings.motionRegion;
+    syncMusic();
   }
 
   function stopClock() {
@@ -1082,13 +1100,6 @@
   });
 
   document.addEventListener("visibilitychange", () => {
-    if (document.hidden && settings.musicEnabled) {
-      settings.musicEnabled = false;
-      if (musicTimer !== null) clearTimeout(musicTimer);
-      musicTimer = null;
-      save();
-      renderMusicButton();
-    }
     if (document.hidden && ["running", "break"].includes(phase)) {
       pausedFrom = phase;
       stopClock();
@@ -1116,7 +1127,6 @@
   stageLeft = settings.stages[0].seconds;
   populate();
   render();
-  settings.musicEnabled = false;
   renderMusicButton();
   save();
   say("Ready, little superstar? Pick up your toothbrush!");
