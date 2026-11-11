@@ -157,6 +157,7 @@
     animalSounds: true,
     uiSounds: true,
     musicOn: true,
+    appearance: "auto",
     animations: true,
     reducedMotion: false,
     motionSensitivity: "medium",
@@ -233,6 +234,16 @@
       audio.resume().catch(() => {});
     }
     return audio;
+  }
+
+  /* Appearance: "auto" follows the device, otherwise force light or dark. */
+  const darkQuery = window.matchMedia ? window.matchMedia("(prefers-color-scheme: dark)") : null;
+
+  function applyAppearance() {
+    const dark = settings.appearance === "dark" || (settings.appearance !== "light" && Boolean(darkQuery?.matches));
+    document.documentElement.dataset.scheme = dark ? "dark" : "light";
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute("content", dark ? "#172625" : "#fff5f7");
   }
 
   function randomTheme() {
@@ -879,6 +890,7 @@
     $("custom-melody").value = settings.customMelody;
     $("custom-tempo").value = settings.customTempo;
     checkCustomMelody();
+    $("appearance-select").value = settings.appearance;
     $("break-select").value = String(settings.breakSeconds);
     $("animal-sounds").checked = settings.animalSounds;
     $("ui-sounds").checked = settings.uiSounds;
@@ -903,6 +915,7 @@
     settings.song = $("song-select").value;
     if (checkCustomMelody()) settings.customMelody = $("custom-melody").value.trim();
     settings.customTempo = $("custom-tempo").value;
+    settings.appearance = $("appearance-select").value;
     settings.breakSeconds = Number($("break-select").value);
     settings.animalSounds = $("animal-sounds").checked;
     settings.uiSounds = $("ui-sounds").checked;
@@ -1199,6 +1212,7 @@
     selected = randomTheme();
     save();
     populate();
+    applyAppearance();
     applyTheme();
     renderStages();
     reset();
@@ -1214,6 +1228,13 @@
     settings.customTempo = $("custom-tempo").value;
     save();
   });
+
+  $("appearance-select").addEventListener("change", () => {
+    settings.appearance = $("appearance-select").value;
+    save();
+    applyAppearance();
+  });
+  if (darkQuery) darkQuery.addEventListener("change", applyAppearance);
 
   $("add-stage").addEventListener("click", () => {
     settings.stages.push({
@@ -1271,6 +1292,7 @@
   if (!navigator.mediaDevices?.getUserMedia) $("motion-toggle").disabled = true;
 
   settings.totalSeconds = total();
+  applyAppearance();
   applyTheme();
   renderStages();
   stageLeft = settings.stages[0].seconds;
