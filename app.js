@@ -882,7 +882,7 @@
       card.className = "stage-edit-card";
       card.dataset.index = i;
       card.innerHTML =
-        '<div class="stage-edit-heading"><span class="stage-drag-handle" role="button" tabindex="0" aria-label="Drag to reorder stage">⠿</span><span class="stage-edit-number"></span><button class="text-button remove-stage" type="button">Remove</button></div>' +
+        '<div class="stage-edit-heading"><span class="stage-drag-handle" role="button" tabindex="0" aria-label="Hold and drag to reorder stage">⠿</span><span class="stage-edit-number"></span><button class="text-button remove-stage" type="button">Remove</button></div>' +
         '<div class="stage-fields"><label>Picture<input class="stage-icon-input" maxlength="4"></label><label>Stage name<input class="stage-name-input" maxlength="28"></label><label>Seconds<input class="stage-seconds-input" type="number" min="5" max="180" step="5"></label></div>' +
         '<label class="tip-field">Reminder<textarea class="stage-tip-input" rows="2" maxlength="140"></textarea></label>' +
         '<label class="tip-field">Music for this stage<select class="select-control stage-sound-input"></select></label>';
@@ -1168,29 +1168,51 @@
     let dragStarted = false;
     let suppressClick = false;
 
+    const HOLD_MS = 380; // press and hold this long before a stage can be dragged
+    const HOLD_SLOP = 10; // moving further than this (px) before the hold finishes cancels it
+
+    const clearHold = () => {
+      if (hold !== null) clearTimeout(hold);
+      hold = null;
+    };
+
+    // Nothing is captured on a plain tap, so taps and scrolling keep working normally.
     const begin = (e, container, item) => {
       if (e.button !== undefined && e.button !== 0) return;
+      clearHold();
       activeContainer = container;
       activeItem = item;
       activePointer = e.pointerId;
       startX = e.clientX;
       startY = e.clientY;
       dragStarted = false;
-      try {
-        container.setPointerCapture(e.pointerId);
-      } catch {}
       dragIndex = Number(item.dataset.index);
-      clearTimeout(hold);
-    };
-
-    const reorderAt = e => {
-      if (!activeContainer || activePointer !== e.pointerId) return;
-      if (!dragStarted && Math.hypot(e.clientX - startX, e.clientY - startY) < 7) return;
-      if (!dragStarted) {
+      hold = setTimeout(() => {
+        hold = null;
+        if (!activeContainer) return;
         dragStarted = true;
         dragging = true;
         suppressClick = true;
         activeItem.classList.add("dragging");
+        try {
+          activeContainer.setPointerCapture(activePointer);
+        } catch {}
+        if (navigator.vibrate) navigator.vibrate(15);
+        say("Picked up " + (settings.stages[dragIndex]?.name || "stage") + ". Drag to move it.");
+      }, HOLD_MS);
+    };
+
+    const reorderAt = e => {
+      if (!activeContainer || activePointer !== e.pointerId) return;
+      if (!dragStarted) {
+        // Moved before the hold finished: this is a swipe or scroll, not a drag.
+        if (Math.hypot(e.clientX - startX, e.clientY - startY) > HOLD_SLOP) {
+          clearHold();
+          activeContainer = null;
+          activeItem = null;
+          activePointer = null;
+        }
+        return;
       }
       const selector = activeContainer.id === "zone-track" ? ".zone" : ".stage-edit-card";
       const over = document.elementFromPoint(e.clientX, e.clientY)?.closest?.(selector);
@@ -1199,13 +1221,15 @@
       if (Number.isInteger(next) && next !== dragIndex) {
         moveStage(dragIndex, next);
         dragIndex = next;
+        activeItem = activeContainer.querySelector(selector + '[data-index="' + next + '"]');
+        if (activeItem) activeItem.classList.add("dragging");
       }
     };
 
     const finish = () => {
       if (!activeContainer) return;
-      clearTimeout(hold);
-      if (activeItem) activeItem.classList.remove("dragging");
+      clearHold();
+      document.querySelectorAll(".dragging").forEach(el => el.classList.remove("dragging"));
       if (dragStarted) {
         setTimeout(() => {
           suppressClick = false;
@@ -1214,6 +1238,7 @@
       activeContainer = null;
       activeItem = null;
       activePointer = null;
+      dragStarted = false;
       dragging = false;
       dragIndex = null;
     };
@@ -1241,6 +1266,10 @@
     });
 
     document.addEventListener("pointermove", reorderAt);
+    // Once a drag has started, stop the page from scrolling under the finger.
+    document.addEventListener("touchmove", e => {
+      if (dragging) e.preventDefault();
+    }, { passive: false });
     document.addEventListener("pointerup", finish);
     document.addEventListener("pointercancel", finish);
     $("zone-track").addEventListener("contextmenu", e => e.preventDefault());
