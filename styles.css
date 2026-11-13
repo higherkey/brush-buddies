@@ -390,123 +390,11 @@ button, select, input:not([type="hidden"]), textarea {
   background: #172321;
 }
 
-.camera-target {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  display: grid;
-  place-items: center;
-}
-
-.camera-target::before {
-  content: "";
-  position: absolute;
-  inset: 9% 13%;
-  border: 1px dashed rgba(255, 255, 255, 0.6);
-  box-shadow: 0 0 0 999px rgba(17, 17, 17, 0.2);
-}
-
-.camera-target .target-corner {
-  position: absolute;
-  width: 24px;
-  height: 24px;
-  border-color: #ffe16b;
-  border-style: solid;
-}
-
-.target-corner.top-left {
-  top: 9%;
-  left: 13%;
-  border-width: 3px 0 0 3px;
-}
-
-.target-corner.top-right {
-  top: 9%;
-  right: 13%;
-  border-width: 3px 3px 0 0;
-}
-
-.target-corner.bottom-left {
-  bottom: 9%;
-  left: 13%;
-  border-width: 0 0 3px 3px;
-}
-
-.target-corner.bottom-right {
-  bottom: 9%;
-  right: 13%;
-  border-width: 0 3px 3px 0;
-}
-
-.target-crosshair {
-  position: absolute;
-  width: 28px;
-  height: 28px;
-  border: 1px solid rgba(255, 255, 255, 0.6);
-}
-
-.target-crosshair::before,
-.target-crosshair::after {
-  content: "";
-  position: absolute;
-  background: #ffe16b;
-}
-
-.target-crosshair::before {
-  width: 1px;
-  height: 42px;
-  left: 13px;
-  top: -8px;
-}
-
-.target-crosshair::after {
-  height: 1px;
-  width: 42px;
-  top: 13px;
-  left: -8px;
-}
-
-.target-label {
-  position: absolute;
-  bottom: 12%;
-  padding: 3px 7px;
-  background: rgba(32, 42, 40, 0.8);
-  color: #ffe16b;
-  font-size: 9px;
-  font-weight: 900;
-  letter-spacing: 0.12em;
-  line-height: 1;
-}
-
 .motion-status {
   margin: 5px 0 0;
   font-size: 0.75rem;
   font-weight: 800;
   color: var(--accent-text);
-}
-
-.camera-view[data-region="wide"] .camera-target::before {
-  inset: 5% 5%;
-}
-
-.camera-view[data-region="wide"] .target-corner.top-left {
-  top: 5%;
-  left: 5%;
-}
-
-.camera-view[data-region="wide"] .target-corner.top-right {
-  top: 5%;
-  right: 5%;
-}
-
-.camera-view[data-region="wide"] .target-corner.bottom-left {
-  bottom: 5%;
-  left: 5%;
-}
-
-.camera-view[data-region="wide"] .target-corner.bottom-right {
-  bottom: 5%;
-  right: 5%;
 }
 
 /* Timer Card Section */
@@ -1407,7 +1295,7 @@ button, select, input:not([type="hidden"]), textarea {
   .top-actions {
     grid-column: 1 / -1;
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr)) 46px 46px;
     gap: 4px;
     width: 100%;
   }
@@ -1612,3 +1500,370 @@ html[data-scheme="dark"] #app {
   --accent-text: color-mix(in srgb, var(--accent) 55%, #ffffff);
   --accent-strong: color-mix(in srgb, var(--accent-dark) 72%, #000000);
 }
+
+/* Adventure Mode */
+.mode-quick {
+  min-width: 44px;
+  padding: 5px;
+  background: var(--accent-soft);
+  font-size: 1.15rem;
+  line-height: 1;
+}
+
+.mode-quick.enabled {
+  background: var(--done-bg);
+  border-color: var(--done-line);
+  box-shadow: inset 0 -3px 0 var(--done-line);
+}
+
+.adv-scene {
+  --adv-sky: #cfe8f6;
+  --adv-ground: #bfdcae;
+  --adv-tint: 85%;
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--adv-sky) var(--adv-tint), var(--surface)) 0 60%,
+    color-mix(in srgb, var(--adv-ground) var(--adv-tint), var(--surface)) 60% 100%
+  );
+}
+
+.adv-scene[hidden] {
+  display: none;
+}
+
+html[data-scheme="dark"] .adv-scene {
+  --adv-tint: 30%;
+}
+
+.adv-scene[data-scene="meadow"] { --adv-sky: #cfe8f6; --adv-ground: #bfdcae; }
+.adv-scene[data-scene="beach"] { --adv-sky: #bfe6f2; --adv-ground: #f1e1b0; }
+.adv-scene[data-scene="snow"] { --adv-sky: #dbe8f4; --adv-ground: #f4f8fb; }
+.adv-scene[data-scene="forest"] { --adv-sky: #cde3c4; --adv-ground: #9fc08f; }
+.adv-scene[data-scene="night"] { --adv-sky: #6b78b4; --adv-ground: #4f6a63; }
+.adv-scene[data-scene="desert"] { --adv-sky: #f7dfb6; --adv-ground: #e6c28a; }
+.adv-scene[data-scene="sky"] { --adv-sky: #b9defa; --adv-ground: #f4f1ff; }
+.adv-scene[data-scene="jungle"] { --adv-sky: #bfe0b5; --adv-ground: #7fb783; }
+
+.adv-scene::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: #7a4a1c;
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+
+.adv-scene.resting::after {
+  opacity: 0.16;
+}
+
+.adv-backdrop,
+.adv-bugs {
+  position: absolute;
+  inset: 0;
+}
+
+.adv-deco {
+  position: absolute;
+  font-size: 2.4rem;
+  line-height: 1;
+  opacity: 0.85;
+}
+
+.adv-deco.deco-1 { left: 4%; bottom: 6%; }
+.adv-deco.deco-2 { right: 4%; bottom: 8%; font-size: 2.8rem; }
+.adv-deco.deco-3 { right: 12%; top: 6%; font-size: 2rem; }
+
+.adv-bug {
+  position: absolute;
+  z-index: 1;
+  font-size: 1.8rem;
+  line-height: 1;
+  opacity: 1;
+  transform: scale(1);
+  transition: opacity 0.4s;
+}
+
+/* Bugs sit around the buddy, above the place bar. */
+.adv-bug.bug-1 { left: 3%; top: 6%; }
+.adv-bug.bug-2 { left: 29%; top: 10%; }
+.adv-bug.bug-3 { left: 30%; top: 46%; }
+
+
+.adv-bug.cleaned {
+  opacity: 0;
+  transform: scale(0.3);
+}
+
+#app.animations-on:not(.reduced-motion) .adv-bug {
+  transition: opacity 0.4s, transform 0.4s;
+  animation: advWobble 2.2s ease-in-out infinite;
+}
+
+#app.animations-on:not(.reduced-motion) .adv-bug.bug-2 { animation-delay: 0.6s; }
+#app.animations-on:not(.reduced-motion) .adv-bug.bug-3 { animation-delay: 1.1s; }
+
+#app.animations-on:not(.reduced-motion) .adv-bug.cleaned {
+  animation: none;
+  filter: drop-shadow(0 0 6px #ffe16b);
+}
+
+#app.reduced-motion .adv-bug {
+  transition: opacity 0.4s;
+}
+
+#app.animations-on:not(.reduced-motion) .adv-scene.departing .adv-backdrop {
+  animation: advArrive 0.9s ease-out 1;
+}
+
+@keyframes advWobble {
+  0%, 100% { transform: translate(0, 0) rotate(-6deg); }
+  50% { transform: translate(3px, -4px) rotate(6deg); }
+}
+
+@keyframes advArrive {
+  0% { transform: translateX(24px); opacity: 0; }
+  100% { transform: translateX(0); opacity: 1; }
+}
+
+#app[data-mode="adventure"] .buddy-area > :not(.adv-scene):not(.floaty) {
+  position: relative;
+  z-index: 1;
+}
+
+#app[data-mode="adventure"] .floaty {
+  z-index: 1;
+}
+
+/* The scene sits behind the name, so give it a paper tag for contrast. */
+#app[data-mode="adventure"] .buddy-name {
+  padding: 2px 8px;
+  background: var(--panel);
+}
+
+.adv-bar {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 5px;
+}
+
+.adv-bar[hidden] {
+  display: none;
+}
+
+.adv-place {
+  padding: 4px 8px;
+  border: 1px solid var(--line-strong);
+  border-left: 3px solid var(--accent);
+  background: var(--panel);
+  color: var(--ink);
+  font-size: 0.75rem;
+  font-weight: 900;
+}
+
+.adv-journal-open {
+  min-width: 44px;
+  background: var(--surface);
+}
+
+#app[data-mode="adventure"] .zone-track {
+  position: relative;
+}
+
+#app[data-mode="adventure"] .zone-track::before {
+  content: "";
+  position: absolute;
+  left: 6%;
+  right: 6%;
+  top: 50%;
+  border-top: 3px dashed var(--line-strong);
+  pointer-events: none;
+}
+
+#app[data-mode="adventure"] .zone {
+  position: relative;
+  z-index: 1;
+  background: var(--surface);
+}
+
+#app[data-mode="adventure"] .zone.active {
+  background: var(--accent-soft);
+}
+
+#app[data-mode="adventure"] .zone.done {
+  background: var(--done-bg);
+}
+
+#app[data-mode="adventure"] .zone.done::after,
+#app[data-mode="adventure"] .zone.active::after {
+  position: absolute;
+  top: 1px;
+  right: 2px;
+  font-size: 0.8rem;
+  line-height: 1;
+  pointer-events: none;
+}
+
+#app[data-mode="adventure"] .zone.done::after {
+  content: "\2713";
+  color: var(--done-ink);
+  font-weight: 900;
+}
+
+#app[data-mode="adventure"] .zone.active::after {
+  content: "\1F463";
+}
+
+.adv-shell {
+  text-align: center;
+}
+
+.treasure-emoji {
+  font-size: 5rem;
+  line-height: 1.1;
+  margin: 8px 0;
+}
+
+#treasure-dialog.animate .treasure-emoji {
+  animation: treasurePop 0.6s cubic-bezier(0.3, 0.8, 0.3, 1) 1;
+}
+
+.treasure-name {
+  font-size: 1.25rem;
+  font-weight: 900;
+  margin: 0 0 6px;
+}
+
+#treasure-dialog.rare .treasure-emoji {
+  text-shadow: 0 0 18px #ffd34d, 0 0 6px #ffe99a;
+  filter: drop-shadow(0 0 10px #ffd34d);
+}
+
+#treasure-dialog .settings-actions {
+  justify-content: center;
+}
+
+#treasure-dialog .secondary-button {
+  min-height: 44px;
+  padding: 10px 16px;
+  border: 1px solid var(--line-strong);
+  background: transparent;
+  color: var(--ink);
+  font-size: 0.85rem;
+  font-weight: 900;
+}
+
+
+@keyframes treasurePop {
+  0% { transform: scale(0.2) rotate(-12deg); }
+  60% { transform: scale(1.2) rotate(4deg); }
+  100% { transform: scale(1) rotate(0); }
+}
+
+.journal-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  text-align: left;
+}
+
+.journal-page {
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+}
+
+.journal-page h3 {
+  font-size: 1rem;
+  margin: 0 0 6px;
+}
+
+.sticker-row {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.sticker {
+  position: relative;
+  width: 52px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  border: 1px dashed var(--line-strong);
+  color: var(--muted);
+  font-size: 1.6rem;
+  line-height: 1;
+}
+
+.sticker.found {
+  border-style: solid;
+  background: var(--surface);
+  color: var(--ink);
+}
+
+.sticker-count {
+  position: absolute;
+  right: 2px;
+  bottom: 2px;
+  font-size: 0.625rem;
+  font-weight: 900;
+  line-height: 1;
+  color: var(--accent-text);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #app.animations-on:not(.reduced-motion) .adv-bug,
+  #app.animations-on:not(.reduced-motion) .adv-scene.departing .adv-backdrop,
+  #treasure-dialog.animate .treasure-emoji {
+    animation: none;
+    transition: none;
+  }
+}
+
+/* The overlay shares the video's contain mapping, including portrait letterboxing. */
+.motion-overlay {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: contain;
+  transform: scaleX(-1);
+  pointer-events: none;
+}
+.camera-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-block-start: 0.5rem;
+}
+.camera-tools button, .camera-diagnostics summary,
+#manual-target-controls input, #motion-replay {
+  min-block-size: 48px;
+  min-inline-size: 48px;
+}
+.camera-tools progress {
+  flex: 1;
+  min-inline-size: 64px;
+  max-inline-size: 180px;
+  accent-color: var(--accent-text);
+}
+.camera-diagnostics { color: var(--ink); font-size: 0.8rem; }
+.camera-diagnostics summary { display: flex; align-items: center; cursor: pointer; }
+.camera-diagnostics summary:focus-visible { outline: 2px solid var(--accent-text); }
+.camera-diagnostics p { line-height: 1.5; margin-block: 0 0.5rem; }
+#manual-target-controls input { display: block; inline-size: 100%; accent-color: var(--accent-text); }
+#motion-replay { max-inline-size: 100%; font: inherit; color: var(--ink); }

@@ -1,11 +1,17 @@
 "use strict";
 
-const CACHE_NAME = "brush-buddies-shell-v6";
+const CACHE_NAME = "brush-buddies-shell-v8";
 const APP_SHELL = [
   "./",
   "./index.html",
-  "./styles.css?v=0.5.2",
-  "./app.js?v=0.5.2",
+  "./styles.css?v=0.7.0",
+  "./adventure-data.js?v=0.6.0",
+  "./adventure.js?v=0.6.0",
+  "./app.js?v=0.7.0",
+  "./camera-helper.js?v=0.7.0",
+  "./camera-worker.js?v=0.7.0",
+  "./camera-motion.js",
+  "./vendor/mediapipe/vision_bundle.js",
   "./manifest.webmanifest",
   "./icon.svg",
   "./icons/icon-192.png",
@@ -44,7 +50,8 @@ self.addEventListener("fetch", event => {
       .then(response => {
         if (response.ok) {
           const copy = response.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put(request, copy));
+          // Keep large model/WASM writes alive after their response is delivered.
+          event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.put(request, copy)).catch(() => {}));
         }
         return response;
       })
