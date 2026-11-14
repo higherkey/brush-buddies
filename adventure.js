@@ -128,14 +128,14 @@
   // so pausing, resuming or the camera helper never repeats a line.
   function narrate(s) {
     const say = s.storyText ? api()?.say : null;
+    if (!say) return;
     if (s.phase === "break") {
       if (trip.restKey === s.stageIndex) return;
       trip.restKey = s.stageIndex;
-      if (say) say(fill(pick(DATA.restLines), s));
+      say(fill(pick(DATA.restLines), s));
     } else if (s.phase === "running" && trip.spokenStage !== s.stageIndex) {
       const first = trip.spokenStage === null && s.sessionElapsed === 0;
       trip.spokenStage = s.stageIndex;
-      if (!say) return;
       const stop = stopFor(s.stageIndex);
       const lead = first ? fill(pick(DATA.departLines), s) : stop.icon + " " + stop.name + "!";
       say(lead + (s.stage?.tip ? " " + s.stage.tip : ""));
@@ -195,6 +195,7 @@
     const found = navigator.locks
       ? await navigator.locks.request(KEY, () => award(finishedTrip.dest))
       : award(finishedTrip.dest);
+    if ($("journal-dialog").open) openJournal();
     if (trip !== finishedTrip) return;
     pendingTreasure = found;
     clearTimeout(treasureTimer);

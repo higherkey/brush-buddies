@@ -1529,7 +1529,7 @@
       if (cameraPauses() && ["running", "break"].includes(phase)) motionArmed = true;
       if (!cameraPauses() && ["motion-wait", "motion-paused"].includes(phase)) {
         const resume = phase === "motion-paused" || motionArmed;
-        phase = resume ? "running" : "ready";
+        phase = resume ? (breakLeft > 0 ? "break" : "running") : "ready";
         if (resume && clock === null) clock = setInterval(tick, 1000);
       }
       render();

@@ -215,6 +215,15 @@ test('real MediaPipe worker, camera UI, timer integration, offline assets and mo
     await page.locator('#pause-button').click();
     await page.waitForFunction(() => window.BrushBuddies.snapshot().phase !== 'motion-wait');
     check((await page.evaluate(() => window.BrushBuddies.snapshot())).phase === 'break', 'strict camera resume preserves unfinished break');
+    await page.locator('#pause-button').click();
+    await page.evaluate(() => { window.__cameraMode = 'still'; });
+    await page.waitForTimeout(500);
+    await page.locator('#pause-button').click();
+    await page.locator('#settings-open').click();
+    await page.locator('[data-panel="motion-panel"]').click();
+    await page.locator('#motion-brush-type').selectOption('electric');
+    check((await page.evaluate(() => window.BrushBuddies.snapshot())).phase === 'break', 'switching from strict wait to Assist preserves unfinished break');
+    await page.keyboard.press('Escape');
     await page.waitForFunction(() => window.BrushBuddies.snapshot().stageIndex === 1);
     check((await page.evaluate(() => window.BrushBuddies.snapshot())).stageLeft === 5, 'resumed break advances without brushing the previous stage again');
     check(external.length === 0, 'no external requests from camera runtime: ' + external.join(','));

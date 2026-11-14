@@ -48,6 +48,7 @@ Install Playwright in a separate tools directory, point PLAYWRIGHT_MODULE at tha
 
 ~~~sh
 node --test tests/camera-browser.cjs
+node --test tests/adventure-browser.cjs
 ~~~
 
 CHROMIUM_EXECUTABLE can select an existing Chromium binary. The browser tests run actual bundled MediaPipe inference against a public MediaPipe portrait and synthetic motion, verify timer integration, local-only requests, offline restart and responsive layouts. The portrait is a test fixture, not training data. Real brushing accuracy and performance still require iPhone Safari, Android Chrome and installed-PWA sessions with manual/electric brushes, dim light, head motion and hand occlusion. Custom temporal models or optical flow remain possible later improvements if those measurements justify them.
