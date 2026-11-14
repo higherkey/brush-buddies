@@ -162,14 +162,20 @@
     reducedMotion: false,
     motionSensitivity: "medium",
     motionRegion: "center",
+    motionTarget: "auto",
+    motionTargetX: 0.5,
+    motionTargetY: 0.6,
+    motionTargetSize: 0.5,
+    motionAutoPause: false,
+    motionBrushType: "manual",
+    experience: "simple",
+    storyText: false,
     stages: DEFAULT_STAGES
   };
 
   const KEY = "brushBuddiesSettingsV2";
   const CIRC = 2 * Math.PI * 99;
-  const MW = 96;
-  const MH = 72;
-  const GRACE = 1800;
+  const GRACE = 2500;
 
   function cloneStages(a) {
     return a.map((s, i) => ({
@@ -214,13 +220,14 @@
   let motionOn = false;
   let motionArmed = false;
   let motionActive = false;
-  let prev = null;
-  let raf = null;
   let lastMove = 0;
-  let lastVideoTime = -1;
+  let cameraHelper = null;
+  let cameraGeneration = 0;
+  let replayURL = null;
+  let cameraStatus = "";
+  let cameraCalibrating = false;
   const video = $("motion-preview");
-  const canvas = document.createElement("canvas");
-  const ctx = canvas.getContext("2d", { willReadFrequently: true });
+  const overlay = $("motion-overlay");
 
   let hold = null;
   let dragging = false;
@@ -302,6 +309,44 @@
   function say(t) {
     $("message").textContent = t;
     $("announcer").textContent = t;
+  }
+
+  /* Adventure Mode listens to these events; Simple mode ignores them. */
+  function emit(name, detail) {
+    document.dispatchEvent(new CustomEvent("bb:" + name, { detail }));
+  }
+
+  function snapshot() {
+    return {
+      phase,
+      pausedFrom,
+      stageIndex,
+      stageLeft,
+      stageSeconds: settings.stages[stageIndex]?.seconds || 0,
+      stageCount: settings.stages.length,
+      stage: settings.stages[stageIndex] ? { ...settings.stages[stageIndex] } : null,
+      sessionElapsed,
+      buddy: selected,
+      buddyName: animal()[1],
+      experience: settings.experience,
+      storyText: settings.storyText,
+      calm: !settings.animations || settings.reducedMotion || window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    };
+  }
+
+  function renderModeButton() {
+    const on = settings.experience === "adventure";
+    $("mode-toggle").setAttribute("aria-pressed", String(on));
+    $("mode-toggle").classList.toggle("enabled", on);
+  }
+
+  function setExperience(mode) {
+    settings.experience = mode === "adventure" ? "adventure" : "simple";
+    save();
+    $("app").dataset.mode = settings.experience;
+    $("experience-select").value = settings.experience;
+    renderModeButton();
+    render();
   }
 
   function tone(f, d = 0.13, type = "sine", v = 0.04) {
@@ -622,6 +667,8 @@
     $("quick-buddy-emoji").textContent = a[0];
     $("buddy-name").textContent = a[1];
     $("app").dataset.theme = selected;
+    $("app").dataset.mode = settings.experience;
+    renderModeButton();
     $("buddy").setAttribute("aria-label", a[1]);
     $("app").classList.toggle("animations-on", settings.animations);
     $("app").classList.toggle("reduced-motion", settings.reducedMotion);
@@ -699,12 +746,13 @@
     $("start-button").hidden = !["ready", "done"].includes(phase);
     $("pause-button").hidden = !["running", "break", "paused", "motion-wait", "motion-paused"].includes(phase);
 
-    const canPause = ["running", "break", "motion-wait"].includes(phase);
+    const waitingForStart = phase === "motion-wait" && !motionArmed;
+    const canPause = ["running", "break"].includes(phase) || (phase === "motion-wait" && motionArmed);
     $("pause-button-icon").textContent = canPause ? "Ⅱ" : "▶";
-    $("pause-button-label").textContent = canPause ? "Pause" : "Resume";
+    $("pause-button-label").textContent = waitingForStart ? "Start brushing" : canPause ? "Pause" : "Resume";
     $("timer-ring").setAttribute("aria-label",
-      canPause ? "Pause brushing" : ["ready", "done"].includes(phase) ? "Start brushing" : "Resume brushing");
-    $("pause-button").setAttribute("aria-label", canPause ? "Pause brushing" : "Resume brushing");
+      canPause ? "Pause brushing" : waitingForStart || ["ready", "done"].includes(phase) ? "Start brushing" : "Resume brushing");
+    $("pause-button").setAttribute("aria-label", waitingForStart ? "Start brushing" : canPause ? "Pause brushing" : "Resume brushing");
 
     $("motion-toggle").classList.toggle("enabled", motionOn);
     $("motion-toggle").setAttribute("aria-pressed", String(motionOn));
@@ -712,6 +760,7 @@
     $("camera-view").hidden = !motionOn;
     $("camera-view").dataset.region = settings.motionRegion;
     syncMusic();
+    emit("render", snapshot());
   }
 
   function stopClock() {
@@ -726,10 +775,11 @@
     stageIndex = 0;
     stageLeft = settings.stages[0].seconds;
     breakLeft = 0;
-    phase = motionOn ? "motion-wait" : "ready";
+    phase = motionOn && cameraPauses() ? "motion-wait" : "ready";
     motionArmed = false;
     dance(false);
     $("buddy-area").classList.remove("celebrate");
+    emit("reset", null);
     render();
     say(motionOn ? "Camera helper is ready. Press Start, then brush to begin." : "Ready, little superstar? Pick up your toothbrush!");
   }
@@ -751,6 +801,7 @@
     $("buddy-area").classList.add("celebrate");
     animalSound();
     victorySound();
+    emit("finish", snapshot());
   }
 
   function advance() {
@@ -809,7 +860,7 @@
     if (phase === "done") reset();
     if (motionOn && phase === "motion-wait" && motionArmed) {
       motionArmed = false;
-      pausedFrom = "motion-wait";
+      pausedFrom = breakLeft > 0 ? "break" : "running";
       phase = "paused";
       stopClock();
       dance(false);
@@ -818,7 +869,8 @@
       return;
     }
     if (["ready", "paused", "motion-paused", "motion-wait"].includes(phase)) {
-      if (motionOn) {
+      if (motionOn) motionArmed = true;
+      if (motionOn && cameraPauses()) {
         motionArmed = true;
         phase = "motion-wait";
         say("Ready! Brush back and forth to wake your buddy.");
@@ -836,6 +888,7 @@
       }
     } else if (["running", "break"].includes(phase)) {
       pausedFrom = phase;
+      motionArmed = false;
       stopClock();
       phase = "paused";
       dance(false);
@@ -852,8 +905,8 @@
     stageIndex = i;
     stageLeft = leftOf(i) > 0 ? leftOf(i) : settings.stages[i].seconds;
     breakLeft = 0;
-    phase = motionOn ? "motion-wait" : was ? "running" : "ready";
-    if (was && !motionOn) {
+    phase = motionOn && cameraPauses() ? "motion-wait" : was ? "running" : "ready";
+    if (was && !(motionOn && cameraPauses())) {
       speakStage();
       clock = setInterval(tick, 1000);
     } else {
@@ -946,8 +999,18 @@
     $("ui-sounds").checked = settings.uiSounds;
     $("animations").checked = settings.animations;
     $("reduced-motion").checked = settings.reducedMotion;
+    $("experience-select").value = settings.experience;
+    $("story-text").checked = settings.storyText;
     $("motion-sensitivity").value = settings.motionSensitivity;
     $("motion-region").value = settings.motionRegion;
+    $("motion-target").value = settings.motionTarget;
+    $("motion-target-x").value = String(Math.round((1 - settings.motionTargetX) * 100));
+    $("motion-target-y").value = String(Math.round(settings.motionTargetY * 100));
+    $("motion-target-size").value = String(Math.round(settings.motionTargetSize * 100));
+    $("motion-auto-pause").checked = settings.motionAutoPause;
+    $("motion-brush-type").value = settings.motionBrushType;
+    $("manual-target-controls").hidden = settings.motionTarget !== "manual";
+    $("motion-auto-pause").disabled = settings.motionBrushType === "electric";
     renderEditor();
   }
 
@@ -957,6 +1020,13 @@
     help.textContent = r.error || "Looks good! " + r.melody.length + " steps. Pick My Melody as your music or for a stage.";
     help.classList.toggle("error-text", Boolean(r.error));
     return !r.error;
+  }
+
+  let settingsBeforeDialog = "";
+
+  function sessionSettings() {
+    const { experience, storyText, ...rest } = settings;
+    return JSON.stringify(rest);
   }
 
   function saveUI() {
@@ -971,18 +1041,23 @@
     settings.uiSounds = $("ui-sounds").checked;
     settings.animations = $("animations").checked;
     settings.reducedMotion = $("reduced-motion").checked;
+    settings.experience = $("experience-select").value === "adventure" ? "adventure" : "simple";
+    settings.storyText = $("story-text").checked;
     settings.motionSensitivity = $("motion-sensitivity").value;
     settings.motionRegion = $("motion-region").value;
+    readCameraSettings();
     settings.stages = cloneStages(settings.stages);
     settings.totalSeconds = total();
     save();
     if (old !== settings.theme) selected = settings.theme === "random" ? randomTheme() : settings.theme;
     applyTheme();
     renderStages();
-    reset();
+    if (sessionSettings() !== settingsBeforeDialog) reset();
+    else render();
   }
 
   function openSettings(tab = "buddy-panel") {
+    settingsBeforeDialog = sessionSettings();
     populate();
     switchTab(tab);
     $("settings-dialog").showModal();
@@ -1001,30 +1076,67 @@
     render();
   }
 
+  function cameraPauses() {
+    return settings.motionAutoPause && settings.motionBrushType !== "electric";
+  }
+
+  function cameraOptions() {
+    return { sensitivity: settings.motionSensitivity, region: settings.motionRegion,
+      target: settings.motionTarget, targetX: settings.motionTargetX,
+      targetY: settings.motionTargetY, targetSize: settings.motionTargetSize,
+      brushType: settings.motionBrushType };
+  }
+
+  function readCameraSettings() {
+    settings.motionSensitivity = $("motion-sensitivity").value;
+    settings.motionRegion = $("motion-region").value;
+    settings.motionTarget = $("motion-target").value;
+    settings.motionTargetX = 1 - Number($("motion-target-x").value) / 100;
+    settings.motionTargetY = Number($("motion-target-y").value) / 100;
+    settings.motionTargetSize = Number($("motion-target-size").value) / 100;
+    settings.motionAutoPause = $("motion-auto-pause").checked;
+    settings.motionBrushType = $("motion-brush-type").value;
+    $("manual-target-controls").hidden = settings.motionTarget !== "manual";
+    $("motion-auto-pause").disabled = settings.motionBrushType === "electric";
+  }
+
   function stopLoop() {
-    if (raf !== null) cancelAnimationFrame(raf);
-    raf = null;
-    prev = null;
-    lastVideoTime = -1;
+    cameraHelper?.stop();
+    cameraHelper = null;
+  }
+
+  function cameraMessage(key, message) {
+    if (key !== cameraStatus) {
+      cameraStatus = key;
+      $("motion-status").textContent = message;
+    }
   }
 
   function stopCamera(resumeTimer = false) {
+    cameraGeneration++;
     const wasWaiting = phase === "motion-wait";
     const wasMotionPaused = phase === "motion-paused";
     stopLoop();
     dance(false);
-    if (stream) {
-      stream.getTracks().forEach(t => t.stop());
-      stream = null;
-    }
+    if (stream) stream.getTracks().forEach(t => t.stop());
+    stream = null;
+    video.pause();
     video.srcObject = null;
+    video.removeAttribute("src");
+    video.load();
+    if (replayURL) URL.revokeObjectURL(replayURL);
+    replayURL = null;
     motionOn = false;
     motionArmed = false;
+    if (["motion-wait", "motion-paused"].includes(pausedFrom)) pausedFrom = "running";
     cameraStarting = false;
-    lastVideoTime = -1;
-    $("camera-view").hidden = true;
-    $("motion-status").textContent = "Camera is off. Nothing is being watched.";
-    if (resumeTimer && (wasWaiting || wasMotionPaused)) {
+    cameraCalibrating = false;
+    $("motion-toggle").disabled = false;
+    $("motion-calibrate").disabled = true;
+    $("motion-replay").value = "";
+    overlay.getContext("2d").clearRect(0, 0, overlay.width, overlay.height);
+    cameraMessage("off", "Camera is off. Nothing is being watched.");
+    if (resumeTimer === true && (wasWaiting || wasMotionPaused)) {
       phase = wasMotionPaused ? "running" : "ready";
       if (wasMotionPaused && clock === null) clock = setInterval(tick, 1000);
       say(wasMotionPaused ? "Camera helper off. Your timer is running normally again." : "Camera helper off. Press Start to brush normally.");
@@ -1048,115 +1160,146 @@
 
   function resumeMotion() {
     if (motionArmed && ["motion-wait", "motion-paused"].includes(phase)) {
-      phase = "running";
+      phase = breakLeft > 0 ? "break" : "running";
       say("There you go! Keep those brushing moves going!");
       if (clock === null) clock = setInterval(tick, 1000);
       render();
     }
   }
 
-  function grayFrame() {
-    ctx.drawImage(video, 0, 0, MW, MH);
-    const p = ctx.getImageData(0, 0, MW, MH).data;
-    const g = new Uint8Array(MW * MH);
-    for (let i = 0, j = 0; i < p.length; i += 4, j++) {
-      g[j] = (p[i] * 0.299 + p[i + 1] * 0.587 + p[i + 2] * 0.114) | 0;
+  function cameraResult(result) {
+    if (!motionOn || document.hidden) return;
+    const context = overlay.getContext("2d");
+    if (overlay.width !== video.videoWidth || overlay.height !== video.videoHeight) {
+      overlay.width = video.videoWidth || 640;
+      overlay.height = video.videoHeight || 480;
     }
-    return g;
-  }
-
-  function frameChange(a, b) {
-    const lim = settings.motionRegion === "center" ? { x0: 18, x1: 78, y0: 10, y1: 62 } : { x0: 4, x1: 92, y0: 4, y1: 68 };
-    let changed = 0;
-    let sum = 0;
-    let count = 0;
-    for (let y = lim.y0; y < lim.y1; y += 2) {
-      for (let x = lim.x0; x < lim.x1; x += 2) {
-        const d = Math.abs(a[y * MW + x] - b[y * MW + x]);
-        sum += d;
-        count++;
-        if (d > 13) changed++;
+    context.clearRect(0, 0, overlay.width, overlay.height);
+    if (result.region) {
+      const r = result.region;
+      context.strokeStyle = result.active ? "#9df1b5" : "#ffe16b";
+      context.lineWidth = Math.max(2, overlay.width / 160);
+      if (result.corners) {
+        context.beginPath();
+        result.corners.forEach((point, index) => index ? context.lineTo(point.x, point.y) : context.moveTo(point.x, point.y));
+        context.closePath();
+        context.stroke();
+      } else context.strokeRect(r.x, r.y, r.width, r.height);
+    }
+    $("motion-strength").value = Math.round((result.score || 0) * 100);
+    $("motion-diagnostics").textContent =
+      (result.faceFound ? "Face tracked" : settings.motionTarget === "manual" ? "Adjustable target" : "Face not found") +
+      " · Motion " + Math.round((result.score || 0) * 100) + "% · " +
+      (result.state || "uncertain") + " · " + (result.latency || 0) + " ms processing · Up to 10 samples/sec" +
+      (replayURL ? " · Local test video" : "");
+    const calibrationFinished = ["complete", "failed"].includes(result.calibration);
+    const calibrating = cameraCalibrating || result.state === "calibrating" || ["quiet", "brushing"].includes(result.calibration);
+    if (calibrating) {
+      if (cameraPauses() && phase === "running") pauseNoMotion();
+      dance(false);
+      lastMove = performance.now();
+      if (calibrationFinished) {
+        cameraCalibrating = false;
+        cameraMessage("calibration-" + result.calibration, result.calibration === "complete"
+          ? "Calibration complete. Brush normally to move your buddy."
+          : "Calibration could not separate brushing from stillness. Try again with better lighting or a smaller target.");
+        return;
       }
-    }
-    return { ratio: changed / count, average: sum / count };
-  }
-
-  function sample() {
-    if (!stream || !motionOn) return;
-    if (video.readyState >= 2 && video.currentTime !== lastVideoTime) {
-      lastVideoTime = video.currentTime;
-      try {
-        const frame = grayFrame();
-        if (prev) {
-          const limits = {
-            low: { ratio: 0.045, average: 8 },
-            medium: { ratio: 0.03, average: 6 },
-            high: { ratio: 0.018, average: 4 }
-          };
-          const threshold = limits[settings.motionSensitivity] || limits.medium;
-          const result = frameChange(prev, frame);
-          const active = result.ratio >= threshold.ratio && result.average >= threshold.average;
-          if (active) {
-            lastMove = performance.now();
-            resumeMotion();
-            dance(phase === "running");
-            $("motion-status").textContent = "Brushing movement detected · " + Math.round(result.ratio * 100) + "% of the target changed";
-          } else if (phase === "running" && performance.now() - lastMove > GRACE) {
-            pauseNoMotion();
-          }
-        }
-        prev = frame;
-      } catch {
-        $("motion-status").textContent = "Camera is on, but this browser could not read the video frame.";
-      }
-    }
-    raf = requestAnimationFrame(sample);
-  }
-
-  async function startCamera() {
-    if (cameraStarting || motionOn) return;
-    if (!navigator.mediaDevices?.getUserMedia) {
-      $("motion-status").textContent = "Camera needs HTTPS or localhost in this browser.";
+      cameraMessage("calibration-" + result.calibration, result.calibration === "brushing"
+        ? "Now brush normally for three seconds. Keep your face in view."
+        : "Learning the camera noise. Hold still for two seconds and keep your face in view.");
       return;
     }
+    if (result.active) {
+      lastMove = Number.isFinite(result.now) ? result.now : performance.now();
+      if (cameraPauses()) resumeMotion();
+      dance(phase === "running");
+      cameraMessage("brushing", "Brushing movement detected. Keep going!");
+    } else {
+      dance(false);
+      if (cameraPauses() && phase === "running" && performance.now() - lastMove > GRACE) pauseNoMotion();
+      if (result.calibration === "failed") {
+        cameraMessage("calibration-failed", "Calibration could not separate brushing from stillness. Try again with better lighting or a smaller target.");
+      } else if (result.state === "uncertain") {
+        cameraMessage("uncertain", result.reason === "no-face"
+          ? "Bring your face into view, or choose an adjustable target in Camera settings."
+          : "Tracking is uncertain. Check the video and keep the mouth area visible.");
+      } else if (settings.motionBrushType === "electric") {
+        cameraMessage("electric", "Electric brush: the timer keeps running. Tiny vibrations may not be visible to the camera.");
+      } else {
+        cameraMessage("idle-" + result.calibration, result.calibration === "complete"
+          ? "Calibration saved for this camera session. Brush normally to move your buddy."
+          : cameraPauses() ? "Waiting for brushing movement. Keep the brush near your mouth inside the target."
+            : "Camera Assist is watching for movement. Your timer runs normally after Start.");
+      }
+    }
+  }
+
+  async function startCamera(file = null) {
+    if (cameraStarting || motionOn) return;
+    if (!window.Worker || !window.OffscreenCanvas || !window.createImageBitmap ||
+        (!file && !navigator.mediaDevices?.getUserMedia)) {
+      $("camera-view").hidden = false;
+      cameraMessage("unsupported", "Camera tracking needs a current browser on HTTPS or localhost. The regular timer still works.");
+      return;
+    }
+    const generation = ++cameraGeneration;
     cameraStarting = true;
     $("motion-toggle").disabled = true;
     $("camera-view").hidden = false;
-    $("motion-status").textContent = "Opening your camera…";
+    cameraMessage("loading", file ? "Opening your local test video…" : "Opening your camera and loading face tracking…");
     try {
-      stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "user", width: { ideal: 640 }, height: { ideal: 480 }, frameRate: { ideal: 20, max: 30 } },
-        audio: false
-      });
-      video.muted = true;
-      video.autoplay = true;
-      video.playsInline = true;
-      video.srcObject = stream;
+      if (file) {
+        replayURL = URL.createObjectURL(file);
+        video.src = replayURL;
+        video.loop = true;
+      } else {
+        const opened = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: "user", width: { ideal: 640 }, height: { ideal: 480 }, frameRate: { ideal: 20, max: 30 } },
+          audio: false
+        });
+        if (generation !== cameraGeneration) { opened.getTracks().forEach(t => t.stop()); return; }
+        stream = opened;
+        video.srcObject = stream;
+        stream.getVideoTracks()[0].addEventListener("ended", () => {
+          if (generation === cameraGeneration) cameraFailure(new Error("The camera disconnected."));
+        }, { once: true });
+      }
       await video.play();
-      canvas.width = MW;
-      canvas.height = MH;
+      if (generation !== cameraGeneration) return;
+      cameraHelper = new window.BrushCamera(cameraResult, cameraFailure);
+      cameraHelper.configure(cameraOptions());
+      await cameraHelper.start(video);
+      if (generation !== cameraGeneration) return;
       cameraStarting = false;
       $("motion-toggle").disabled = false;
+      $("motion-calibrate").disabled = false;
       motionOn = true;
-      $("camera-view").hidden = false;
-      $("camera-view").dataset.region = settings.motionRegion;
       motionArmed = phase === "running" || phase === "break";
       lastMove = performance.now();
-      prev = null;
-      lastVideoTime = -1;
-      $("motion-status").textContent = "Camera ready. Press Start, then brush inside the target.";
-      if (phase === "ready" || phase === "paused") phase = "motion-wait";
-      else if (motionArmed) $("motion-status").textContent = "Keep brushing inside the target to keep the timer running.";
+      if (cameraPauses() && (phase === "ready" || phase === "paused")) phase = "motion-wait";
       render();
-      $("camera-view").hidden = false;
-      raf = requestAnimationFrame(sample);
-    } catch (e) {
-      stopCamera();
-      $("motion-toggle").disabled = false;
-      $("camera-view").hidden = true;
-      $("motion-status").textContent =
-        e?.name === "NotAllowedError" ? "Camera permission was denied. The regular timer still works." : "Couldn't start the camera. Check browser permissions.";
+      cameraMessage("ready", "Face tracking is ready. Press Start to brush, or Calibrate to learn your movement.");
+    } catch (error) {
+      if (generation !== cameraGeneration) return;
+      cameraFailure(error);
     }
+  }
+
+  function cameraFailure(error) {
+    const strict = cameraPauses();
+    const wasRunning = phase === "running" || phase === "break";
+    stopCamera();
+    if (strict && wasRunning) {
+      stopClock();
+      pausedFrom = phase;
+      phase = "paused";
+      render();
+    }
+    $("camera-view").hidden = false;
+    cameraMessage("error", error?.name === "NotAllowedError"
+      ? "Camera permission was denied. The regular timer still works."
+      : "Camera tracking could not start or stopped. Reload and try again; the regular timer still works.");
   }
 
   function gestures() {
@@ -1291,6 +1434,8 @@
     selected = randomTheme();
     save();
     populate();
+    cameraCalibrating = false;
+    cameraHelper?.configure(cameraOptions());
     applyAppearance();
     applyTheme();
     renderStages();
@@ -1314,6 +1459,18 @@
     applyAppearance();
   });
   if (darkQuery) darkQuery.addEventListener("change", applyAppearance);
+
+  // Mode and story text apply at once, without resetting the timer.
+  $("experience-select").addEventListener("change", () => setExperience($("experience-select").value));
+  $("story-text").addEventListener("change", () => {
+    settings.storyText = $("story-text").checked;
+    save();
+    render();
+  });
+  $("mode-toggle").addEventListener("click", () => {
+    setExperience(settings.experience === "adventure" ? "simple" : "adventure");
+    say(settings.experience === "adventure" ? "Adventure mode! Let's explore while we brush." : "Simple timer mode.");
+  });
 
   $("add-stage").addEventListener("click", () => {
     settings.stages.push({
@@ -1355,12 +1512,43 @@
     if (e.target === e.currentTarget) e.currentTarget.classList.remove("poked");
   });
   $("motion-toggle").addEventListener("click", () => (motionOn ? stopCamera(true) : startCamera()));
+  $("motion-calibrate").addEventListener("click", () => {
+    if (!motionOn) return;
+    cameraCalibrating = true;
+    if (cameraPauses() && phase === "running") pauseNoMotion();
+    cameraHelper?.calibrate();
+    cameraMessage("calibration-quiet", "Hold still for two seconds, then brush when prompted. Calibration stays on this device.");
+  });
+  for (const id of ["motion-sensitivity", "motion-region", "motion-target", "motion-target-x", "motion-target-y", "motion-target-size", "motion-auto-pause", "motion-brush-type"]) {
+    $(id).addEventListener("change", () => {
+      readCameraSettings();
+      save();
+      cameraCalibrating = false;
+      cameraHelper?.configure(cameraOptions());
+      lastMove = performance.now();
+      if (cameraPauses() && ["running", "break"].includes(phase)) motionArmed = true;
+      if (!cameraPauses() && ["motion-wait", "motion-paused"].includes(phase)) {
+        const resume = phase === "motion-paused" || motionArmed;
+        phase = resume ? (breakLeft > 0 ? "break" : "running") : "ready";
+        if (resume && clock === null) clock = setInterval(tick, 1000);
+      }
+      render();
+    });
+  }
+  $("motion-replay").addEventListener("change", () => {
+    const file = $("motion-replay").files[0];
+    if (!file) return;
+    stopCamera();
+    $("settings-dialog").close();
+    startCamera(file);
+  });
 
   $("settings-dialog").addEventListener("click", e => {
     if (e.target === $("settings-dialog")) $("settings-dialog").close();
   });
 
   document.addEventListener("visibilitychange", () => {
+    if (document.hidden && (motionOn || cameraStarting)) stopCamera();
     if (document.hidden && ["running", "break"].includes(phase)) {
       pausedFrom = phase;
       stopClock();
@@ -1371,7 +1559,7 @@
     }
   });
 
-  window.addEventListener("pagehide", stopCamera);
+  window.addEventListener("pagehide", () => stopCamera());
 
   if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {
@@ -1382,6 +1570,7 @@
   gestures();
   if (!navigator.mediaDevices?.getUserMedia) $("motion-toggle").disabled = true;
 
+  window.BrushBuddies = Object.freeze({ snapshot, say, tone });
   settings.totalSeconds = total();
   applyAppearance();
   applyTheme();
