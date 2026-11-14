@@ -79,3 +79,21 @@ Adventure Mode is optional and can be switched on or off at any time without res
 - Finishing every stage awards a sticker for the Field Journal, with an occasional rare 🌟.
 - It's picture-first by default. Turn on **Story text** in Buddy settings to add a short line at each stop.
 - Journal progress is stored on the device under its own key, so "Reset settings" does not erase it.
+
+## Animal expeditions (in development)
+
+Adventure is the default for new settings. Each local calendar day chooses a visiting buddy from the locked collection. Cat and Bunny are starter choices; the 75-animal field journal unlocks each visitor and its habitat after three completed sessions. Unlocked animals can be chosen in Simple mode or from the collection for another adventure. Switching animals updates the journey immediately. Existing stickers are preserved.
+
+The creek avatar follows completed brushing time, with reduced-motion support. Collection backup/restore is available because clearing browser storage can erase guest progress. Neon accounts save completed expeditions across devices. One account can own a single profile or separate child profiles. Guest progress is imported only when explicitly checked while creating a profile.
+
+Verify progression with `node --test tests/buddies.test.cjs` and, with the same Playwright environment as above, `node --test tests/expedition-browser.cjs`.
+
+## Neon accounts
+
+The dedicated Brush Buddies Neon project uses managed Auth and the authenticated Data API. Public endpoints are in neon-config.js; no API key or database password belongs in frontend code. db/001-accounts.sql is the additive schema already applied to the project. RLS restricts profiles and append-only expedition events to their owner.
+
+Sign in with email/password, then create or select a nickname profile. Profile switches reset the current timer. Account collections and guest progress use separate local keys. Completed sessions are queued on the device, deduplicated by session ID in Neon, and retried when online or through Sync now. Do not clear an offline device until syncing succeeds. Backup imports go into guest mode and can be brought into a new profile.
+
+Auth calls are lazy: camera/timer-only use makes no account-service requests. Managed cookies are secure and HTTP-only, and short-lived database JWTs stay in memory. Password reset uses Neon's email flow. Cross-site-cookie restrictions (especially Safari/installed PWAs) and email delivery still need real-device verification; a same-site Auth domain/proxy may be needed where browser policy blocks the managed cookie.
+
+Run npm test for deterministic tests. Live-service tests require explicit NEON_LIVE_TEST=1: node --test tests/accounts-live.cjs, followed by node --test tests/accounts-browser.cjs with the Playwright environment described above. They create synthetic accounts using example.com addresses; test credentials are stored only in ignored .local/ for the follow-on browser test. Never run the schema migration against an unrelated database.

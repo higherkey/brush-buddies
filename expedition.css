@@ -1,0 +1,58 @@
+/* Adventure is the main activity; Simple retains the compact timer layout. */
+:root { font-family: "Segoe UI", system-ui, sans-serif; }
+.collection-save { grid-column: 1 / -1; padding-block: 1rem; border-block-start: 1px solid var(--line); }
+.collection-save p { max-inline-size: 65ch; font-size: .875rem; }
+.account-actions { display: flex; flex-wrap: wrap; gap: .5rem; margin-block: 1rem; }
+#account-dialog label { display: block; margin-block: .75rem; text-align: start; }
+#account-dialog .account-checkbox { display: flex; align-items: center; gap: .5rem; }
+#account-dialog input, #account-dialog button, #account-dialog select { min-block-size: 48px; }
+#account-dialog .account-checkbox input { min-inline-size: 24px; }
+.collection-save .quick-button { display: inline-flex; margin-inline-end: .5rem; margin-block-end: .5rem; cursor: pointer; }
+.app[data-mode="adventure"] {
+  inline-size: min(100%, 1120px);
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas: "top" "intro" "buddy" "timer" "camera" "footer";
+  gap: 1rem;
+  --accent-text: oklch(38% .08 165);
+  --accent-strong: oklch(37% .08 165);
+}
+.app[data-mode="adventure"] .intro { text-align: start; }
+.app[data-mode="adventure"] h1 { font-family: "Bahnschrift", "DIN Alternate", system-ui, sans-serif; font-size: clamp(1.5rem, 4vw, 2.25rem); }
+.app[data-mode="adventure"] .subtitle { margin-block-end: 0; }
+.app[data-mode="adventure"] .buddy-area {
+  display: flex; flex-direction: column; justify-content: end; align-items: start;
+  min-block-size: clamp(380px, 58vh, 650px); padding: 1rem; overflow: hidden;
+  border: 1px solid var(--line-strong); gap: .5rem;
+}
+.app[data-mode="adventure"] .buddy-area > .buddy,
+.app[data-mode="adventure"] .floaty { display: none; }
+.app[data-mode="adventure"] .adv-scene { background: none; }
+.app[data-mode="adventure"] .adv-backdrop { inset: 0; }
+.app[data-mode="adventure"] .speech { max-inline-size: 36rem; margin: 0; background: var(--panel); padding: .5rem 1rem; }
+.app[data-mode="adventure"] .adv-bar { justify-content: start; margin: 0; }
+.app[data-mode="adventure"] .timer-card { display: grid; grid-template-columns: 100px minmax(0,1fr); gap: .5rem 1rem; padding-block: .5rem; }
+.app[data-mode="adventure"] .timer-ring { inline-size: 100px; block-size: 100px; grid-row: 1 / 5; margin: 0; }
+.app[data-mode="adventure"] .timer-time { font-size: 1.75rem; }
+.app[data-mode="adventure"] .timer-caption { font-size: .55rem; }
+.app[data-mode="adventure"] .zone-title { text-align: start; margin: 0; }
+.app[data-mode="adventure"] .stage-hint { text-align: start; }
+.app[data-mode="adventure"] .timer-controls,
+.app[data-mode="adventure"] .total-row { grid-column: 1 / -1; }
+.app[data-mode="adventure"] .zone-track { margin: 0; }
+.app[data-mode="adventure"] .camera-view { max-inline-size: 32rem; }
+.animal-collection { border-block-end: 1px solid var(--line); padding-block-end: 1rem; }
+.collection-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(160px,1fr)); gap: .5rem; }
+.collection-grid button { min-block-size: 72px; padding: .75rem; text-align: start; background: var(--panel); color: var(--ink); border: 1px solid var(--line-strong); font: inherit; }
+.collection-grid button:disabled { opacity: .7; }
+.quick-button, .icon-button { min-block-size: 48px; min-inline-size: 48px; }
+.settings-dialog::backdrop { backdrop-filter: none; }
+html[data-scheme="dark"] .app[data-mode="adventure"] { --accent-text: oklch(88% .06 160); --accent-strong: oklch(37% .08 165); }
+@media (max-width: 699px) {
+  .top-actions { grid-template-columns: repeat(3,minmax(0,1fr)) 48px 48px; }
+  .app[data-mode="adventure"] { padding: .5rem; gap: .5rem; }
+  .app[data-mode="adventure"] .eyebrow { margin-block: .25rem; }
+  .app[data-mode="adventure"] .intro h1 { margin-block: .25rem; }
+  .app[data-mode="adventure"] .buddy-area { min-block-size: 52vh; padding: .5rem; }
+  .app[data-mode="adventure"] .speech { font-size: .8rem; }
+  .settings-dialog { margin-block-start: auto; margin-block-end: 0; max-block-size: 88dvh; inline-size: 100%; overscroll-behavior: contain; }
+}

@@ -1,0 +1,117 @@
+.creek-scene {
+  --creek-sky: oklch(92% 0.045 225);
+  --creek-far: oklch(80% 0.09 150);
+  --creek-hill: oklch(71% 0.12 145);
+  --creek-bank: oklch(83% 0.12 120);
+  --creek-water: oklch(69% 0.1 220);
+  --creek-light: oklch(97% 0.02 95);
+  --creek-leaf: oklch(43% 0.095 155);
+  --creek-bark: oklch(43% 0.065 65);
+  --creek-stone: oklch(78% 0.025 90);
+  --creek-shadow: oklch(38% 0.055 210 / 28%);
+  --creek-gold: oklch(89% 0.15 90);
+  --creek-petal: oklch(74% 0.15 25);
+  --creek-flag: oklch(57% 0.15 30);
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  min-block-size: 15rem;
+  aspect-ratio: 2 / 1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.creek-scene[data-scene="forest"],
+.creek-scene[data-scene="jungle"] {
+  --creek-sky: oklch(89% 0.055 140);
+  --creek-far: oklch(66% 0.09 160);
+  --creek-hill: oklch(57% 0.11 150);
+  --creek-bank: oklch(74% 0.12 125);
+}
+
+.creek-scene[data-scene="snow"] {
+  --creek-sky: oklch(91% 0.04 250);
+  --creek-far: oklch(78% 0.055 255);
+  --creek-hill: oklch(87% 0.035 235);
+  --creek-bank: oklch(96% 0.015 240);
+  --creek-stone: oklch(88% 0.025 240);
+  --creek-water: oklch(70% 0.085 245);
+}
+
+.creek-scene[data-scene="beach"],
+.creek-scene[data-scene="desert"] {
+  --creek-sky: oklch(92% 0.055 220);
+  --creek-far: oklch(84% 0.07 105);
+  --creek-hill: oklch(86% 0.095 90);
+  --creek-bank: oklch(91% 0.085 90);
+  --creek-water: oklch(72% 0.115 205);
+}
+
+.creek-scene[data-scene="night"] {
+  --creek-sky: oklch(30% 0.075 275);
+  --creek-far: oklch(38% 0.065 265);
+  --creek-hill: oklch(42% 0.06 180);
+  --creek-bank: oklch(51% 0.07 160);
+  --creek-water: oklch(49% 0.075 250);
+  --creek-leaf: oklch(32% 0.045 170);
+}
+
+.creek-scene[data-scene="sky"] {
+  --creek-far: oklch(85% 0.065 290);
+  --creek-hill: oklch(80% 0.075 180);
+  --creek-bank: oklch(91% 0.055 135);
+}
+
+.creek-sky { fill: var(--creek-sky); }
+.creek-hill-far { fill: var(--creek-far); }
+.creek-hill { fill: var(--creek-hill); }
+.creek-bank { fill: var(--creek-bank); }
+.creek-water { fill: var(--creek-water); }
+.creek-sun-halo { fill: var(--creek-gold); opacity: 0.2; }
+.creek-sun, .creek-flower-heart { fill: var(--creek-gold); }
+.creek-cloud { fill: var(--creek-light); opacity: 0.8; }
+.creek-tree { fill: var(--creek-leaf); }
+.creek-trunk { fill: var(--creek-bark); }
+.creek-stone { fill: var(--creek-stone); }
+.creek-stone-shadow, .creek-avatar-shadow { fill: var(--creek-shadow); }
+.creek-flower, .creek-shell { fill: var(--creek-petal); }
+.creek-moon, .creek-star, .creek-snowcap { fill: var(--creek-light); }
+.creek-flag { fill: var(--creek-flag); }
+.creek-ripple, .creek-stone-glint, .creek-snowflake {
+  fill: none;
+  stroke: var(--creek-light);
+  stroke-width: 3;
+  stroke-linecap: round;
+  opacity: 0.6;
+}
+.creek-reed, .creek-grass {
+  fill: none;
+  stroke: var(--creek-leaf);
+  stroke-width: 5;
+  stroke-linecap: round;
+}
+.creek-cattail, .creek-flagpole {
+  fill: none;
+  stroke: var(--creek-bark);
+  stroke-width: 4;
+  stroke-linecap: round;
+}
+.creek-cattail { stroke-width: 8; }
+.creek-buddy { font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif; font-size: 64px; }
+.creek-flag-number { fill: var(--creek-light); font: 700 13px system-ui, sans-serif; }
+.creek-avatar { transition: none; }
+
+.creek-beach, .creek-night, .creek-snow, .creek-snowcap { display: none; }
+.creek-scene[data-scene="snow"] .creek-snow,
+.creek-scene[data-scene="snow"] .creek-snowcap,
+.creek-scene[data-scene="beach"] .creek-beach,
+.creek-scene[data-scene="night"] .creek-night { display: inline; }
+.creek-scene[data-scene="beach"] .creek-forest,
+.creek-scene[data-scene="desert"] .creek-forest,
+.creek-scene[data-scene="night"] .creek-sun,
+.creek-scene[data-scene="night"] .creek-sun-halo,
+.creek-scene[data-scene="night"] .creek-cloud { display: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .creek-avatar { transition: none; }
+}

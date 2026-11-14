@@ -20,7 +20,7 @@
       this.stop();
       const generation = this.generation;
       this.video = video;
-      this.worker = new Worker("./camera-worker.js?v=0.7.0");
+      this.worker = new Worker("./camera-worker.js?v=0.8.0");
       try {
         await new Promise((resolve, reject) => {
           this.rejectStart = reject;
