@@ -12,7 +12,7 @@ test('real sign-in, separate child profiles, offline queue and recovery on anoth
     const pathname = new URL(req.url,'http://localhost').pathname;
     const file = path.resolve(root,'.'+(pathname==='/'?'/index.html':decodeURIComponent(pathname)));
     if(!file.startsWith(root+path.sep)){res.writeHead(403).end();return;}
-    fs.readFile(file,(error,data)=>{if(error){res.writeHead(404).end();return;}res.setHeader('Content-Type',file.endsWith('.js')?'text/javascript':file.endsWith('.css')?'text/css':file.endsWith('.wasm')?'application/wasm':'text/html');res.end(data);});
+    fs.readFile(file,(error,data)=>{if(error){res.writeHead(404).end();return;}res.setHeader('Content-Type',file.endsWith('.js')?'text/javascript':file.endsWith('.css')?'text/css':file.endsWith('.wasm')?'application/wasm':file.endsWith('.svg')?'image/svg+xml':'text/html');res.end(data);});
   });
   await new Promise(r=>server.listen(4173,'127.0.0.1',r));
   let browser;

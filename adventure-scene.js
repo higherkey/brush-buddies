@@ -8,6 +8,7 @@
   let frame = null;
   let position = 0;
   let target = 0;
+  let resizeObserver;
 
   function element(tag, attributes, parent, text) {
     const node = document.createElementNS(NS, tag);
@@ -28,12 +29,21 @@
     const fraction = step - index;
     const [x, y] = stones[index];
     const [nextX, nextY] = stones[index + 1];
-    avatar.setAttribute("transform", `translate(${x + (nextX - x) * fraction} ${y + (nextY - y) * fraction - 12})`);
+    const animalX = x + (nextX - x) * fraction;
+    const animalY = y + (nextY - y) * fraction - 12;
+    avatar.setAttribute("transform", `translate(${animalX} ${animalY})`);
+    // Follow the animal on portrait screens instead of cropping the ends of its path.
+    const aspect = backdrop.clientHeight > 0 && backdrop.clientWidth > 0 ? backdrop.clientWidth / backdrop.clientHeight : 2;
+    const width = Math.min(1000, 500 * aspect);
+    const height = Math.min(500, 1000 / aspect);
+    const cameraX = Math.max(0, Math.min(1000 - width, animalX - width / 2));
+    const cameraY = Math.max(0, Math.min(500 - height, animalY - 36 - height / 2));
+    svg.setAttribute("viewBox", `${cameraX} ${cameraY} ${width} ${height}`);
   }
 
   function create(host) {
     backdrop = host;
-    svg = element("svg", { class: "creek-scene", viewBox: "0 0 1000 500", "aria-hidden": "true", focusable: "false", preserveAspectRatio: "xMidYMid slice" });
+    svg = element("svg", { class: "creek-scene", viewBox: "0 0 1000 500", "aria-hidden": "true", focusable: "false", preserveAspectRatio: "xMidYMid meet" });
     element("rect", { width: 1000, height: 500, class: "creek-sky" }, svg);
     element("circle", { cx: 822, cy: 83, r: 55, class: "creek-sun-halo" }, svg);
     element("circle", { cx: 822, cy: 83, r: 34, class: "creek-sun" }, svg);
@@ -66,6 +76,7 @@
       path(`M${cx - 5} ${cy}h10m-5-5v10`, "creek-snowflake", snow);
     }
 
+    window.BB_HABITATS?.render(svg, 'meadow', '');
     for (const [x, y] of stones) {
       element("ellipse", { cx: x, cy: y + 12, rx: 39, ry: 13, class: "creek-stone-shadow" }, svg);
       element("ellipse", { cx: x, cy: y, rx: 33, ry: 17, class: "creek-stone" }, svg);
@@ -84,9 +95,15 @@
     }
     avatar = element("g", { class: "creek-avatar" }, svg);
     element("ellipse", { cx: 0, cy: 9, rx: 22, ry: 6, class: "creek-avatar-shadow" }, avatar);
-    emoji = element("text", { x: 0, y: 0, "text-anchor": "middle", class: "creek-buddy" }, avatar);
+    element("circle", { cx: 0, cy: -36, r: 47, class: "creek-avatar-badge" }, avatar);
+    emoji = element("image", { x: -40, y: -76, width: 80, height: 80, class: "creek-buddy" }, avatar);
     host.replaceChildren(svg);
     place(0);
+    resizeObserver?.disconnect();
+    if (window.ResizeObserver) {
+      resizeObserver = new window.ResizeObserver(() => place(position));
+      resizeObserver.observe(host);
+    }
   }
 
   function render(snapshot, destination) {
@@ -97,7 +114,10 @@
     const changed = fresh || destinationId !== destination.id;
     destinationId = destination.id;
     svg.dataset.scene = destination.scene || "meadow";
-    emoji.textContent = snapshot.buddyEmoji || "🐾";
+    svg.dataset.habitat = destination.habitat || 'meadow';
+    window.BB_HABITATS?.render(svg, destination.habitat || 'meadow', snapshot.buddy);
+    const animalId = /^[a-z-]+$/.test(snapshot.buddy || '') ? snapshot.buddy : 'cat';
+    emoji.setAttribute('href', 'animals/' + animalId + '.svg');
     if (changed) {
       flags.replaceChildren();
       const stops = destination.stops || [];

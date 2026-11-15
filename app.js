@@ -676,8 +676,16 @@
 
   function applyTheme() {
     const a = animal();
-    $("buddy-emoji").textContent = a[0];
-    $("quick-buddy-emoji").textContent = a[0];
+    const art = document.createElement('img');
+    art.src = 'animals/' + (ANIMALS[selected] ? selected : 'cat') + '.svg';
+    art.alt = '';
+    art.width = 120;
+    art.height = 120;
+    $("buddy-emoji").replaceChildren(art);
+    const quickArt = art.cloneNode();
+    quickArt.width = 24;
+    quickArt.height = 24;
+    $("quick-buddy-emoji").replaceChildren(quickArt);
     $("buddy-name").textContent = a[1];
     $("app").dataset.theme = selected;
     $("app").dataset.mode = settings.experience;

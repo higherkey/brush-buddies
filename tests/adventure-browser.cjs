@@ -13,7 +13,7 @@ test('live story preference and open journal update during a brushing session', 
     if (!file.startsWith(root + path.sep)) { res.writeHead(403).end(); return; }
     fs.readFile(file, (error, data) => {
       if (error) { res.writeHead(404).end(); return; }
-      res.setHeader('Content-Type', file.endsWith('.js') ? 'text/javascript' : file.endsWith('.css') ? 'text/css' : 'text/html');
+      res.setHeader('Content-Type', file.endsWith('.js') ? 'text/javascript' : file.endsWith('.css') ? 'text/css' : file.endsWith('.svg') ? 'image/svg+xml' : 'text/html');
       res.end(data);
     });
   });

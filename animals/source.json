@@ -1,0 +1,307 @@
+{
+  "source": "https://github.com/jdecked/twemoji",
+  "commit": "b6b55fef1e8636b540a6d016a4729ca8cdf2e60b",
+  "license": "CC-BY-4.0",
+  "files": {
+    "dog": {
+      "codepoint": "1f436",
+      "sha256": "52acbb8b0f2d817937b6de1581e298217887e62fb1265055fdcbacae10c669c3"
+    },
+    "fox": {
+      "codepoint": "1f98a",
+      "sha256": "5b5b42dd21db3a10ad01b079ccd22da94aa5a00a216fcef3052020354f6a5580"
+    },
+    "bunny": {
+      "codepoint": "1f430",
+      "sha256": "19f213da129217b424595228e6f25eadf8c737a6128827a1e36058fba237f1d2"
+    },
+    "koala": {
+      "codepoint": "1f428",
+      "sha256": "3248d764a53f410897bd0742e4e87603e122d9130b1d54a2fdba36f001970be5"
+    },
+    "panda": {
+      "codepoint": "1f43c",
+      "sha256": "f62d0a2b082c192743e4ea6e3ec841c76efb17fe882c068e00d5264e9ad42128"
+    },
+    "owl": {
+      "codepoint": "1f989",
+      "sha256": "9305c70ce193140e274162fd3237143ffa5fcaeedf15ce573291f076ddecc508"
+    },
+    "penguin": {
+      "codepoint": "1f427",
+      "sha256": "68dc119e054a8660c1d0e7ee999b649be22309e050a7f68ba9458f36eb2db489"
+    },
+    "cat": {
+      "codepoint": "1f431",
+      "sha256": "a7f61fb700b3a7d3cd6b6839e8574c330fe7baff59f0a964614a2cb324f95abf"
+    },
+    "lion": {
+      "codepoint": "1f981",
+      "sha256": "bd269f15a1e303fda5c87a4ff92f3e981a4ed5c4eab175393a73897d714c5f84"
+    },
+    "frog": {
+      "codepoint": "1f438",
+      "sha256": "82f93e8eec264c4c0f1c932e61b80735904d8f853cbfabd80965576deb827d41"
+    },
+    "elephant": {
+      "codepoint": "1f418",
+      "sha256": "b23f4d2146dcf07d2dc7fc72d206788581f0ec8c5979a2704ad93d772bc83682"
+    },
+    "bear": {
+      "codepoint": "1f43b",
+      "sha256": "01203c85604edcc900adab2c45324174e6771db767345d53aebd0469a4c21a5a"
+    },
+    "mouse": {
+      "codepoint": "1f42d",
+      "sha256": "e0cd07ccfa1798bc34bed1b77c0f8ef6492b9578c2805bac75d89b7a8a608c68"
+    },
+    "unicorn": {
+      "codepoint": "1f984",
+      "sha256": "6063b1ca7021881784eb5a8110997357026fb7376785e639850335a9c422a639"
+    },
+    "tiger": {
+      "codepoint": "1f42f",
+      "sha256": "7a07089eeed2d819b151171845cb6f62f9e601b95c5e4793e7f08fb6a6d9b833"
+    },
+    "wolf": {
+      "codepoint": "1f43a",
+      "sha256": "4d26cdb3f88ec66e26787a47ca3597c0ad25093aeeac660b8ffa88048b49fc9b"
+    },
+    "hamster": {
+      "codepoint": "1f439",
+      "sha256": "de2c5a5ca1be8fa8f768efee6b1ced41e7c6152671a207d58f077a24ecfa0cb3"
+    },
+    "raccoon": {
+      "codepoint": "1f99d",
+      "sha256": "679a3349c5303709e8f78027814511a4c1fa1a4035524ea52b367210df832fe5"
+    },
+    "deer": {
+      "codepoint": "1f98c",
+      "sha256": "eddcd2e43a46c652103e0df0fcb57a9be561e7c8cc5c7468ff643fe0ad397f75"
+    },
+    "moose": {
+      "codepoint": "1face",
+      "sha256": "2a63c151f3e4ff3ee0464a088fb7d69a31a4b1b3f15edf11795b074451c9b679"
+    },
+    "hedgehog": {
+      "codepoint": "1f994",
+      "sha256": "f0e84b08ea2056f50c9f63d4296e8c824e100fad65ceec9c62b388f7a0e9b86d"
+    },
+    "badger": {
+      "codepoint": "1f9a1",
+      "sha256": "8a961350b2aa6d013d189bee9319e655ecf691df25e790716129167f2e8272c3"
+    },
+    "skunk": {
+      "codepoint": "1f9a8",
+      "sha256": "fb8e434cda82690fffb6f02ee0bb22a4d21d2dbda578b9b72b150a82ebbcec07"
+    },
+    "beaver": {
+      "codepoint": "1f9ab",
+      "sha256": "5ddc891c223ba6fed66f266f79c1a586b780d3695e8019e131b927ee41fc4d3f"
+    },
+    "squirrel": {
+      "codepoint": "1f43f",
+      "sha256": "1b2d9e432ccea3989d41fc52d731e0b0a8aefb21861313c2f7a02951d0d8426b"
+    },
+    "otter": {
+      "codepoint": "1f9a6",
+      "sha256": "d4400baf49fb861405b3a05b33969384a396d2451bbc5b7d07b158c64aaab2e3"
+    },
+    "bat": {
+      "codepoint": "1f987",
+      "sha256": "15e1e1bac9988be3960759f24289e3a5bfb04ad0a42a88f1ab10680df1bfa61c"
+    },
+    "sloth": {
+      "codepoint": "1f9a5",
+      "sha256": "dd2fa94f90aed2fe8923ee0e7b0e4666c8aa5591d86cd6a52bdb2be15b652436"
+    },
+    "monkey": {
+      "codepoint": "1f412",
+      "sha256": "b4544110be26cf10e8b486633f7cf5e5c7483373deb740de5ce131dfc014c6a6"
+    },
+    "orangutan": {
+      "codepoint": "1f9a7",
+      "sha256": "837f47b2e5c83afb973cdd55a2857ba947a656b3fb5e8f49b2d46d6fbadd654c"
+    },
+    "leopard": {
+      "codepoint": "1f406",
+      "sha256": "f7bed20ca8eb7c35fb2f4677b9af3820bd9d5c0341a0dcca339bd9448d0eefa4"
+    },
+    "gorilla": {
+      "codepoint": "1f98d",
+      "sha256": "50a64889b6e620554d00a1f3c11d627192e3c5e7f80935c11ea4c1ef77405d42"
+    },
+    "hippopotamus": {
+      "codepoint": "1f99b",
+      "sha256": "ba1ec3adcaa959a1423dd6a7f88cfa0a1c92da239228687285c54be2659d88d5"
+    },
+    "rhinoceros": {
+      "codepoint": "1f98f",
+      "sha256": "96263ede0ffc9902a34bdd7cca8210fa419b8306105cbbe52251ac361ddaa151"
+    },
+    "zebra": {
+      "codepoint": "1f993",
+      "sha256": "303de99b0b43eeaf599b59598588e5805f0c59ced55462bb128f93030172185a"
+    },
+    "camel": {
+      "codepoint": "1f42a",
+      "sha256": "5aa547209a11b2ef5fa49b194177854e7a035b635a565e2b076037526fc72125"
+    },
+    "kangaroo": {
+      "codepoint": "1f998",
+      "sha256": "b8d61f1e5d5aa393302e4f3845bb912e6a1168878e24341476ad0dc0c8a626f4"
+    },
+    "giraffe": {
+      "codepoint": "1f992",
+      "sha256": "07a63c7cec7bf62f111d9967e3fd519a90c5148204e1cd99fc1811bba48ce9a9"
+    },
+    "horse": {
+      "codepoint": "1f434",
+      "sha256": "34f4c592c77acedc68f523aedd30c7d1cf04937e722db1956b46e731b6190189"
+    },
+    "cow": {
+      "codepoint": "1f42e",
+      "sha256": "44edfb30db3862e85ff4ae355a52706030b446b0fd75783e3e3882f00d696fb0"
+    },
+    "donkey": {
+      "codepoint": "1facf",
+      "sha256": "6132a68972376788802b9d6423ea2d2b4736cdca4346cefb60be3cdba8e05537"
+    },
+    "pig": {
+      "codepoint": "1f437",
+      "sha256": "ea4dc77fdf5e91c1cac823dc7dc7108bf7cf08c4fa44ccf9492ebd332be0af01"
+    },
+    "goat": {
+      "codepoint": "1f410",
+      "sha256": "818b0c0ae7322fec7e3db3499dbd7b78dc5a3fec41813b2147ad67251bd74212"
+    },
+    "llama": {
+      "codepoint": "1f999",
+      "sha256": "4a1765f4c6b434bb74cc8fcf1aff0b2cf71a533d2ff84ec80aaaec4da7a1c438"
+    },
+    "bison": {
+      "codepoint": "1f9ac",
+      "sha256": "fc0e1d4877d343a4cbcd4e52173c685753f66b772c6fc8a726502c541ee2521d"
+    },
+    "duck": {
+      "codepoint": "1f986",
+      "sha256": "74114f0e02acbd2a91b55f72e597c27d5c8da1fe2d03910ccd17a5180102c89b"
+    },
+    "sheep": {
+      "codepoint": "1f411",
+      "sha256": "23d57bfbd45dd5c58a6762db275b4eade1a98b613b34f04877128ad2dfecf36b"
+    },
+    "boar": {
+      "codepoint": "1f417",
+      "sha256": "c24a202756aaee2433a33ec19220bb60384f4abafe0298f56e7387a0a77870aa"
+    },
+    "goose": {
+      "codepoint": "1fabf",
+      "sha256": "b6d265b709cd214aa77d955c45efc827d50ff314935ae79d1ed3aef690b39022"
+    },
+    "swan": {
+      "codepoint": "1f9a2",
+      "sha256": "fe56a4a7f9ab3267cef021fcf1316d6fa5053c9497c6f43dc3bd270b570511d8"
+    },
+    "flamingo": {
+      "codepoint": "1f9a9",
+      "sha256": "df7e3f837657268451b7bbff123254f520050c4ab336955b6fcac1782aad63fc"
+    },
+    "parrot": {
+      "codepoint": "1f99c",
+      "sha256": "6ca5357a83bea09872817fb4f6f24f0b287e9f5dff221f0e6be733a342a84c5f"
+    },
+    "peacock": {
+      "codepoint": "1f99a",
+      "sha256": "6f9be75cbe9c98a640ea9410a0bfbb472da7a8e0f383a24b807fbeb0832dc395"
+    },
+    "eagle": {
+      "codepoint": "1f985",
+      "sha256": "70d3f8b904079499625475ec4758f178378983f9b569481e08c3fc8e243f7a75"
+    },
+    "turkey": {
+      "codepoint": "1f983",
+      "sha256": "ea158b235aadb6f8feac7f6d55455ea355de54d697910be1b317c1a566f1afec"
+    },
+    "chicken": {
+      "codepoint": "1f414",
+      "sha256": "38184b07b552b5f7bf76cad78bf4dab2a9fcc16800c51596a1a93f9b2abc03a3"
+    },
+    "dove": {
+      "codepoint": "1f54a",
+      "sha256": "c0d31764848cc9f3873efce6f159f1a917fd9540d01e396e417bad653a23c118"
+    },
+    "seal": {
+      "codepoint": "1f9ad",
+      "sha256": "8efa52a65d66715b3334d30bb04440a2b57063a3d3f28687ea6dccee42d4507d"
+    },
+    "whale": {
+      "codepoint": "1f40b",
+      "sha256": "8ef657c5e310650e105b56ca7b9a38d2f3af5ab2684077df5ace79ab67ba4dda"
+    },
+    "octopus": {
+      "codepoint": "1f419",
+      "sha256": "92d125d9c4c2d7e7d8ff450d0fb1cd80c089804fa06663cf1e12ac29ed173c54"
+    },
+    "shark": {
+      "codepoint": "1f988",
+      "sha256": "accb7bae5d222c1610528269fbfb44a75d7a96e955a8526334fc7c2153a0edca"
+    },
+    "squid": {
+      "codepoint": "1f991",
+      "sha256": "bd44e1d4db19744c519d1d6490873ca76f8894680b6bfd529d89585196cb9cf7"
+    },
+    "crab": {
+      "codepoint": "1f980",
+      "sha256": "7c95cad49ca19cee604037d049a7f154fb02b785a95b9d32f99d7efe33cb2218"
+    },
+    "dolphin": {
+      "codepoint": "1f42c",
+      "sha256": "94eba04777cdb147a9359132effa6bf8b0ebccd8c08ba1a6eec4e17e5acd2ac6"
+    },
+    "lobster": {
+      "codepoint": "1f99e",
+      "sha256": "c6ef048c73f3038412ca909ec412ebf53fe7dc9dbab6b13dec485cac8c11851a"
+    },
+    "shrimp": {
+      "codepoint": "1f990",
+      "sha256": "154400268f8a187f34a8b9fef7a43016e585a6f0a115e96e589049d842f29be9"
+    },
+    "jellyfish": {
+      "codepoint": "1fabc",
+      "sha256": "cdde79d74d14930ea1e5901ca213b0dc993356ac7dc3b74c1615881ead5369c3"
+    },
+    "turtle": {
+      "codepoint": "1f422",
+      "sha256": "c79bb7aa13c847aead252a730ab44f5e631d8409569717b963d1f0f476252342"
+    },
+    "crocodile": {
+      "codepoint": "1f40a",
+      "sha256": "8acb7dfd69ceb853d57eeaaf63b2b3237ae8dfdf9d770c0637e20bb9c0331b3c"
+    },
+    "snake": {
+      "codepoint": "1f40d",
+      "sha256": "0b5464f87e1571fffee05d254c8fe1cf1f880c20d8a8c100b942537606dab54b"
+    },
+    "lizard": {
+      "codepoint": "1f98e",
+      "sha256": "e6def08ca112ef70631be14be4425ec4aec800eaeccc6a76d6c38e48f72b2f50"
+    },
+    "butterfly": {
+      "codepoint": "1f98b",
+      "sha256": "6ce1f664bbdfbcf69732b00f55cc257469a26c115b8891526193e0ea837f836a"
+    },
+    "bee": {
+      "codepoint": "1f41d",
+      "sha256": "462a19f9db69d8938155c589be0aeed4ce3538ea734c2d3278b205c83932de3d"
+    },
+    "ladybug": {
+      "codepoint": "1f41e",
+      "sha256": "e846ca01f190e98e1e3c57d8d24b984c64f5dbb0aabad93997f10b5dd8ef3587"
+    },
+    "snail": {
+      "codepoint": "1f40c",
+      "sha256": "2ea85c06c823529e21d018820d1b1326eb7ae30d118a7f252fb35315e3e512a1"
+    }
+  }
+}

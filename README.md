@@ -5,7 +5,7 @@ A kid-friendly animal-themed toothbrushing timer hosted as a static site on GitH
 ## Features
 
 - 14 animal buddies with a quick switcher on the main screen
-- Two experiences: a Simple timer, or Adventure Mode, where each brush is a short trip with sugar bugs to clean and stickers to collect in a Field Journal (switch with the 🗺️ button or in Buddy settings)
+- Two experiences: a Simple timer, or Adventure Mode, where each brush is a short trip with scenery to explore and stickers to collect in a Field Journal (switch with the 🗺️ button or in Buddy settings)
 
 - Customizable brushing stages: rename, change emoji, edit reminders, set each stage duration, add or remove stages
 - Tap a stage to jump to it; touch and hold a stage on the main screen to reorder it
@@ -55,7 +55,7 @@ CHROMIUM_EXECUTABLE can select an existing Chromium binary. The browser tests ru
 
 ## Sound and artwork
 
-Animal calls and interface sounds are synthesized locally with the Web Audio API. Animal artwork uses Unicode emoji. No third-party audio or image assets are bundled or hotlinked.
+Animal calls and interface sounds are synthesized locally with the Web Audio API. Animal artwork is locally bundled Twemoji SVGs (CC BY 4.0; attribution in animals/README.md and the app footer). No third-party artwork is hotlinked.
 
 ## Run locally
 
@@ -75,7 +75,7 @@ The web app manifest and SVG icon provide the app name, launch location, colors,
 Adventure Mode is optional and can be switched on or off at any time without resetting the timer.
 
 - Each session your buddy visits a place: one of six shared destinations, or sometimes their own home spot.
-- Each brushing stage is a stop on the trail. Sugar bugs fade away as the stage timer runs down.
+- Each brushing stage is a stop on the trail. Your buddy moves through their habitat as the stage timer runs down.
 - Finishing every stage awards a sticker for the Field Journal, with an occasional rare 🌟.
 - It's picture-first by default. Turn on **Story text** in Buddy settings to add a short line at each stop.
 - Journal progress is stored on the device under its own key, so "Reset settings" does not erase it.
@@ -97,3 +97,5 @@ Sign in with email/password, then create or select a nickname profile. Profile s
 Auth calls are lazy: camera/timer-only use makes no account-service requests. Managed cookies are secure and HTTP-only, and short-lived database JWTs stay in memory. Password reset uses Neon's email flow. Cross-site-cookie restrictions (especially Safari/installed PWAs) and email delivery still need real-device verification; a same-site Auth domain/proxy may be needed where browser policy blocks the managed cookie.
 
 Run npm test for deterministic tests. Live-service tests require explicit NEON_LIVE_TEST=1: node --test tests/accounts-live.cjs, followed by node --test tests/accounts-browser.cjs with the Playwright environment described above. They create synthetic accounts using example.com addresses; test credentials are stored only in ignored .local/ for the follow-on browser test. Never run the schema migration against an unrelated database.
+
+Adventure scenery follows each animal’s habitat (15 illustrated environments). The portrait camera follows the buddy across the entire path; narration sits below the scene, and germs are no longer shown.

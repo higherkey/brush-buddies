@@ -19,6 +19,7 @@
   aspect-ratio: 2 / 1;
   overflow: hidden;
   pointer-events: none;
+  background: var(--creek-sky);
 }
 
 .creek-scene[data-scene="forest"],
@@ -97,9 +98,12 @@
   stroke-linecap: round;
 }
 .creek-cattail { stroke-width: 8; }
-.creek-buddy { font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif; font-size: 64px; }
+.creek-avatar-badge { fill: var(--creek-light); stroke: var(--creek-bark); stroke-width: 2; }
 .creek-flag-number { fill: var(--creek-light); font: 700 13px system-ui, sans-serif; }
 .creek-avatar { transition: none; }
+.creek-scene[data-habitat] .creek-forest { display: none; }
+.creek-scene[data-habitat="forest"] .creek-forest,
+.creek-scene[data-habitat="mountain"] .creek-forest { display: inline; }
 
 .creek-beach, .creek-night, .creek-snow, .creek-snowcap { display: none; }
 .creek-scene[data-scene="snow"] .creek-snow,
@@ -111,6 +115,7 @@
 .creek-scene[data-scene="night"] .creek-sun,
 .creek-scene[data-scene="night"] .creek-sun-halo,
 .creek-scene[data-scene="night"] .creek-cloud { display: none; }
+.creek-scene[data-habitat="ocean"] .creek-beach { display: none; }
 
 @media (prefers-reduced-motion: reduce) {
   .creek-avatar { transition: none; }

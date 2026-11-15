@@ -10,7 +10,6 @@
 
   const KEY = "brushBuddiesAdventureV1";
   const storageKey = (scope = window.BB_PROFILE_SCOPE) => KEY + (scope ? ':' + scope : '');
-  const BUGS_PER_STAGE = 3;
   const HOME_CHANCE = 0.25;
   const RARE_CHANCE = 0.1;
   const RARE = Object.freeze({ id: "rare-star", emoji: "🌟", name: "Shooting Star" });
@@ -47,7 +46,7 @@
   }
 
   let store = loadStore();
-  let trip = null; // { dest, started, bugKey, spokenStage, restKey, awarded }
+  let trip = null; // { dest, started, spokenStage, restKey, awarded }
   let treasureTimer = null;
   let pendingTreasure = null; // shown when Adventure Mode is next on screen
   const rewardedSessions = new Set();
@@ -72,10 +71,12 @@
 
   function chooseDestination(buddy) {
     if (COLLECTION) {
-      if (COLLECTION.homeUnlocked(buddy)) return COLLECTION.home(buddy);
+      const animal = COLLECTION.get(buddy);
+      const home = { ...COLLECTION.home(buddy), habitat: animal.habitat };
+      if (COLLECTION.homeUnlocked(buddy)) return home;
+      const routes = { cottage: 'Garden Brook', meadow: 'Clover Creek', eucalyptus: 'Gumtree Gully', forest: 'Woodland Creek', bamboo: 'Bamboo Brook', polar: 'Ice Floe Crossing', savanna: 'Savanna Stream', wetland: 'Lily Lagoon', jungle: 'Rainforest River', rainbow: 'Rainbow Run', cave: 'Moonlit Creek', desert: 'Oasis Trail', mountain: 'Alpine Stream', ocean: 'Coral Crossing', shore: 'Tidepool Trail' };
       const index = COLLECTION.catalog.findIndex(a => a.id === buddy);
-      const base = DATA.shared[Math.max(0, index) % DATA.shared.length];
-      return { ...base, id: "trail-" + buddy, name: COLLECTION.get(buddy).name + " · " + base.name };
+      return { ...home, stickers: DATA.shared[index % DATA.shared.length].stickers, id: "trail-" + buddy, name: animal.name + " · " + routes[animal.habitat] };
     }
     const home = DATA.homes[buddy];
     if (home && home.id !== store.last && Math.random() < HOME_CHANCE) return home;
@@ -109,28 +110,6 @@
       }));
     }
 
-    // A fresh set of sugar bugs for each stage; they fade as the stage timer runs down.
-    const bugs = $("adv-bugs");
-    const key = trip.dest.id + ":" + s.stageIndex;
-    if (trip.bugKey !== key) {
-      trip.bugKey = key;
-      bugs.replaceChildren(...Array.from({ length: BUGS_PER_STAGE }, (_, i) => {
-        const bug = document.createElement("span");
-        bug.className = "adv-bug bug-" + (i + 1);
-        bug.textContent = "🦠";
-        return bug;
-      }));
-    }
-    const ratio = s.phase === "done" ? 1 : s.stageSeconds ? 1 - s.stageLeft / s.stageSeconds : 0;
-    const cleaned = trip.started ? Math.min(BUGS_PER_STAGE, Math.ceil(ratio * BUGS_PER_STAGE - 1e-9)) : 0;
-    let newlyCleaned = 0;
-    bugs.querySelectorAll(".adv-bug").forEach((bug, i) => {
-      const gone = i < cleaned;
-      if (gone && !bug.classList.contains("cleaned")) newlyCleaned++;
-      bug.classList.toggle("cleaned", gone);
-    });
-    if (newlyCleaned && s.phase === "running") api()?.tone(1046, 0.09, "triangle", 0.03);
-
     const stop = stopFor(s.stageIndex);
     $("adv-place").textContent =
       s.phase === "done" ? trip.dest.emoji + " " + trip.dest.name + " · 🎉" :
@@ -162,7 +141,7 @@
     $("adv-scene").hidden = !on;
     $("adv-bar").hidden = !on;
     if (on) {
-      if (!trip || trip.buddy !== s.buddy) trip = { dest: chooseDestination(s.buddy), buddy: s.buddy, started: false, bugKey: "", spokenStage: null, restKey: null, awarded: false };
+      if (!trip || trip.buddy !== s.buddy) trip = { dest: chooseDestination(s.buddy), buddy: s.buddy, started: false, spokenStage: null, restKey: null, awarded: false };
       const starting = !trip.started && sessionStarted(s);
       if (starting) {
         trip.started = true;
@@ -295,7 +274,13 @@
         button.type = "button";
         const visits = COLLECTION.load().visits[a.id] || 0;
         button.disabled = !COLLECTION.unlocked(a.id);
-        button.textContent = a.emoji + " " + a.name + " · " + (button.disabled ? Math.min(3, visits) + "/3 visits" : COLLECTION.homeUnlocked(a.id) ? "Home unlocked" : "Starter buddy");
+        button.textContent = a.name + " · " + (button.disabled ? Math.min(3, visits) + "/3 visits" : COLLECTION.homeUnlocked(a.id) ? "Home unlocked" : "Starter buddy");
+        const art = document.createElement('img');
+        art.src = 'animals/' + a.id + '.svg';
+        art.alt = '';
+        art.width = 36;
+        art.height = 36;
+        button.prepend(art);
         button.addEventListener("click", () => {
           $("journal-dialog").close();
           document.dispatchEvent(new CustomEvent("bb:choose", { detail: a.id }));

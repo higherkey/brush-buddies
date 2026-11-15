@@ -1562,8 +1562,7 @@ html[data-scheme="dark"] .adv-scene {
   opacity: 0.16;
 }
 
-.adv-backdrop,
-.adv-bugs {
+.adv-backdrop {
   position: absolute;
   inset: 0;
 }
@@ -1579,51 +1578,8 @@ html[data-scheme="dark"] .adv-scene {
 .adv-deco.deco-2 { right: 4%; bottom: 8%; font-size: 2.8rem; }
 .adv-deco.deco-3 { right: 12%; top: 6%; font-size: 2rem; }
 
-.adv-bug {
-  position: absolute;
-  z-index: 1;
-  font-size: 1.8rem;
-  line-height: 1;
-  opacity: 1;
-  transform: scale(1);
-  transition: opacity 0.4s;
-}
-
-/* Bugs sit around the buddy, above the place bar. */
-.adv-bug.bug-1 { left: 3%; top: 6%; }
-.adv-bug.bug-2 { left: 29%; top: 10%; }
-.adv-bug.bug-3 { left: 30%; top: 46%; }
-
-
-.adv-bug.cleaned {
-  opacity: 0;
-  transform: scale(0.3);
-}
-
-#app.animations-on:not(.reduced-motion) .adv-bug {
-  transition: opacity 0.4s, transform 0.4s;
-  animation: advWobble 2.2s ease-in-out infinite;
-}
-
-#app.animations-on:not(.reduced-motion) .adv-bug.bug-2 { animation-delay: 0.6s; }
-#app.animations-on:not(.reduced-motion) .adv-bug.bug-3 { animation-delay: 1.1s; }
-
-#app.animations-on:not(.reduced-motion) .adv-bug.cleaned {
-  animation: none;
-  filter: drop-shadow(0 0 6px #ffe16b);
-}
-
-#app.reduced-motion .adv-bug {
-  transition: opacity 0.4s;
-}
-
 #app.animations-on:not(.reduced-motion) .adv-scene.departing .adv-backdrop {
   animation: advArrive 0.9s ease-out 1;
-}
-
-@keyframes advWobble {
-  0%, 100% { transform: translate(0, 0) rotate(-6deg); }
-  50% { transform: translate(3px, -4px) rotate(6deg); }
 }
 
 @keyframes advArrive {
@@ -1825,7 +1781,6 @@ html[data-scheme="dark"] .adv-scene {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  #app.animations-on:not(.reduced-motion) .adv-bug,
   #app.animations-on:not(.reduced-motion) .adv-scene.departing .adv-backdrop,
   #treasure-dialog.animate .treasure-emoji {
     animation: none;

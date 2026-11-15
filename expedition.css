@@ -1,5 +1,9 @@
 /* Adventure is the main activity; Simple retains the compact timer layout. */
 :root { font-family: "Segoe UI", system-ui, sans-serif; }
+.buddy-emoji img { display: block; inline-size: 1em; block-size: 1em; }
+.collection-grid button { display: flex; align-items: center; gap: .5rem; }
+.collection-grid img { flex: 0 0 36px; }
+.buddy-quick img { display: block; inline-size: 24px; block-size: 24px; }
 .collection-save { grid-column: 1 / -1; padding-block: 1rem; border-block-start: 1px solid var(--line); }
 .collection-save p { max-inline-size: 65ch; font-size: .875rem; }
 .account-actions { display: flex; flex-wrap: wrap; gap: .5rem; margin-block: 1rem; }
@@ -26,7 +30,10 @@
 }
 .app[data-mode="adventure"] .buddy-area > .buddy,
 .app[data-mode="adventure"] .floaty { display: none; }
-.app[data-mode="adventure"] .adv-scene { background: none; }
+.app[data-mode="adventure"] .adv-scene {
+  position: relative; inset: auto; inline-size: 100%; flex: 1 0 280px; min-block-size: 280px;
+  align-self: stretch; order: -1; background: none; overflow: hidden;
+}
 .app[data-mode="adventure"] .adv-backdrop { inset: 0; }
 .app[data-mode="adventure"] .speech { max-inline-size: 36rem; margin: 0; background: var(--panel); padding: .5rem 1rem; }
 .app[data-mode="adventure"] .adv-bar { justify-content: start; margin: 0; }
