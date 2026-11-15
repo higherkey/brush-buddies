@@ -4,6 +4,7 @@
 .collection-grid button { display: flex; align-items: center; gap: .5rem; }
 .collection-grid img { flex: 0 0 36px; }
 .buddy-quick img { display: block; inline-size: 24px; block-size: 24px; }
+.footer-link { display: inline-flex; align-items: center; min-inline-size: 48px; min-block-size: 48px; }
 .collection-save { grid-column: 1 / -1; padding-block: 1rem; border-block-start: 1px solid var(--line); }
 .collection-save p { max-inline-size: 65ch; font-size: .875rem; }
 .account-actions { display: flex; flex-wrap: wrap; gap: .5rem; margin-block: 1rem; }

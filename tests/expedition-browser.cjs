@@ -51,6 +51,7 @@ test('daily visitor, creek travel and three-session unlock progression', async (
     await page.waitForFunction(scheme=>document.documentElement.dataset.scheme===scheme,colorScheme);
     for(const {width,height} of [{width:320,height:568},{width:360,height:800},{width:390,height:844},{width:430,height:932},{width:844,height:390},{width:1200,height:900}]){
       await page.setViewportSize({width,height});
+      assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'no horizontal overflow at '+width+'px');
       for(const animal of habitats){
         for(const progress of [0,.5,1]){
           const result=await page.evaluate(({animal,progress})=>{
