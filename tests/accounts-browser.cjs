@@ -1,0 +1,92 @@
+const { test } = require('node:test');
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const http = require('node:http');
+const path = require('node:path');
+const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
+
+test('real sign-in, separate child profiles, offline queue and recovery on another device', { skip: !process.env.NEON_LIVE_TEST, timeout: 90000 }, async () => {
+  const fixture = JSON.parse(fs.readFileSync('.local/synthetic-accounts.json','utf8'));
+  const root = path.resolve(__dirname,'..');
+  const server = http.createServer((req,res) => {
+    const pathname = new URL(req.url,'http://localhost').pathname;
+    const file = path.resolve(root,'.'+(pathname==='/'?'/index.html':decodeURIComponent(pathname)));
+    if(!file.startsWith(root+path.sep)){res.writeHead(403).end();return;}
+    fs.readFile(file,(error,data)=>{if(error){res.writeHead(404).end();return;}res.setHeader('Content-Type',file.endsWith('.js')?'text/javascript':file.endsWith('.css')?'text/css':file.endsWith('.wasm')?'application/wasm':'text/html');res.end(data);});
+  });
+  await new Promise(r=>server.listen(4173,'127.0.0.1',r));
+  let browser;
+  async function signIn(page,index){
+    await page.click('#account-open');
+    await page.waitForFunction(()=>!document.querySelector('#account-email').disabled);
+    await page.fill('#account-email',fixture.credentials[index].email);
+    await page.fill('#account-password',fixture.credentials[index].password);
+    await page.click('button[value="signin"]');
+    await page.waitForFunction(()=>!document.querySelector('#account-profiles').hidden);
+    await page.waitForFunction(()=>!document.querySelector('#account-profile').disabled);
+  }
+  try {
+    browser=await chromium.launch({executablePath:process.env.CHROMIUM_EXECUTABLE||undefined});
+    const context=await browser.newContext({serviceWorkers:'block',viewport:{width:390,height:844}});
+    const page=await context.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.stack));
+    await page.goto('http://localhost:4173');
+    await page.evaluate(()=>localStorage.setItem('brushBuddiesSettingsV2',JSON.stringify({experience:'adventure',musicOn:false,uiSounds:false,animalSounds:false,breakSeconds:0,stages:[{id:'a',name:'Top',icon:'A',tip:'Gentle circles.',seconds:5}]})));
+    await page.reload();
+    await signIn(page,0);
+    await page.selectOption('#account-profile',fixture.profileId);
+    await page.waitForFunction(()=>document.querySelector('#account-status').textContent.includes('saved to your account'));
+    assert.equal(await page.evaluate(()=>BB_BUDDIES.load().visits.fox),1);
+    await page.fill('#account-profile-name','Second child');
+    await page.click('#account-create-profile button');
+    await page.waitForFunction(()=>document.querySelector('#account-status').textContent.includes('saved to your account · Second child'));
+    assert.deepEqual(await page.evaluate(()=>BB_BUDDIES.load().visits),{});
+    const siblingId=await page.inputValue('#account-profile');
+    await page.selectOption('#account-profile',fixture.profileId);
+    await page.waitForFunction(()=>document.querySelector('#account-status').textContent.includes('saved to your account · Synthetic child'));
+    assert.equal(await page.evaluate(()=>BB_BUDDIES.load().visits.fox),1);
+    await page.click('#account-close');
+    const holder=await context.newPage();await holder.goto('http://localhost:4173');
+    await holder.evaluate(()=>new Promise(acquired=>navigator.locks.request('brushBuddiesAdventureV1',()=>new Promise(release=>{window.releaseReward=release;acquired();}))));
+    await page.bringToFront();await page.click('#start-button');
+    await page.click('#account-open');
+    await page.selectOption('#account-profile',siblingId);
+    await page.waitForFunction(()=>BrushBuddies.snapshot().phase==='done');
+    await holder.evaluate(()=>window.releaseReward());await holder.close();
+    await page.waitForFunction(()=>document.querySelector('#account-status').textContent.includes('saved to your account · Second child'));
+    assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('brushBuddiesAdventureV1:'+BB_PROFILE_SCOPE)).sessions),0);
+    await page.selectOption('#account-profile',fixture.profileId);
+    await page.waitForFunction(()=>document.querySelector('#account-status').textContent.includes('saved to your account · Synthetic child'));
+    assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('brushBuddiesAdventureV1:'+BB_PROFILE_SCOPE)).sessions),2);
+    await page.screenshot({path:path.join(root,'.local/account-mobile.png')});
+    await page.click('#account-close');
+    await context.setOffline(true);
+    await page.click('#start-button');
+    await page.waitForFunction(()=>BrushBuddies.snapshot().phase==='done');
+    await page.waitForFunction(()=>document.querySelector('#account-status').textContent.includes('Not synced'));
+    await context.setOffline(false);
+    await page.waitForFunction(()=>document.querySelector('#account-status').textContent.includes('saved to your account'));
+    const context2=await browser.newContext({serviceWorkers:'block'});
+    const other=await context2.newPage();await other.goto('http://localhost:4173');
+    await signIn(other,0);await other.selectOption('#account-profile',fixture.profileId);
+    await other.waitForFunction(()=>document.querySelector('#account-status').textContent.includes('saved to your account'));
+    assert.equal(await other.evaluate(()=>JSON.parse(localStorage.getItem('brushBuddiesAdventureV1:'+BB_PROFILE_SCOPE)).sessions),3);
+    if(await page.locator('#treasure-dialog').evaluate(d=>d.open))await page.click('#treasure-close');
+    const twin=await context.newPage();await twin.goto('http://localhost:4173');await twin.click('#account-open');
+    await twin.waitForFunction(()=>!document.querySelector('#account-profiles').hidden&&!document.querySelector('#account-profile').disabled);
+    await twin.selectOption('#account-profile',fixture.profileId);await twin.waitForFunction(()=>document.querySelector('#account-status').textContent.includes('saved to your account'));await twin.click('#account-close');
+    await context.setOffline(true);
+    await Promise.all([page.click('#start-button'),twin.click('#start-button')]);
+    await Promise.all([page.waitForFunction(()=>BrushBuddies.snapshot().phase==='done'),twin.waitForFunction(()=>BrushBuddies.snapshot().phase==='done')]);
+    await twin.waitForFunction(()=>JSON.parse(localStorage.getItem('brushAccount:'+BB_PROFILE_SCOPE)).events.length===5);
+    await page.close();await context.setOffline(false);await twin.reload();await twin.click('#account-open');
+    await twin.waitForFunction(()=>!document.querySelector('#account-profiles').hidden&&!document.querySelector('#account-profile').disabled);
+    await twin.selectOption('#account-profile',fixture.profileId);await twin.waitForFunction(()=>document.querySelector('#account-status').textContent.includes('saved to your account'));
+    assert.equal(await twin.evaluate(()=>JSON.parse(localStorage.getItem('brushBuddiesAdventureV1:'+BB_PROFILE_SCOPE)).sessions),5);
+    const cookies=await context.cookies();assert.ok(cookies.some(cookie=>cookie.name.includes('session_token')&&cookie.httpOnly&&cookie.secure));
+    assert.ok(await other.evaluate(()=>!Object.values(localStorage).some(value=>value.startsWith('eyJ'))));
+    await other.click('#account-signout');await other.waitForFunction(()=>document.querySelector('#account-status').textContent.startsWith('Signed out'));
+    assert.equal(await other.evaluate(()=>BB_PROFILE_SCOPE),'');
+    assert.equal(await other.evaluate(()=>BB_BUDDIES.load().visits.fox||0),0);
+    assert.deepEqual(errors,[]);
+  } finally {await browser?.close();await new Promise(r=>server.close(r));}
+});

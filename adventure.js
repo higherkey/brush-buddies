@@ -5,15 +5,21 @@
   "use strict";
 
   const DATA = window.BB_ADVENTURE_DATA;
+  const COLLECTION = window.BB_BUDDIES;
   if (!DATA) return;
 
   const KEY = "brushBuddiesAdventureV1";
+  const storageKey = (scope = window.BB_PROFILE_SCOPE) => KEY + (scope ? ':' + scope : '');
   const BUGS_PER_STAGE = 3;
   const HOME_CHANCE = 0.25;
   const RARE_CHANCE = 0.1;
   const RARE = Object.freeze({ id: "rare-star", emoji: "🌟", name: "Shooting Star" });
-  const ALL = [...DATA.shared, ...Object.values(DATA.homes)];
-  const BUDDY_HOME = Object.fromEntries(Object.entries(DATA.homes).map(([k, d]) => [d.id, k]));
+  const destinations = new Map();
+  [...DATA.shared, ...Object.values(DATA.homes), ...(COLLECTION ? COLLECTION.catalog.map(a => COLLECTION.home(a.id)) : [])].forEach(d => {
+    const existing = destinations.get(d.id);
+    destinations.set(d.id, existing ? { ...d, stickers: [...existing.stickers, ...d.stickers] } : d);
+  });
+  const ALL = [...destinations.values()];
 
   const $ = id => document.getElementById(id);
   const pick = list => list[Math.floor(Math.random() * list.length)];
@@ -23,9 +29,9 @@
   }
 
   // Journal progress lives under its own key so "Reset settings" never wipes it.
-  function loadStore() {
+  function loadStore(scope = window.BB_PROFILE_SCOPE) {
     try {
-      const v = JSON.parse(localStorage.getItem(KEY) || "{}");
+      const v = JSON.parse(localStorage.getItem(storageKey(scope)) || "{}");
       const out = emptyStore();
       if (v && typeof v.stickers === "object" && v.stickers) {
         for (const [id, n] of Object.entries(v.stickers)) {
@@ -44,10 +50,11 @@
   let trip = null; // { dest, started, bugKey, spokenStage, restKey, awarded }
   let treasureTimer = null;
   let pendingTreasure = null; // shown when Adventure Mode is next on screen
+  const rewardedSessions = new Set();
 
-  function persist() {
+  function persist(scope = window.BB_PROFILE_SCOPE) {
     try {
-      localStorage.setItem(KEY, JSON.stringify(store));
+      localStorage.setItem(storageKey(scope), JSON.stringify(store));
     } catch {}
   }
 
@@ -64,6 +71,12 @@
   }
 
   function chooseDestination(buddy) {
+    if (COLLECTION) {
+      if (COLLECTION.homeUnlocked(buddy)) return COLLECTION.home(buddy);
+      const index = COLLECTION.catalog.findIndex(a => a.id === buddy);
+      const base = DATA.shared[Math.max(0, index) % DATA.shared.length];
+      return { ...base, id: "trail-" + buddy, name: COLLECTION.get(buddy).name + " · " + base.name };
+    }
     const home = DATA.homes[buddy];
     if (home && home.id !== store.last && Math.random() < HOME_CHANCE) return home;
     const pool = DATA.shared.filter(d => d.id !== store.last);
@@ -85,7 +98,8 @@
     scene.classList.toggle("resting", s.phase === "break" || (s.phase === "paused" && s.pausedFrom === "break"));
 
     const backdrop = $("adv-backdrop");
-    if (backdrop.dataset.dest !== trip.dest.id) {
+    if (window.BB_SCENE) window.BB_SCENE.render(s, trip.dest);
+    else if (backdrop.dataset.dest !== trip.dest.id) {
       backdrop.dataset.dest = trip.dest.id;
       backdrop.replaceChildren(...trip.dest.backdrop.map((e, i) => {
         const span = document.createElement("span");
@@ -148,7 +162,7 @@
     $("adv-scene").hidden = !on;
     $("adv-bar").hidden = !on;
     if (on) {
-      if (!trip || (!trip.started && trip.buddy !== s.buddy)) trip = { dest: chooseDestination(s.buddy), buddy: s.buddy, started: false, bugKey: "", spokenStage: null, restKey: null, awarded: false };
+      if (!trip || trip.buddy !== s.buddy) trip = { dest: chooseDestination(s.buddy), buddy: s.buddy, started: false, bugKey: "", spokenStage: null, restKey: null, awarded: false };
       const starting = !trip.started && sessionStarted(s);
       if (starting) {
         trip.started = true;
@@ -157,6 +171,10 @@
         $("adv-scene").classList.add("departing");
       }
       renderScene(s);
+      if (COLLECTION) {
+        const visits = COLLECTION.load().visits[s.buddy] || 0;
+        $("buddy-name").textContent = s.buddyName + " · " + (COLLECTION.homeUnlocked(s.buddy) ? "Home unlocked" : "Journal " + Math.min(visits, 3) + "/3") + (s.buddy === COLLECTION.daily() ? " · Today's visitor" : "");
+      }
       document.querySelectorAll(".zone").forEach((button, i) => {
         if (!button.dataset.baseLabel) button.dataset.baseLabel = button.getAttribute("aria-label");
         button.setAttribute("aria-label", button.dataset.baseLabel + (s.storyText ? " Stop: " + stopFor(i).name + "." : ""));
@@ -175,26 +193,31 @@
     trip = null;
   }
 
-  function award(dest) {
-    store = loadStore(); // pick up stickers saved by another open tab first
+  function award(dest, s) {
+    store = loadStore(s.profileScope); // Persist to the owner at completion, even if a profile switch queued first.
     const missing = dest.stickers.filter(st => !store.stickers[st.id]);
     const sticker = Math.random() < RARE_CHANCE ? RARE : missing.length ? missing[0] : pick(dest.stickers);
     store.stickers[sticker.id] = (store.stickers[sticker.id] || 0) + 1;
     store.sessions += 1;
     store.last = dest.id;
-    persist();
+    persist(s.profileScope);
+    if (COLLECTION) {
+      COLLECTION.completeInScope(s.sessionId, s.buddy, s.profileScope);
+    }
+    document.dispatchEvent(new CustomEvent('bb:reward', { detail: { session_id: s.sessionId, buddy_id: s.buddy, sticker_id: sticker.id, profile_scope: s.profileScope } }));
     return { sticker, count: store.stickers[sticker.id] };
   }
 
   // One sticker per session: jumping back to a stage after finishing does not earn another.
   async function onFinish(e) {
     const s = e.detail;
-    if (s.experience !== "adventure" || !trip || trip.awarded) return;
+    if (s.experience !== "adventure" || !trip || trip.awarded || rewardedSessions.has(s.sessionId)) return;
+    rewardedSessions.add(s.sessionId);
     const finishedTrip = trip;
     finishedTrip.awarded = true;
     const found = navigator.locks
-      ? await navigator.locks.request(KEY, () => award(finishedTrip.dest))
-      : award(finishedTrip.dest);
+      ? await navigator.locks.request(KEY, () => award(finishedTrip.dest, s))
+      : award(finishedTrip.dest, s);
     if ($("journal-dialog").open) openJournal();
     if (trip !== finishedTrip) return;
     pendingTreasure = found;
@@ -213,6 +236,7 @@
     $("treasure-dialog").classList.toggle("animate", !s.calm);
     $("treasure-emoji").textContent = sticker.emoji;
     $("treasure-name").textContent = sticker.name + (count > 1 ? " ×" + count : "");
+    if (COLLECTION?.homeUnlocked(s.buddy)) $("treasure-name").textContent += " · " + s.buddyName + " and their home are unlocked!";
     $("treasure-dialog").classList.toggle("rare", sticker.id === RARE.id);
     api()?.say(firstName(s) + " found a " + sticker.name + "!");
     api()?.tone(1318, 0.18, "triangle", 0.04);
@@ -249,12 +273,38 @@
 
   function openJournal() {
     store = loadStore();
+    if (COLLECTION) COLLECTION.load();
     const buddy = api()?.snapshot().buddy;
     // Shared places, then homes the child has visited or the current buddy's home.
-    const pages = ALL.filter(d => !BUDDY_HOME[d.id] || BUDDY_HOME[d.id] === buddy || d.stickers.some(st => store.stickers[st.id]));
+    const pages = ALL.filter(d => !d.id.startsWith("home-") || d.id === "home-" + buddy || d.stickers.some(st => store.stickers[st.id]));
     const list = pages.map(d => journalPage(d.emoji + " " + d.name, d.stickers));
     if (store.stickers[RARE.id]) list.push(journalPage("✨ Lucky finds", [RARE]));
     $("journal-list").replaceChildren(...list);
+    if (COLLECTION) {
+      const collection = document.createElement("section");
+      collection.className = "animal-collection";
+      const heading = document.createElement("h3");
+      heading.textContent = "Meet your buddies · " + COLLECTION.available().length + " of " + COLLECTION.catalog.length + " unlocked";
+      const help = document.createElement("p");
+      help.textContent = "Complete 3 expeditions with a visitor to fill their entry, unlock their home, and choose them any time.";
+      collection.append(heading, help);
+      const grid = document.createElement("div");
+      grid.className = "collection-grid";
+      COLLECTION.catalog.forEach(a => {
+        const button = document.createElement("button");
+        button.type = "button";
+        const visits = COLLECTION.load().visits[a.id] || 0;
+        button.disabled = !COLLECTION.unlocked(a.id);
+        button.textContent = a.emoji + " " + a.name + " · " + (button.disabled ? Math.min(3, visits) + "/3 visits" : COLLECTION.homeUnlocked(a.id) ? "Home unlocked" : "Starter buddy");
+        button.addEventListener("click", () => {
+          $("journal-dialog").close();
+          document.dispatchEvent(new CustomEvent("bb:choose", { detail: a.id }));
+        });
+        grid.append(button);
+      });
+      collection.append(grid);
+      $("journal-list").prepend(collection);
+    }
 
     const total = ALL.reduce((n, d) => n + d.stickers.length, 0);
     const found = ALL.reduce((n, d) => n + d.stickers.filter(st => store.stickers[st.id]).length, 0);

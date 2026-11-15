@@ -1,15 +1,24 @@
 "use strict";
 
-const CACHE_NAME = "brush-buddies-shell-v8";
+const CACHE_NAME = "brush-buddies-shell-v9";
 const APP_SHELL = [
   "./",
   "./index.html",
-  "./styles.css?v=0.7.0",
+  "./account-progress.js?v=0.8.0",
+  "./neon-config.js?v=0.8.0",
+  "./neon-api.js?v=0.8.0",
+  "./accounts.js?v=0.8.0",
+  "./buddies.js?v=0.8.0",
+  "./adventure-scene.js?v=0.8.0",
+  "./adventure-scene.css?v=0.8.0",
+  "./expedition.css?v=0.8.0",
+  "./collection-backup.js?v=0.8.0",
+  "./styles.css?v=0.8.0",
   "./adventure-data.js?v=0.6.0",
   "./adventure.js?v=0.6.0",
-  "./app.js?v=0.7.0",
-  "./camera-helper.js?v=0.7.0",
-  "./camera-worker.js?v=0.7.0",
+  "./app.js?v=0.8.0",
+  "./camera-helper.js?v=0.8.0",
+  "./camera-worker.js?v=0.8.0",
   "./camera-motion.js",
   "./vendor/mediapipe/vision_bundle.js",
   "./manifest.webmanifest",

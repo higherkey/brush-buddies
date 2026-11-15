@@ -3,7 +3,7 @@
 
   const $ = id => document.getElementById(id);
 
-  const ANIMALS = {
+  const LEGACY_ANIMALS = {
     cat: ["🐱", "Kitty the Cat", "meow"],
     bunny: ["🐰", "Bubbles the Bunny", "squeak"],
     koala: ["🐨", "Koko the Koala", "koala"],
@@ -19,6 +19,9 @@
     elephant: ["🐘", "Ellie the Elephant", "trumpet"],
     unicorn: ["🦄", "Star the Unicorn", "magic"]
   };
+
+  const COLLECTION = window.BB_BUDDIES;
+  const ANIMALS = COLLECTION ? Object.fromEntries(COLLECTION.catalog.map(a => [a.id, [a.emoji, a.name, a.sound]])) : LEGACY_ANIMALS;
 
   const DEFAULT_STAGES = [
     { id: "top", name: "Top teeth", icon: "🌸", tip: "Reach those top teeth with gentle little circles.", seconds: 30 },
@@ -168,7 +171,7 @@
     motionTargetSize: 0.5,
     motionAutoPause: false,
     motionBrushType: "manual",
-    experience: "simple",
+    experience: "adventure",
     storyText: false,
     stages: DEFAULT_STAGES
   };
@@ -202,7 +205,9 @@
   }
 
   let settings = load();
-  let selected = settings.theme === "random" ? randomTheme() : settings.theme;
+  let selected = settings.experience === "adventure" && COLLECTION ? COLLECTION.daily() : settings.theme === "random" ? randomTheme() : settings.theme;
+  if (COLLECTION && settings.experience === "simple" && !COLLECTION.unlocked(selected)) selected = "cat";
+  let sessionId = crypto.randomUUID();
   let stageIndex = 0;
   let stageLeft = 0;
   let breakLeft = 0;
@@ -255,7 +260,7 @@
   }
 
   function randomTheme() {
-    const a = Object.keys(ANIMALS);
+    const a = COLLECTION ? COLLECTION.available() : Object.keys(ANIMALS);
     return a[Math.floor(Math.random() * a.length)];
   }
 
@@ -328,6 +333,10 @@
       sessionElapsed,
       buddy: selected,
       buddyName: animal()[1],
+      buddyEmoji: animal()[0],
+      sessionId,
+      profileScope: window.BB_PROFILE_SCOPE || '',
+      progress: total() ? Math.max(0, Math.min(1, 1 - settings.stages.reduce((sum, stage, i) => sum + (i === stageIndex ? stageLeft : leftOf(i)), 0) / total())) : 0,
       experience: settings.experience,
       storyText: settings.storyText,
       calm: !settings.animations || settings.reducedMotion || window.matchMedia("(prefers-reduced-motion: reduce)").matches
@@ -342,6 +351,10 @@
 
   function setExperience(mode) {
     settings.experience = mode === "adventure" ? "adventure" : "simple";
+    if (COLLECTION) {
+      selected = settings.experience === "adventure" ? COLLECTION.daily() : COLLECTION.unlocked(settings.theme) ? settings.theme : "cat";
+      applyTheme();
+    }
     save();
     $("app").dataset.mode = settings.experience;
     $("experience-select").value = settings.experience;
@@ -769,6 +782,7 @@
   }
 
   function reset() {
+    sessionId = crypto.randomUUID();
     stopClock();
     sessionElapsed = 0;
     Object.keys(stageProgress).forEach(k => delete stageProgress[k]);
@@ -988,6 +1002,15 @@
   }
 
   function populate() {
+    if (COLLECTION) {
+      const select = $("theme-select");
+      select.replaceChildren(new Option("Surprise me (unlocked buddies)", "random"));
+      COLLECTION.catalog.forEach(a => {
+        const option = new Option(a.name + (COLLECTION.unlocked(a.id) ? "" : " — complete 3 adventures to unlock"), a.id);
+        option.disabled = !COLLECTION.unlocked(a.id);
+        select.add(option);
+      });
+    }
     $("theme-select").value = settings.theme;
     $("song-select").value = settings.song || "sparkle";
     $("custom-melody").value = settings.customMelody;
@@ -1049,7 +1072,7 @@
     settings.stages = cloneStages(settings.stages);
     settings.totalSeconds = total();
     save();
-    if (old !== settings.theme) selected = settings.theme === "random" ? randomTheme() : settings.theme;
+    if (old !== settings.theme) selected = settings.theme === "random" ? randomTheme() : COLLECTION && !COLLECTION.unlocked(settings.theme) ? "cat" : settings.theme;
     applyTheme();
     renderStages();
     if (sessionSettings() !== settingsBeforeDialog) reset();
@@ -1486,13 +1509,23 @@
   });
 
   $("buddy-quick").addEventListener("click", () => {
-    const keys = Object.keys(ANIMALS);
+    const keys = COLLECTION ? COLLECTION.available() : Object.keys(ANIMALS);
     selected = keys[(keys.indexOf(selected) + 1) % keys.length];
     settings.theme = selected;
     $("theme-select").value = selected;
     save();
     applyTheme();
     say("Hello! I'm " + animal()[1] + "!");
+    render();
+  });
+
+  document.addEventListener("bb:choose", event => {
+    if (!COLLECTION?.unlocked(event.detail)) return;
+    selected = event.detail;
+    settings.theme = selected;
+    save();
+    applyTheme();
+    render();
   });
 
   $("start-button").addEventListener("click", start);
@@ -1570,7 +1603,13 @@
   gestures();
   if (!navigator.mediaDevices?.getUserMedia) $("motion-toggle").disabled = true;
 
-  window.BrushBuddies = Object.freeze({ snapshot, say, tone });
+  function refreshCollection() {
+    COLLECTION.load();
+    selected = settings.experience === 'adventure' ? COLLECTION.daily() : COLLECTION.unlocked(settings.theme) ? settings.theme : 'cat';
+    applyTheme();
+    reset();
+  }
+  window.BrushBuddies = Object.freeze({ snapshot, say, tone, refreshCollection });
   settings.totalSeconds = total();
   applyAppearance();
   applyTheme();
