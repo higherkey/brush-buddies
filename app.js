@@ -207,6 +207,7 @@
   let settings = load();
   let selected = settings.experience === "adventure" && COLLECTION ? COLLECTION.daily() : settings.theme === "random" ? randomTheme() : settings.theme;
   if (COLLECTION && settings.experience === "simple" && !COLLECTION.unlocked(selected)) selected = "cat";
+  let visitorDate = COLLECTION?.load().daily.date;
   let sessionId = crypto.randomUUID();
   let stageIndex = 0;
   let stageLeft = 0;
@@ -347,6 +348,8 @@
     const on = settings.experience === "adventure";
     $("mode-toggle").setAttribute("aria-pressed", String(on));
     $("mode-toggle").classList.toggle("enabled", on);
+    $("mode-toggle").textContent = on ? 'Adventure · Switch to timer' : 'Simple timer · Switch to adventure';
+    $("mode-toggle").setAttribute('aria-label', on ? 'Switch to simple timer' : 'Switch to adventure');
   }
 
   function setExperience(mode) {
@@ -880,6 +883,7 @@
 
   function start() {
     if (phase === "done") reset();
+    refreshDailyVisitor();
     if (motionOn && phase === "motion-wait" && motionArmed) {
       motionArmed = false;
       pausedFrom = breakLeft > 0 ? "break" : "running";
@@ -1080,7 +1084,7 @@
     settings.stages = cloneStages(settings.stages);
     settings.totalSeconds = total();
     save();
-    if (old !== settings.theme) selected = settings.theme === "random" ? randomTheme() : COLLECTION && !COLLECTION.unlocked(settings.theme) ? "cat" : settings.theme;
+    if (old !== settings.theme) selected = settings.experience === 'adventure' && COLLECTION ? COLLECTION.daily() : settings.theme === "random" ? randomTheme() : COLLECTION && !COLLECTION.unlocked(settings.theme) ? "cat" : settings.theme;
     applyTheme();
     renderStages();
     if (sessionSettings() !== settingsBeforeDialog) reset();
@@ -1589,6 +1593,7 @@
   });
 
   document.addEventListener("visibilitychange", () => {
+    if (!document.hidden) refreshDailyVisitor();
     if (document.hidden && (motionOn || cameraStarting)) stopCamera();
     if (document.hidden && ["running", "break"].includes(phase)) {
       pausedFrom = phase;
@@ -1614,9 +1619,21 @@
   function refreshCollection() {
     COLLECTION.load();
     selected = settings.experience === 'adventure' ? COLLECTION.daily() : COLLECTION.unlocked(settings.theme) ? settings.theme : 'cat';
+    visitorDate = COLLECTION.load().daily.date;
     applyTheme();
     reset();
   }
+  function refreshDailyVisitor() {
+    if (!COLLECTION || settings.experience !== 'adventure' || sessionElapsed > 0 || !['ready', 'motion-wait'].includes(phase)) return;
+    const visitor = COLLECTION.daily();
+    const date = COLLECTION.load().daily.date;
+    if (date === visitorDate) return;
+    visitorDate = date;
+    selected = visitor;
+    applyTheme();
+    render();
+  }
+  window.addEventListener('focus', refreshDailyVisitor);
   window.BrushBuddies = Object.freeze({ snapshot, say, tone, refreshCollection });
   settings.totalSeconds = total();
   applyAppearance();

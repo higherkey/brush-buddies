@@ -74,13 +74,13 @@ The web app manifest and SVG icon provide the app name, launch location, colors,
 
 Adventure Mode is optional and can be switched on or off at any time without resetting the timer.
 
-- Each session your buddy visits a place: one of six shared destinations, or sometimes their own home spot.
+- Each session follows your buddy's habitat trail; three completed trips unlock their own home route.
 - Each brushing stage is a stop on the trail. Your buddy moves through their habitat as the stage timer runs down.
 - Finishing every stage awards a sticker for the Field Journal, with an occasional rare 🌟.
 - It's picture-first by default. Turn on **Story text** in Buddy settings to add a short line at each stop.
-- Journal progress is stored on the device under its own key, so "Reset settings" does not erase it.
+- Journal progress is separate from timer settings, so "Reset settings" does not erase it. Sign in to save the collection across devices.
 
-## Animal expeditions (in development)
+## Animal expeditions
 
 Adventure is the default for new settings. Each local calendar day chooses a visiting buddy from the locked collection. Cat and Bunny are starter choices; the 75-animal field journal unlocks each visitor and its habitat after three completed sessions. Unlocked animals can be chosen in Simple mode or from the collection for another adventure. Switching animals updates the journey immediately. Existing stickers are preserved.
 
@@ -99,3 +99,13 @@ Auth calls are lazy: camera/timer-only use makes no account-service requests. Ma
 Run npm test for deterministic tests. Live-service tests require explicit NEON_LIVE_TEST=1: node --test tests/accounts-live.cjs, followed by node --test tests/accounts-browser.cjs with the Playwright environment described above. They create synthetic accounts using example.com addresses; test credentials are stored only in ignored .local/ for the follow-on browser test. Never run the schema migration against an unrelated database.
 
 Adventure scenery follows each animal’s habitat (15 illustrated environments). The portrait camera follows the buddy across the entire path; narration sits below the scene, and germs are no longer shown.
+
+The mobile layout is capped at 430px on every screen. Today's visitor is labeled above the animal; three trips unlock that buddy and its home. Visitors change with the local calendar day, including when the app stays open overnight, without interrupting an active trip. Consecutive days avoid the same visitor. Camera and music controls sit beneath the timer; collection backups are in Settings.
+
+## Current-profile progress tools
+
+Open **Settings → Advanced tools**, enter **brush-admin**, then choose **Open progress tools**. Edit animal visits (three unlocks its home), sticker counts, total trips, and today's visitor. Changes are drafts until saved. Unlock all animals and Undo last save are available. Saving starts a fresh timer.
+
+The code reveals editing controls; it is not an authentication secret. Guest edits affect only this device. Signed-in edits require a selected owned profile and a successful sync, and are saved to that account. Today's visitor stays device-local. Older edits are rejected if progress changed, including changes on another device. Existing completed-session IDs are preserved so syncing cannot award them twice.
+
+Apply `db/002-progress-tools.sql` after migration 001 before deploying this version. It adds a revision column, owner-only updates limited to progress and revision, and a trigger requiring revisions to advance exactly once; profile identity and expedition events remain protected. Verify with `npm test`, `tests/progress-tools-browser.cjs`, and the opt-in account suites above (run `accounts-live.cjs` first to create a fresh fixture).

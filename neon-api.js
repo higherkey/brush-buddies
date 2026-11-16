@@ -15,13 +15,14 @@
       ...(body === undefined ? {} : { body: JSON.stringify(body) })
     });
   }
-  async function data(table, query = {}, body) {
+  async function data(table, query = {}, body, method = body === undefined ? 'GET' : 'POST') {
     if (!['brush_profiles', 'brush_events'].includes(table)) throw new Error('Unknown account data.');
+    if (!['GET', 'POST'].includes(method) && !(method === 'PATCH' && table === 'brush_profiles')) throw new Error('Unsupported account operation.');
     const token = await auth('token');
     if (!token?.token) throw new Error('Sign in again to save your collection.');
     return request(config.dataUrl + '/' + table + '?' + new URLSearchParams(query), {
-      method: body === undefined ? 'GET' : 'POST',
-      headers: { Authorization: 'Bearer ' + token.token, 'Content-Type': 'application/json', Prefer: body === undefined ? 'return=representation' : 'resolution=ignore-duplicates,return=representation' },
+      method,
+      headers: { Authorization: 'Bearer ' + token.token, 'Content-Type': 'application/json', Prefer: method === 'POST' ? 'resolution=ignore-duplicates,return=representation' : 'return=representation' },
       ...(body === undefined ? {} : { body: JSON.stringify(body) })
     });
   }

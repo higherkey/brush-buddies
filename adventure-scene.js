@@ -95,8 +95,7 @@
     }
     avatar = element("g", { class: "creek-avatar" }, svg);
     element("ellipse", { cx: 0, cy: 9, rx: 22, ry: 6, class: "creek-avatar-shadow" }, avatar);
-    element("circle", { cx: 0, cy: -36, r: 47, class: "creek-avatar-badge" }, avatar);
-    emoji = element("image", { x: -40, y: -76, width: 80, height: 80, class: "creek-buddy" }, avatar);
+    emoji = element("image", { x: -32, y: -60, width: 64, height: 64, class: "creek-buddy" }, avatar);
     host.replaceChildren(svg);
     place(0);
     resizeObserver?.disconnect();

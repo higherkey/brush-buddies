@@ -76,7 +76,7 @@
       if (COLLECTION.homeUnlocked(buddy)) return home;
       const routes = { cottage: 'Garden Brook', meadow: 'Clover Creek', eucalyptus: 'Gumtree Gully', forest: 'Woodland Creek', bamboo: 'Bamboo Brook', polar: 'Ice Floe Crossing', savanna: 'Savanna Stream', wetland: 'Lily Lagoon', jungle: 'Rainforest River', rainbow: 'Rainbow Run', cave: 'Moonlit Creek', desert: 'Oasis Trail', mountain: 'Alpine Stream', ocean: 'Coral Crossing', shore: 'Tidepool Trail' };
       const index = COLLECTION.catalog.findIndex(a => a.id === buddy);
-      return { ...home, stickers: DATA.shared[index % DATA.shared.length].stickers, id: "trail-" + buddy, name: animal.name + " · " + routes[animal.habitat] };
+      return { ...home, stickers: DATA.shared[index % DATA.shared.length].stickers, id: "trail-" + buddy, name: routes[animal.habitat] };
     }
     const home = DATA.homes[buddy];
     if (home && home.id !== store.last && Math.random() < HOME_CHANCE) return home;
@@ -111,10 +111,7 @@
     }
 
     const stop = stopFor(s.stageIndex);
-    $("adv-place").textContent =
-      s.phase === "done" ? trip.dest.emoji + " " + trip.dest.name + " · 🎉" :
-      scene.classList.contains("resting") ? "🍎 " + trip.dest.name :
-      trip.dest.emoji + " " + trip.dest.name + " · " + stop.icon + (s.storyText ? " " + stop.name : "");
+    $("adv-place").textContent = trip.dest.name + (s.storyText ? ' · ' + stop.name : '');
   }
 
   // Speak once per stage and once per break, keyed on what was already said,
@@ -153,7 +150,11 @@
       if (COLLECTION) {
         const visits = COLLECTION.load().visits[s.buddy] || 0;
         $("buddy-name").textContent = s.buddyName;
-        $("buddy-status").textContent = (COLLECTION.homeUnlocked(s.buddy) ? "Home unlocked" : "Journal " + Math.min(visits, 3) + "/3") + (s.buddy === COLLECTION.daily() ? " · Today's visitor" : "");
+        const visiting = s.buddy === COLLECTION.daily();
+        $('visitor-label').textContent = visiting ? "Today's visitor" : 'Your adventure buddy';
+        $("buddy-status").textContent = COLLECTION.homeUnlocked(s.buddy)
+          ? firstName(s) + " and their home are unlocked. Choose them any time."
+          : Math.min(visits, 3) + '/3 trips · Complete 3 to keep ' + firstName(s) + ' and unlock their home.' + (visiting ? ' A new visitor arrives tomorrow.' : '');
       }
       document.querySelectorAll(".zone").forEach((button, i) => {
         if (!button.dataset.baseLabel) button.dataset.baseLabel = button.getAttribute("aria-label");
