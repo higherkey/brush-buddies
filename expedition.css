@@ -1,5 +1,13 @@
 /* Adventure is the main activity; Simple retains the compact timer layout. */
 :root { font-family: "Segoe UI", system-ui, sans-serif; }
+.buddy-emoji img { display: block; inline-size: 1em; block-size: 1em; }
+.collection-grid button { display: flex; align-items: center; gap: .5rem; }
+.collection-grid img { flex: 0 0 36px; }
+.buddy-quick img { display: block; inline-size: 24px; block-size: 24px; }
+.app[data-mode="simple"] .buddy-status { display: none; }
+#app[data-mode="adventure"] .buddy-name { order: -2; font-size: 1rem; letter-spacing: 0; text-transform: none; color: var(--ink); background: none; padding: 0; margin: 0; font-weight: 800; }
+.buddy-status { font-size: .8rem; color: var(--muted); }
+.footer-link { display: inline-flex; align-items: center; min-inline-size: 48px; min-block-size: 48px; }
 .collection-save { grid-column: 1 / -1; padding-block: 1rem; border-block-start: 1px solid var(--line); }
 .collection-save p { max-inline-size: 65ch; font-size: .875rem; }
 .account-actions { display: flex; flex-wrap: wrap; gap: .5rem; margin-block: 1rem; }
@@ -9,7 +17,7 @@
 #account-dialog .account-checkbox input { min-inline-size: 24px; }
 .collection-save .quick-button { display: inline-flex; margin-inline-end: .5rem; margin-block-end: .5rem; cursor: pointer; }
 .app[data-mode="adventure"] {
-  inline-size: min(100%, 1120px);
+  inline-size: min(100%, var(--app-max-width));
   grid-template-columns: minmax(0, 1fr);
   grid-template-areas: "top" "intro" "buddy" "timer" "camera" "footer";
   gap: 1rem;
@@ -17,7 +25,7 @@
   --accent-strong: oklch(37% .08 165);
 }
 .app[data-mode="adventure"] .intro { text-align: start; }
-.app[data-mode="adventure"] h1 { font-family: "Bahnschrift", "DIN Alternate", system-ui, sans-serif; font-size: clamp(1.5rem, 4vw, 2.25rem); }
+.app[data-mode="adventure"] h1 { font-family: "Bahnschrift", "DIN Alternate", system-ui, sans-serif; font-size: 1.5rem; }
 .app[data-mode="adventure"] .subtitle { margin-block-end: 0; }
 .app[data-mode="adventure"] .buddy-area {
   display: flex; flex-direction: column; justify-content: end; align-items: start;
@@ -26,7 +34,10 @@
 }
 .app[data-mode="adventure"] .buddy-area > .buddy,
 .app[data-mode="adventure"] .floaty { display: none; }
-.app[data-mode="adventure"] .adv-scene { background: none; }
+.app[data-mode="adventure"] .adv-scene {
+  position: relative; inset: auto; inline-size: 100%; flex: 1 0 280px; min-block-size: 280px;
+  align-self: stretch; order: -1; background: none; overflow: hidden;
+}
 .app[data-mode="adventure"] .adv-backdrop { inset: 0; }
 .app[data-mode="adventure"] .speech { max-inline-size: 36rem; margin: 0; background: var(--panel); padding: .5rem 1rem; }
 .app[data-mode="adventure"] .adv-bar { justify-content: start; margin: 0; }
@@ -47,12 +58,11 @@
 .quick-button, .icon-button { min-block-size: 48px; min-inline-size: 48px; }
 .settings-dialog::backdrop { backdrop-filter: none; }
 html[data-scheme="dark"] .app[data-mode="adventure"] { --accent-text: oklch(88% .06 160); --accent-strong: oklch(37% .08 165); }
-@media (max-width: 699px) {
-  .top-actions { grid-template-columns: repeat(3,minmax(0,1fr)) 48px 48px; }
-  .app[data-mode="adventure"] { padding: .5rem; gap: .5rem; }
-  .app[data-mode="adventure"] .eyebrow { margin-block: .25rem; }
-  .app[data-mode="adventure"] .intro h1 { margin-block: .25rem; }
-  .app[data-mode="adventure"] .buddy-area { min-block-size: 52vh; padding: .5rem; }
-  .app[data-mode="adventure"] .speech { font-size: .8rem; }
-  .settings-dialog { margin-block-start: auto; margin-block-end: 0; max-block-size: 88dvh; inline-size: 100%; overscroll-behavior: contain; }
-}
+/* One mobile layout at every viewport width. */
+.top-actions { grid-template-columns: repeat(3,minmax(0,1fr)) 48px 48px; }
+.app[data-mode="adventure"] { padding: .5rem; gap: .5rem; }
+.app[data-mode="adventure"] .eyebrow { margin-block: .25rem; }
+.app[data-mode="adventure"] .intro h1 { margin-block: .25rem; }
+.app[data-mode="adventure"] .buddy-area { min-block-size: clamp(380px, 52svh, 480px); padding: .5rem; }
+.app[data-mode="adventure"] .speech { font-size: .8rem; }
+.settings-dialog { margin-block-start: auto; margin-block-end: 0; max-block-size: 88dvh; inline-size: min(100%, var(--app-max-width)); overscroll-behavior: contain; }

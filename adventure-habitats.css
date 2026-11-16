@@ -1,0 +1,47 @@
+.creek-habitat-details {
+  --habitat-sand: oklch(85% 0.09 80);
+  --habitat-ice: oklch(87% 0.065 230);
+  --habitat-crystal: oklch(71% 0.16 300);
+  --habitat-gum: oklch(64% 0.075 165);
+  --habitat-cave: oklch(28% 0.04 275);
+  pointer-events: none;
+}
+
+.creek-habitat-details .habitat-leaf { fill: var(--creek-leaf); }
+.creek-habitat-details .habitat-hill { fill: var(--creek-hill); }
+.creek-habitat-details .habitat-bark,
+.creek-habitat-details .habitat-soil { fill: var(--creek-bark); }
+.creek-habitat-details .habitat-petal { fill: var(--creek-petal); }
+.creek-habitat-details .habitat-gold { fill: var(--creek-gold); }
+.creek-habitat-details .habitat-light { fill: var(--creek-light); }
+.creek-habitat-details .habitat-water { fill: var(--creek-water); }
+.creek-habitat-details .habitat-roof { fill: var(--creek-flag); }
+.creek-habitat-details .habitat-rock { fill: var(--creek-stone); }
+.creek-habitat-details .habitat-facet { fill: var(--creek-shadow); }
+.creek-habitat-details .habitat-sand { fill: var(--habitat-sand); }
+.creek-habitat-details .habitat-ice { fill: var(--habitat-ice); }
+.creek-habitat-details .habitat-crystal { fill: var(--habitat-crystal); }
+.creek-habitat-details .habitat-gum { fill: var(--habitat-gum); }
+.creek-habitat-details .habitat-cave { fill: var(--habitat-cave); }
+.creek-habitat-details .habitat-golden-grass .habitat-leaf { fill: var(--creek-gold); }
+
+.creek-habitat-details .habitat-light-line,
+.creek-habitat-details .habitat-shell-line,
+.creek-habitat-details .habitat-stem,
+.creek-habitat-details .habitat-reed-head,
+.creek-habitat-details .habitat-fence,
+.creek-habitat-details .habitat-vine,
+.creek-habitat-details .habitat-coral,
+.creek-habitat-details .habitat-bubble {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.creek-habitat-details .habitat-light-line { stroke: var(--creek-light); stroke-width: 2; opacity: 0.65; }
+.creek-habitat-details .habitat-shell-line { stroke: var(--creek-bark); stroke-width: 2; opacity: 0.5; }
+.creek-habitat-details .habitat-stem,
+.creek-habitat-details .habitat-vine { stroke: var(--creek-leaf); stroke-width: 5; }
+.creek-habitat-details .habitat-reed-head { stroke: var(--creek-bark); stroke-width: 9; }
+.creek-habitat-details .habitat-fence { stroke: var(--creek-light); stroke-width: 6; }
+.creek-habitat-details .habitat-coral { stroke: var(--creek-petal); stroke-width: 11; }
+.creek-habitat-details .habitat-bubble { stroke: var(--creek-light); stroke-width: 3; opacity: 0.7; }
