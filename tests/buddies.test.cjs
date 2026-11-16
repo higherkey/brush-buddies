@@ -139,6 +139,24 @@ test('daily rollover cannot overwrite completions from another tab', () => {
   assert.ok(fixture.api.unlocked('fox'));
 });
 
+test('a new day avoids the previous visitor, and explicit daily edits stay scoped', () => {
+  const { api, context, data, nextDay } = setup();
+  assert.equal(api.daily(), 'koala');
+  nextDay();
+  assert.equal(api.daily(), 'dog');
+  api.setDaily('jellyfish');
+  assert.equal(api.daily(), 'jellyfish');
+  vm.runInContext(source, context);
+  assert.equal(context.BB_BUDDIES.daily(), 'jellyfish');
+  context.BB_PROFILE_SCOPE = 'owner:child';
+  context.BB_BUDDIES.setDaily('fox');
+  assert.equal(context.BB_BUDDIES.daily(), 'fox');
+  context.BB_PROFILE_SCOPE = '';
+  assert.equal(context.BB_BUDDIES.daily(), 'jellyfish');
+  assert.throws(() => context.BB_BUDDIES.setDaily('unknown'), /valid animal/);
+  assert.equal(JSON.parse(data.get(key + 'Daily')).buddy, 'jellyfish');
+});
+
 test('unavailable storage retains in-memory progress without crashes', () => {
   const { api } = setup(undefined, true);
   assert.equal(api.daily(), 'koala');

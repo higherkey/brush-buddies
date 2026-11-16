@@ -32,6 +32,7 @@ test('real Neon accounts enforce ownership and deduplicate expedition inserts', 
   const baseline = { collection: { visits:{}, completed:[], credits:{} }, journal:{stickers:{},sessions:0,last:''} };
   const [profile] = await a.data('brush_profiles', {}, { display_name:'Synthetic child', baseline });
   assert.equal(profile.owner_id, sessionA.user.id);
+  assert.equal(profile.revision, 0);
   assert.deepEqual(await b.data('brush_profiles', { id:'eq.'+profile.id }), []);
   await assert.rejects(() => b.data('brush_profiles', {}, { owner_id:sessionA.user.id, display_name:'Forged owner', baseline }));
   const anonymous = await fetch(config.dataUrl+'/brush_profiles');
@@ -43,6 +44,27 @@ test('real Neon accounts enforce ownership and deduplicate expedition inserts', 
   const rows = await a.data('brush_events', { profile_id:'eq.'+profile.id });
   assert.equal(rows.length,1);
   assert.deepEqual(await b.data('brush_events', { profile_id:'eq.'+profile.id }), []);
+  const edited = { collection:{visits:{fox:1},completed:[event.session_id],credits:{[event.session_id]:'fox'}}, journal:{stickers:{'home-fox-0':1},sessions:1,last:''} };
+  const query = { id:'eq.'+profile.id, revision:'eq.0' };
+  assert.deepEqual(await b.data('brush_profiles', query, {baseline:edited, revision:1}, 'PATCH'), []);
+  const anonymousEdit = await fetch(config.dataUrl+'/brush_profiles?'+new URLSearchParams(query), {
+    method:'PATCH', headers:{'Content-Type':'application/json', Prefer:'return=representation'}, body:JSON.stringify({baseline:edited, revision:1})
+  });
+  assert.ok([401,403].includes(anonymousEdit.status));
+  const [saved] = await a.data('brush_profiles', query, {baseline:edited, revision:1}, 'PATCH');
+  assert.equal(saved.revision, 1);
+  assert.deepEqual(saved.baseline, edited);
+  await assert.rejects(() => a.data('brush_profiles', {id:'eq.'+profile.id}, {baseline}, 'PATCH'));
+  await assert.rejects(() => a.data('brush_profiles', {id:'eq.'+profile.id}, {baseline,revision:0}, 'PATCH'));
+  assert.equal(saved.owner_id, sessionA.user.id);
+  await assert.rejects(() => a.data('brush_profiles', {id:'eq.'+profile.id}, {owner_id:sessionB.user.id}, 'PATCH'));
+  await assert.rejects(() => a.data('brush_profiles', {id:'eq.'+profile.id}, {display_name:'Forbidden rename'}, 'PATCH'));
+  assert.deepEqual(await a.data('brush_profiles', query, {baseline, revision:1}, 'PATCH'), []);
+  const [unchanged] = await a.data('brush_profiles', {id:'eq.'+profile.id});
+  assert.equal(unchanged.revision, 1);
+  assert.deepEqual(unchanged.baseline, edited);
+  assert.equal(unchanged.owner_id, sessionA.user.id);
+  assert.equal(unchanged.display_name, profile.display_name);
   fs.mkdirSync('.local', {recursive:true});
   fs.writeFileSync('.local/synthetic-accounts.json', JSON.stringify({ credentials, users:[sessionA.user.id,sessionB.user.id], profileId:profile.id }));
   await a.auth('sign-out',{});

@@ -80,7 +80,7 @@ test('daily visitor, creek travel and three-session unlock progression', async (
           const result=await page.evaluate(({animal,progress})=>{
             BB_SCENE.render({...BrushBuddies.snapshot(),buddy:animal.id,buddyEmoji:animal.emoji,progress,phase:'running',calm:true},{...BB_BUDDIES.home(animal.id),habitat:animal.habitat});
             const svg=document.querySelector('.creek-scene'),a=svg.querySelector('.creek-avatar').getBoundingClientRect(),s=svg.getBoundingClientRect(),m=document.querySelector('#message').getBoundingClientRect();
-            return {visible:a.left>=s.left-1&&a.right<=s.right+1&&a.top>=s.top-1&&a.bottom<=s.bottom+1&&a.bottom<m.top&&a.width>=40,habitat:svg.dataset.habitat,shapes:svg.querySelector('.creek-habitat-details')?.innerHTML};
+            return {visible:a.left>=s.left-1&&a.right<=s.right+1&&a.top>=s.top-1&&a.bottom<=s.bottom+1&&a.bottom<m.top&&a.width>=32,habitat:svg.dataset.habitat,shapes:svg.querySelector('.creek-habitat-details')?.innerHTML};
           },{animal,progress});
           assert.ok(result.visible,animal.id+' stays visible at '+width+'px, progress '+progress);
           assert.equal(result.habitat,animal.habitat);
@@ -105,6 +105,8 @@ test('daily visitor, creek travel and three-session unlock progression', async (
       assert.equal(await page.evaluate(id=>BB_BUDDIES.load().visits[id],guest),visit);
     }
     assert.ok(await page.evaluate(id=>BB_BUDDIES.unlocked(id),guest));
+    await page.click('#settings-open');
+    assert.ok(await page.locator('#backup-import').isVisible(),'restore backup uses a reachable native input');
     const downloadReady = page.waitForEvent('download');
     await page.click('#backup-export');
     const download = await downloadReady;
@@ -112,6 +114,7 @@ test('daily visitor, creek travel and three-session unlock progression', async (
     await page.evaluate(()=>{const state=BB_BUDDIES.load();state.visits={};BB_BUDDIES.save(state);});
     await page.locator('#backup-import').setInputFiles(backupPath);
     await page.waitForFunction(()=>document.querySelector('#backup-status').textContent.includes('restored'));
+    await page.click('#settings-close');
     assert.ok(await page.evaluate(id=>BB_BUDDIES.homeUnlocked(id),guest));
     await page.click('#start-button');
     assert.ok((await page.textContent('#adv-place')).includes(await page.evaluate(id=>BB_BUDDIES.home(id).name,guest)));

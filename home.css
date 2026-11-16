@@ -1,0 +1,39 @@
+/* A single mobile canvas: the visitor, journey and timer lead. */
+.app, .app[data-mode="adventure"] { grid-template-areas: "top" "intro" "buddy" "timer" "tools" "camera" "save" "footer"; }
+.session-tools { grid-area: tools; }
+.collection-save { grid-area: save; }
+.app .topbar { display: flex; gap: .5rem; padding-block-end: .5rem; border-block-end: 1px solid var(--line); }
+.app .top-actions { display: flex; inline-size: auto; }
+.app .top-actions .icon-button { inline-size: 48px; border: 0; }
+.brand { font-size: .75rem; letter-spacing: .08em; }
+.brand-mark { border: 0; }
+.experience-bar { grid-area: intro; }
+.experience-bar .quick-button { min-block-size: 48px; padding: .5rem 0; background: none; border: 0; color: var(--muted); font-size: .8rem; font-weight: 600; }
+.visitor-label { order: -3; margin: 0; font-size: .75rem; font-weight: 600; color: var(--muted); }
+.app[data-mode="simple"] .visitor-label { display: none; }
+#app[data-mode="adventure"] .buddy-name { font-size: 1.25rem; font-weight: 700; }
+.app[data-mode="adventure"] .buddy-area { border: 0; padding: 0; gap: .5rem; }
+.app[data-mode="adventure"] .adv-scene { border-radius: 6px; }
+.app[data-mode="adventure"] .speech { background: none; border: 0; padding: 0; font-size: .8rem; font-weight: 400; }
+.buddy-status { line-height: 1.5; }
+.app[data-mode="adventure"] .adv-bar { inline-size: 100%; justify-content: space-between; gap: .5rem; }
+.app[data-mode="adventure"] .adv-place { padding: 0; background: none; border: 0; font-size: .75rem; font-weight: 600; }
+.adv-journal-open { border: 0; background: none; font-size: .75rem; padding: .5rem; }
+.app[data-mode="adventure"] .timer-card { grid-template-columns: 80px minmax(0, 1fr); padding-inline: 0; border: 0; }
+.app[data-mode="adventure"] .timer-ring { inline-size: 80px; block-size: 80px; }
+.app[data-mode="adventure"] .timer-time { font-size: 1.5rem; }
+.app[data-mode="adventure"] .timer-caption { font-size: .5rem; }
+.app .stage-hint { display: none; }
+.app .zone-track { gap: .5rem; }
+.app .zone { min-block-size: 48px; }
+.app .zone-icon { font-size: 1.25rem; }
+.app .timer-controls { gap: .5rem; }
+.app .timer-controls button { min-block-size: 48px; border-radius: 6px; font-size: .875rem; padding: .5rem 1rem; }
+.session-tools { grid-column: 1 / -1; display: flex; justify-content: center; gap: .5rem; }
+.session-tools .quick-button { background: none; border: 0; font-size: .75rem; padding: .5rem; color: var(--muted); }
+.collection-save { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: .5rem; padding-block: .5rem; }
+.collection-save p { margin: 0; font-size: .75rem; }
+.collection-save .text-button { font-size: .75rem; min-block-size: 48px; padding: .5rem; }
+.app .footer { font-size: .65rem; gap: .5rem; }
+.art-credit summary { min-inline-size: 48px; min-block-size: 48px; display: flex; align-items: center; cursor: pointer; }
+.art-credit a { margin-inline-end: .5rem; }

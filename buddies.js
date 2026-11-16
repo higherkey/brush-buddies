@@ -139,12 +139,21 @@
     const collection = load();
     if (collection.daily.date !== date) {
       const locked = catalog.filter(function (buddy) { return !unlocked(buddy.id); });
-      const pool = locked.length ? locked : catalog;
+      const candidates = locked.length ? locked : catalog;
+      const different = candidates.filter(function (buddy) { return buddy.id !== collection.daily.buddy; });
+      const pool = different.length ? different : candidates;
       collection.daily = { date: date, buddy: pool[Math.floor(Math.random() * pool.length)].id };
       // Daily selection has a separate record so rollover cannot overwrite earned visits.
       try { root.localStorage.setItem(storageKey() + 'Daily', JSON.stringify(collection.daily)); } catch (_) {}
     }
     return current().daily.buddy;
+  }
+  function setDaily(id) {
+    if (!get(id)) throw new TypeError('Choose a valid animal.');
+    daily();
+    const value = { date: current().daily.date, buddy: id };
+    root.localStorage.setItem(storageKey() + 'Daily', JSON.stringify(value));
+    current().daily = value;
   }
   function complete(sessionId, buddyId) {
     if (!sessionValid(sessionId) || !get(buddyId)) return null;
@@ -201,5 +210,5 @@
     };
   }
   return { catalog: catalog, starters: starters, get: get, load: load, save: save, unlocked: unlocked,
-    available: available, daily: daily, complete: complete, completeInScope: completeInScope, homeUnlocked: homeUnlocked, home: home };
+    available: available, daily: daily, setDaily: setDaily, complete: complete, completeInScope: completeInScope, homeUnlocked: homeUnlocked, home: home };
 }));

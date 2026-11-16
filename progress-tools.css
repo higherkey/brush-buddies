@@ -1,0 +1,12 @@
+#progress-dialog label { display: block; margin-block: 1rem .5rem; text-align: start; }
+#progress-dialog input, #progress-dialog select, #progress-dialog button,
+.progress-entry input, .progress-entry button, .progress-entry summary {
+  min-inline-size: 48px;
+  min-block-size: 48px;
+}
+.progress-entry { margin-block: 1rem; text-align: start; }
+.progress-entry summary { display: flex; align-items: center; cursor: pointer; }
+.progress-entry form { display: grid; gap: .5rem; }
+.progress-group { border-block-start: 1px solid var(--line); margin-block-start: 1rem; padding-block-start: .5rem; }
+#progress-dialog h3 { margin-block: .5rem; }
+#progress-status { min-block-size: 3rem; }

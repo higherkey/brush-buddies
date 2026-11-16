@@ -98,7 +98,6 @@
   stroke-linecap: round;
 }
 .creek-cattail { stroke-width: 8; }
-.creek-avatar-badge { fill: var(--creek-light); stroke: var(--creek-bark); stroke-width: 2; }
 .creek-flag-number { fill: var(--creek-light); font: 700 13px system-ui, sans-serif; }
 .creek-avatar { transition: none; }
 .creek-scene[data-habitat] .creek-forest { display: none; }
