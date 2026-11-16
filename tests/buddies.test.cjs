@@ -44,6 +44,10 @@ test('profile scopes keep guest and sibling collections separate', () => {
 test('standalone Node and browser exports expose distinct animals and valid homes', () => {
   const api = require('../buddies.js');
   assert.ok(api.catalog.length >= 60);
+  assert.equal(api.get('cat').name,'Kitty the Cat');
+  assert.equal(api.get('bunny').name,'Bubbles the Bunny');
+  assert.equal(api.get('fox').name,'Finn the Fox');
+  assert.ok(api.catalog.every(animal=>animal.name.includes(' the ')));
   for (const field of ['id', 'emoji', 'name']) assert.equal(new Set(api.catalog.map(b => b[field])).size, api.catalog.length);
   const sounds = new Set(['meow', 'squeak', 'koala', 'woof', 'yip', 'growl', 'chirp', 'hoot', 'roar', 'ribbit', 'trumpet', 'magic']);
   const scenes = new Set(['meadow', 'beach', 'snow', 'forest', 'sky', 'night', 'jungle', 'desert']);

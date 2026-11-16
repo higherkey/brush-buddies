@@ -1,6 +1,9 @@
 # Branch Notes: fix/visible-animal-habitats
 
 ## 1. Discoveries & Deviations
+- Mobile-only correction: all modes and dialogs capped at 430px, centered in larger windows. Mobile rules are unconditional; removed the two-column desktop template and viewport-scaled heading. Added regressions comparing phone and 1920px layouts.
+- Restored friendly names (original 14 retained; named all75). Animal name is now above the scene with journal metadata separate below it; IDs/unlocks unchanged.
+- Live diagnosis: public site still served 0.8.0 because PR20 was unmerged; publishing tested 0.8.2/cache v11 is part of the fix.
 - Two root causes: portrait SVG slice cropping hid the avatar at both path ends; newer native emoji (seal/jellyfish) rendered as missing glyphs. Camera now follows the animal; scene/narration have separate space.
 - Habitat-based routes replace modulo-assigned shared scenery; keep existing unlocks, stickers and accounts unchanged.
 

@@ -152,7 +152,8 @@
       renderScene(s);
       if (COLLECTION) {
         const visits = COLLECTION.load().visits[s.buddy] || 0;
-        $("buddy-name").textContent = s.buddyName + " · " + (COLLECTION.homeUnlocked(s.buddy) ? "Home unlocked" : "Journal " + Math.min(visits, 3) + "/3") + (s.buddy === COLLECTION.daily() ? " · Today's visitor" : "");
+        $("buddy-name").textContent = s.buddyName;
+        $("buddy-status").textContent = (COLLECTION.homeUnlocked(s.buddy) ? "Home unlocked" : "Journal " + Math.min(visits, 3) + "/3") + (s.buddy === COLLECTION.daily() ? " · Today's visitor" : "");
       }
       document.querySelectorAll(".zone").forEach((button, i) => {
         if (!button.dataset.baseLabel) button.dataset.baseLabel = button.getAttribute("aria-label");

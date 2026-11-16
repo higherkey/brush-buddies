@@ -36,7 +36,30 @@ test('daily visitor, creek travel and three-session unlock progression', async (
     await page.evaluate(()=>{const s=JSON.parse(localStorage.getItem('brushBuddiesSettingsV2'));delete s.experience;localStorage.setItem('brushBuddiesSettingsV2',JSON.stringify(s));});
     await page.reload();
     assert.equal(await page.getAttribute('#app','data-mode'),'adventure');
+    for(const mode of ['simple','adventure']){
+      if(await page.getAttribute('#app','data-mode')!==mode)await page.click('#mode-toggle');
+      let mobile;
+      for(const width of [430,768,1200,1920]){
+        await page.setViewportSize({width,height:844});
+        const layout=await page.evaluate(()=>{
+          const app=document.querySelector('#app'),box=app.getBoundingClientRect();
+          return {width:box.width,center:box.x+box.width/2,columns:getComputedStyle(app).gridTemplateColumns,header:getComputedStyle(document.querySelector('.topbar')).display,font:getComputedStyle(document.querySelector('h1')).fontSize};
+        });
+        assert.ok(layout.width<=430,'mobile width cap in '+mode+' at '+width);
+        assert.ok(Math.abs(layout.center-width/2)<1,'centered mobile canvas');
+        if(!mobile)mobile=layout;
+        assert.equal(layout.columns,mobile.columns,'no desktop grid');
+        assert.equal(layout.header,mobile.header,'no desktop header');
+        assert.equal(layout.font,mobile.font,'no desktop typography');
+        await page.click('#settings-open');
+        assert.ok((await page.locator('#settings-dialog').boundingBox()).width<=430,'mobile-width dialog');
+        await page.click('#settings-close');
+      }
+    }
+    await page.setViewportSize({width:390,height:844});
     const guest=await page.evaluate(()=>BrushBuddies.snapshot().buddy);
+    assert.equal(await page.textContent('#buddy-name'),await page.evaluate(id=>BB_BUDDIES.get(id).name,guest));
+    assert.ok(await page.locator('#buddy-name').evaluate(el=>el.getBoundingClientRect().bottom<=document.querySelector('.creek-scene').getBoundingClientRect().top),'animal name sits above the scene');
     assert.equal(guest,await page.evaluate(()=>BB_BUDDIES.daily()));
     assert.ok(await page.locator('.creek-scene').isVisible());
     const hero=await page.locator('#buddy-area').boundingBox();assert.ok(hero.height>=400);
