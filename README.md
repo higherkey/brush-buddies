@@ -1,6 +1,8 @@
-# Brush Buddies
+# Toothpaws
 
-A kid-friendly animal-themed toothbrushing timer hosted as a static site on GitHub Pages.
+Two-minute toothbrushing trails with an animal friend. A kid-friendly toothbrushing timer hosted as a static site on GitHub Pages.
+
+(Formerly Brush Buddies. The repository name, PWA id, cache prefix and saved-data keys keep the old name so installed apps and existing progress carry over.)
 
 ## Features
 
@@ -9,11 +11,12 @@ A kid-friendly animal-themed toothbrushing timer hosted as a static site on GitH
 
 - Customizable brushing stages: rename, change emoji, edit reminders, set each stage duration, add or remove stages
 - Tap a stage to jump to it; touch and hold a stage on the main screen to reorder it
+- When every stage is done, one big **Brush again** button starts a fresh session; **Start over** restarts a session in progress
 - Separate settings submenus for Buddy, Stages, Timer & sounds, and Motion
 - Configurable breaks between stages and independent sound toggles
 - Local MediaPipe camera Assist: face-following mouth target, small-motion detection, calibration, adjustable target and local video replay; optional automatic pausing for manual brushes
 - Preferences and stage definitions are saved locally in the browser
-- A paper-and-field-guide inspired layout with clear, squared-off panels and large kid-friendly controls
+- A warm, rounded Toothpaws look with large kid-friendly controls (see Brand below)
 - Motion sampling only analyzes newly delivered camera frames to reduce unnecessary work on phones
 - No build step; camera mode uses a pinned, locally bundled MediaPipe runtime and face model
 
@@ -57,6 +60,15 @@ CHROMIUM_EXECUTABLE can select an existing Chromium binary. The browser tests ru
 
 Animal calls and interface sounds are synthesized locally with the Web Audio API. Animal artwork is locally bundled Twemoji SVGs (CC BY 4.0; attribution in animals/README.md and the app footer). No third-party artwork is hotlinked.
 
+## Brand
+
+- **Name:** Toothpaws: teeth plus paws. Every brush is a short trip with an animal friend.
+- **Mark:** a paw print whose big pad is a tooth, with orange toe beans and a mint sparkle. Source is `icon.svg`; `icons/icon-maskable.svg` is the padded version for Android's adaptive icons and `icons/icon-full.svg` the full-bleed version for iOS. The PNGs in `icons/` are rendered from these.
+- **Palette:** Pine `#1d4a3a`, Leaf `#2f8a5f`, Mint `#a8ebcf`, Sunrise `#ff8a4c`, Cream `#fffaf0`. Each buddy keeps its own accent for the timer ring and the active stage.
+- **Type:** Fredoka for the wordmark, headings and timer; Nunito for body text. Both are bundled in `fonts/` (SIL Open Font License, see the license files there) and cached for offline use.
+- **Share preview:** `og-image.png` (1200×630) is used for link previews.
+- **Styles:** `brand.css` loads last and holds the palette, type and component shapes for light and dark mode.
+
 ## Run locally
 
 Open `index.html` in a modern browser or serve the folder with a static web server. Camera access requires localhost or HTTPS.
@@ -64,11 +76,11 @@ Open `index.html` in a modern browser or serve the folder with a static web serv
 
 ## Install as an app (PWA)
 
-Brush Buddies is a Progressive Web App. On a supported browser, use the browser's **Install app** or **Add to Home Screen** command to put it on your device's home screen. The standalone display mode opens without the normal browser chrome.
+Toothpaws is a Progressive Web App. On a supported browser, use the browser's **Install app** or **Add to Home Screen** command to put it on your device's home screen. The standalone display mode opens without the normal browser chrome.
 
 A service worker precaches the app shell so the timer can load offline after the first successful visit. App navigation is network-first when online and falls back to the cached page when offline. The worker only handles same-origin GET requests; it does not intercept camera streams or external requests. Camera motion detection continues to process frames locally and still requires camera permission.
 
-The web app manifest and SVG icon provide the app name, launch location, colors, and install icon. Service worker registration requires HTTPS (GitHub Pages provides this) or localhost.
+The web app manifest, SVG icon and PNG icons (including maskable versions) provide the app name, launch location, colors, and install icon. Service worker registration requires HTTPS (GitHub Pages provides this) or localhost.
 
 ## Adventure Mode
 

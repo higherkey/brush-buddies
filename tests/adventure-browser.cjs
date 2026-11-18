@@ -43,6 +43,33 @@ test('live story preference and open journal update during a brushing session', 
     assert.ok(await page.locator('#journal-dialog').evaluate(dialog => dialog.open));
     assert.match(await page.textContent('#journal-summary'), /1 trip$/);
     assert.equal(await page.locator('.sticker.found').count(), 1);
+    await page.click('#journal-close');
+    assert.equal(await page.textContent('#start-button-label'), 'Brush again', 'a finished session offers Brush again');
+    assert.ok(await page.locator('#start-button').isVisible(), 'Brush again is visible');
+    assert.ok(await page.locator('#reset-button').isHidden(), 'Start over steps aside once finished');
+    assert.equal(await page.getAttribute('#timer-ring', 'aria-label'), 'Brush again');
+    await page.click('#start-button');
+    assert.equal(await page.evaluate(() => BrushBuddies.snapshot().phase), 'running', 'Brush again starts a fresh session');
+    assert.ok(await page.locator('#reset-button').isVisible(), 'Start over returns during a session');
+    const fits = await page.evaluate(() => {
+      const ring = document.querySelector('#timer-ring').getBoundingClientRect();
+      const caption = document.querySelector('#time-caption').getBoundingClientRect();
+      return caption.left >= ring.left && caption.right <= ring.right && caption.height < 20;
+    });
+    assert.ok(fits, 'the timer caption stays on one line inside the small adventure ring');
+    await page.click('#pause-button');
+    const visitor = await page.evaluate(() => BB_BUDDIES.daily());
+    await page.click('#journal-open');
+    await page.click('#journal-tab-buddies');
+    assert.ok(await page.locator('#journal-list').isHidden(), 'the Buddies tab replaces the sticker pages');
+    await page.locator('.buddy-card', { hasText: 'Bubbles the Bunny' }).click();
+    assert.equal(await page.evaluate(() => BrushBuddies.snapshot().buddy), 'bunny');
+    await page.click('#journal-open');
+    await page.click('#journal-tab-buddies');
+    assert.ok(await page.locator('.buddy-card.visitor').isEnabled(), "today's visitor can be chosen again");
+    await page.locator('.buddy-card.visitor').click();
+    assert.equal(await page.evaluate(() => BrushBuddies.snapshot().buddy), visitor, 'choosing the visitor brings them back');
+    assert.equal(await page.textContent('#visitor-label'), "Today's visitor");
   } finally {
     await browser?.close();
     await new Promise(resolve => server.close(resolve));

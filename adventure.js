@@ -161,6 +161,7 @@
         button.setAttribute("aria-label", button.dataset.baseLabel + (s.storyText ? " Stop: " + stopFor(i).name + "." : ""));
       });
       narrate(s);
+      updateJournalBadge();
       if (pendingTreasure && !treasureTimer) showTreasure(pendingTreasure);
     } else {
       document.querySelectorAll(".zone[data-base-label]").forEach(button => button.setAttribute("aria-label", button.dataset.baseLabel));
@@ -199,6 +200,7 @@
     const found = navigator.locks
       ? await navigator.locks.request(KEY, () => award(finishedTrip.dest, s))
       : award(finishedTrip.dest, s);
+    updateJournalBadge();
     if ($("journal-dialog").open) openJournal();
     if (trip !== finishedTrip) return;
     pendingTreasure = found;
@@ -252,7 +254,85 @@
     return page;
   }
 
-  function openJournal() {
+  function stickerTotals() {
+    const total = ALL.reduce((n, d) => n + d.stickers.length, 0);
+    const found = ALL.reduce((n, d) => n + d.stickers.filter(st => store.stickers[st.id]).length, 0);
+    return { found, total };
+  }
+
+  // The Journal button shows how many stickers have been found, so it reads as a collection worth opening.
+  function updateJournalBadge() {
+    const { found } = stickerTotals();
+    $("journal-badge").textContent = found ? String(found) : "";
+    $("journal-open").setAttribute("aria-label", "Journal, " + found + (found === 1 ? " sticker" : " stickers") + " found");
+  }
+
+  function showJournalTab(tab) {
+    const buddies = tab === "buddies";
+    $("journal-tab-buddies").setAttribute("aria-selected", String(buddies));
+    $("journal-tab-stickers").setAttribute("aria-selected", String(!buddies));
+    $("journal-buddies").hidden = !buddies;
+    $("journal-list").hidden = buddies;
+    $("journal-summary").hidden = buddies;
+  }
+
+  function buddyCard(a, current, visitor) {
+    const unlocked = COLLECTION.unlocked(a.id);
+    const choosable = unlocked || a.id === visitor;
+    const visits = Math.min(3, COLLECTION.load().visits[a.id] || 0);
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "buddy-card" + (a.id === current ? " current" : "") + (a.id === visitor ? " visitor" : "") + (choosable ? "" : " locked");
+    button.disabled = !choosable;
+    button.setAttribute("aria-pressed", String(a.id === current));
+    const art = document.createElement("img");
+    art.src = "animals/" + a.id + ".svg";
+    art.alt = "";
+    art.width = 48;
+    art.height = 48;
+    const name = document.createElement("strong");
+    name.textContent = a.name;
+    const note = document.createElement("small");
+    note.textContent = a.id === current ? "Brushing with you"
+      : a.id === visitor ? "Today's visitor · tap to brush together"
+      : unlocked ? (COLLECTION.homeUnlocked(a.id) ? "Home unlocked" : "Starter buddy")
+      : visits + " of 3 trips";
+    const trips = document.createElement("span");
+    trips.className = "buddy-trips";
+    trips.setAttribute("aria-hidden", "true");
+    if (!unlocked) for (let i = 0; i < 3; i++) {
+      const dot = document.createElement("i");
+      if (i < visits) dot.className = "on";
+      trips.append(dot);
+    }
+    const text = document.createElement("span");
+    text.className = "buddy-card-text";
+    text.append(name, note);
+    if (!unlocked) text.append(trips);
+    button.append(art, text);
+    button.addEventListener("click", () => {
+      $("journal-dialog").close();
+      document.dispatchEvent(new CustomEvent("bb:choose", { detail: a.id }));
+    });
+    return button;
+  }
+
+  function renderBuddies() {
+    const current = api()?.snapshot().buddy;
+    const visitor = COLLECTION.daily();
+    const rank = a => a.id === visitor ? 0 : COLLECTION.unlocked(a.id) ? 1 : 2;
+    const ordered = COLLECTION.catalog.slice().sort((x, y) => rank(x) - rank(y));
+    const help = document.createElement("p");
+    help.className = "panel-intro";
+    help.textContent = "Tap a buddy to brush with them. Brush 3 times with a visitor to keep them and unlock their home.";
+    const grid = document.createElement("div");
+    grid.className = "collection-grid";
+    grid.append(...ordered.map(a => buddyCard(a, current, visitor)));
+    $("journal-buddies").replaceChildren(help, grid);
+    $("journal-buddy-count").textContent = COLLECTION.available().length + "/" + COLLECTION.catalog.length;
+  }
+
+  function openJournal(tab) {
     store = loadStore();
     if (COLLECTION) COLLECTION.load();
     const buddy = api()?.snapshot().buddy;
@@ -261,42 +341,16 @@
     const list = pages.map(d => journalPage(d.emoji + " " + d.name, d.stickers));
     if (store.stickers[RARE.id]) list.push(journalPage("✨ Lucky finds", [RARE]));
     $("journal-list").replaceChildren(...list);
-    if (COLLECTION) {
-      const collection = document.createElement("section");
-      collection.className = "animal-collection";
-      const heading = document.createElement("h3");
-      heading.textContent = "Meet your buddies · " + COLLECTION.available().length + " of " + COLLECTION.catalog.length + " unlocked";
-      const help = document.createElement("p");
-      help.textContent = "Complete 3 expeditions with a visitor to fill their entry, unlock their home, and choose them any time.";
-      collection.append(heading, help);
-      const grid = document.createElement("div");
-      grid.className = "collection-grid";
-      COLLECTION.catalog.forEach(a => {
-        const button = document.createElement("button");
-        button.type = "button";
-        const visits = COLLECTION.load().visits[a.id] || 0;
-        button.disabled = !COLLECTION.unlocked(a.id);
-        button.textContent = a.name + " · " + (button.disabled ? Math.min(3, visits) + "/3 visits" : COLLECTION.homeUnlocked(a.id) ? "Home unlocked" : "Starter buddy");
-        const art = document.createElement('img');
-        art.src = 'animals/' + a.id + '.svg';
-        art.alt = '';
-        art.width = 36;
-        art.height = 36;
-        button.prepend(art);
-        button.addEventListener("click", () => {
-          $("journal-dialog").close();
-          document.dispatchEvent(new CustomEvent("bb:choose", { detail: a.id }));
-        });
-        grid.append(button);
-      });
-      collection.append(grid);
-      $("journal-list").prepend(collection);
-    }
+    $("journal-tab-buddies").hidden = !COLLECTION;
+    if (COLLECTION) renderBuddies();
 
-    const total = ALL.reduce((n, d) => n + d.stickers.length, 0);
-    const found = ALL.reduce((n, d) => n + d.stickers.filter(st => store.stickers[st.id]).length, 0);
+    const { found, total } = stickerTotals();
+    $("journal-sticker-count").textContent = found + "/" + total;
     $("journal-summary").textContent =
       found + " of " + total + " stickers found · " + store.sessions + (store.sessions === 1 ? " trip" : " trips");
+    // Refreshing an open journal keeps the tab the child is looking at.
+    if (!tab && $("journal-dialog").open) tab = $("journal-tab-buddies").getAttribute("aria-selected") === "true" ? "buddies" : "stickers";
+    showJournalTab(tab === "buddies" && COLLECTION ? "buddies" : "stickers");
     if (!$("journal-dialog").open) $("journal-dialog").showModal();
   }
 
@@ -305,7 +359,15 @@
   document.addEventListener("bb:finish", onFinish);
 
   // Defer scripts run in order, so the markup exists by now.
-  $("journal-open").addEventListener("click", openJournal);
+  $("journal-open").addEventListener("click", () => openJournal());
+  $("journal-tab-stickers").addEventListener("click", () => showJournalTab("stickers"));
+  $("journal-tab-buddies").addEventListener("click", () => showJournalTab("buddies"));
+  $("journal-dialog").addEventListener("keydown", e => {
+    if (!e.target.classList.contains("journal-tab") || !["ArrowLeft", "ArrowRight"].includes(e.key)) return;
+    const next = e.target.id === "journal-tab-stickers" ? "buddies" : "stickers";
+    showJournalTab(next);
+    $("journal-tab-" + next).focus();
+  });
   $("journal-close").addEventListener("click", () => $("journal-dialog").close());
   $("journal-dialog").addEventListener("close", () => $("journal-open").focus());
   $("treasure-dialog").addEventListener("close", () => {
@@ -314,7 +376,7 @@
   $("treasure-close").addEventListener("click", () => $("treasure-dialog").close());
   $("treasure-journal").addEventListener("click", () => {
     $("treasure-dialog").close();
-    openJournal();
+    openJournal("stickers");
   });
   ["journal-dialog", "treasure-dialog"].forEach(id => {
     $(id).addEventListener("click", e => {

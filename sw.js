@@ -1,8 +1,11 @@
 "use strict";
 
-const CACHE_NAME = "brush-buddies-shell-v12";
+const CACHE_NAME = "brush-buddies-shell-v13";
 const APP_SHELL = [
   "./home.css?v=0.8.3",
+  "./brand.css?v=0.9.0",
+  "./fonts/fredoka-latin-wght.woff2",
+  "./fonts/nunito-latin-wght.woff2",
   "./progress-tools.js?v=0.8.3",
   "./progress-tools.css?v=0.8.3",
   "./",
@@ -87,16 +90,16 @@ const APP_SHELL = [
   "./account-progress.js?v=0.8.0",
   "./neon-config.js?v=0.8.0",
   "./neon-api.js?v=0.8.3",
-  "./accounts.js?v=0.8.3",
+  "./accounts.js?v=0.9.0",
   "./buddies.js?v=0.8.3",
   "./adventure-scene.js?v=0.8.3",
   "./adventure-scene.css?v=0.8.3",
   "./expedition.css?v=0.8.2",
-  "./collection-backup.js?v=0.8.0",
+  "./collection-backup.js?v=0.9.0",
   "./styles.css?v=0.8.2",
   "./adventure-data.js?v=0.6.0",
   "./adventure.js?v=0.8.3",
-  "./app.js?v=0.8.3",
+  "./app.js?v=0.9.0",
   "./camera-helper.js?v=0.8.0",
   "./camera-worker.js?v=0.8.0",
   "./camera-motion.js",
@@ -104,7 +107,10 @@ const APP_SHELL = [
   "./manifest.webmanifest",
   "./icon.svg",
   "./icons/icon-192.png",
-  "./icons/icon-512.png"
+  "./icons/icon-512.png",
+  "./icons/icon-180.png",
+  "./icons/icon-maskable-192.png",
+  "./icons/icon-maskable-512.png"
 ];
 
 self.addEventListener("install", event => {

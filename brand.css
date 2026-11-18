@@ -1,0 +1,904 @@
+/* Toothpaws brand layer.
+   Loaded after every other stylesheet. It sets the brand palette, type and
+   component shapes; per-buddy accents (ring, active stage) still come from
+   the buddy themes in styles.css. */
+
+@font-face {
+  font-family: "Fredoka";
+  src: url("fonts/fredoka-latin-wght.woff2") format("woff2");
+  font-weight: 300 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Nunito";
+  src: url("fonts/nunito-latin-wght.woff2") format("woff2");
+  font-weight: 200 1000;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --font-body: "Nunito", ui-rounded, system-ui, sans-serif;
+  --font-display: "Fredoka", "Nunito", ui-rounded, system-ui, sans-serif;
+
+  /* Brand palette */
+  --pine: #1d4a3a;
+  --pine-deep: #123328;
+  --leaf: #2f8a5f;
+  --leaf-ink: #24704c;
+  --mint: #a8ebcf;
+  --mint-soft: #e3f6ec;
+  --sun: #ff8a4c;
+  --sun-soft: #ffe8d9;
+  --sun-ink: #a8431a;
+
+  /* Surfaces and text (light) */
+  --page: #efe9da;
+  --surface: #fffaf0;
+  --panel: #f5eedf;
+  --ink: #1b3a2f;
+  --muted: #55695f;
+  --line: #e4dbc7;
+  --line-strong: #cbbfa5;
+  --toggle-off: #d9d0bd;
+  --hl-bg: var(--sun-soft);
+  --hl-line: #f2a57c;
+  --hl-ink: var(--sun-ink);
+  --done-bg: var(--mint-soft);
+  --done-line: #7fcca6;
+  --done-ink: #1f5f40;
+
+  --cta-bg: var(--pine);
+  --cta-ink: #fffaf0;
+  --cta-edge: var(--pine-deep);
+
+  --radius-s: 10px;
+  --radius-m: 14px;
+  --radius-l: 20px;
+
+  font-family: var(--font-body);
+}
+
+html[data-scheme="dark"] {
+  --page: #0c1f18;
+  --surface: #12291f;
+  --panel: #1a3529;
+  --ink: #eef6f0;
+  --muted: #b3c8bc;
+  --line: #2a4a3c;
+  --line-strong: #3f6553;
+  --toggle-off: #3f5a4d;
+  --hl-bg: #4a2c1a;
+  --hl-line: #e0855a;
+  --hl-ink: #ffd9c2;
+  --done-bg: #173f2d;
+  --done-line: #4fae80;
+  --done-ink: #c4f2d6;
+  --mint-soft: #173f2d;
+  --leaf-ink: var(--mint);
+
+  --cta-bg: var(--mint);
+  --cta-ink: #0f2a20;
+  --cta-edge: #6fcf9f;
+}
+
+body {
+  background-color: var(--page);
+  background-image: none;
+  font-family: var(--font-body);
+}
+
+.app {
+  background: var(--surface);
+  box-shadow: 0 0 0 1px var(--line);
+}
+
+h1, h2, h3,
+.buddy-name,
+.zone-title,
+.timer-time,
+.treasure-name {
+  font-family: var(--font-display);
+}
+
+/* Header */
+.app .topbar {
+  align-items: center;
+  padding-block: .25rem .5rem;
+  border-block-end: 1px solid var(--line);
+}
+
+.brand {
+  gap: .5rem;
+  letter-spacing: 0;
+  font-size: 1rem;
+}
+
+.brand-mark,
+.app .brand-mark {
+  inline-size: 32px;
+  block-size: 32px;
+  border: 0;
+  border-radius: 9px;
+  display: block;
+}
+
+.brand-name {
+  font-family: var(--font-display);
+  font-size: 1.375rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+.app .top-actions .icon-button {
+  border-radius: 50%;
+  color: var(--ink);
+}
+
+.icon-button {
+  border-radius: 50%;
+}
+
+/* Mode switch */
+.experience-bar .quick-button,
+.app .experience-bar .quick-button {
+  justify-content: flex-start;
+  padding-inline: .875rem;
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--ink);
+  box-shadow: none;
+  font-weight: 700;
+}
+
+.mode-quick.enabled,
+.app .experience-bar .mode-quick.enabled {
+  background: var(--mint-soft);
+  color: var(--done-ink);
+  box-shadow: none;
+}
+
+/* Buddy and adventure scene */
+.app[data-mode="adventure"] .adv-scene,
+.adv-scene {
+  border-radius: var(--radius-l);
+}
+
+#app[data-mode="adventure"] .buddy-name {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.buddy-name {
+  font-weight: 600;
+}
+
+.visitor-label {
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  font-weight: 800;
+  color: var(--leaf);
+}
+
+html[data-scheme="dark"] .visitor-label {
+  color: var(--mint);
+}
+
+.speech {
+  border-radius: var(--radius-m);
+}
+
+.app[data-mode="simple"] .buddy-area {
+  border-radius: var(--radius-l);
+}
+
+/* Timer */
+.timer-time {
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.timer-caption {
+  font-weight: 800;
+  letter-spacing: .1em;
+}
+
+.zone-title {
+  font-weight: 600;
+  font-size: 1.125rem;
+}
+
+.app .zone,
+.zone {
+  border-radius: var(--radius-m);
+  background: var(--surface);
+  border-color: var(--line-strong);
+}
+
+.zone.active,
+.app .zone.active {
+  border-width: 2px;
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.zone.done,
+.app .zone.done {
+  background: var(--done-bg);
+  border-color: var(--done-line);
+}
+
+.total-row {
+  font-weight: 700;
+}
+
+/* Buttons */
+.app .timer-controls .start-button,
+.app .timer-controls .pause-button,
+.save-button,
+.settings-dialog .save-button {
+  border-radius: var(--radius-m);
+  background: var(--cta-bg);
+  color: var(--cta-ink);
+  box-shadow: 0 4px 0 var(--cta-edge);
+  font-weight: 800;
+  letter-spacing: .01em;
+  margin-block-end: 4px;
+  transition: transform .1s ease, box-shadow .1s ease;
+}
+
+.app .timer-controls .start-button:active,
+.app .timer-controls .pause-button:active,
+.save-button:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 var(--cta-edge);
+}
+
+.app .timer-controls .secondary-button,
+.secondary-button {
+  border-radius: var(--radius-m);
+  border: 2px solid var(--line-strong);
+  background: var(--surface);
+  color: var(--ink);
+  font-weight: 800;
+}
+
+.quick-button {
+  border-radius: 999px;
+}
+
+.session-tools .quick-button,
+.app .session-tools .quick-button {
+  padding-inline: .875rem;
+  font-weight: 700;
+}
+
+#music-toggle.enabled {
+  border-radius: 999px;
+}
+
+.text-button {
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.app .timer-ring:focus-visible,
+.timer-ring:focus-visible {
+  outline-color: var(--sun);
+}
+
+/* Dialogs */
+.settings-dialog {
+  border: 0;
+  border-radius: var(--radius-l) var(--radius-l) 0 0;
+  box-shadow: 0 -8px 40px rgba(18, 51, 40, .25);
+}
+
+.settings-dialog h2 {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.eyebrow {
+  color: var(--leaf);
+  font-weight: 800;
+  letter-spacing: .12em;
+}
+
+html[data-scheme="dark"] .eyebrow {
+  color: var(--mint);
+}
+
+.settings-tabs {
+  gap: 4px;
+  padding: 4px;
+  border: 0;
+  border-radius: var(--radius-m);
+  background: var(--panel);
+}
+
+.settings-tab {
+  border: 0;
+  border-radius: var(--radius-s);
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+.settings-tab.active {
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: 0 1px 3px rgba(18, 51, 40, .18);
+}
+
+.settings-dialog h3,
+.journal-list h3 {
+  font-weight: 600;
+}
+
+.select-control,
+.stage-edit-card,
+.collection-grid button {
+  border-radius: var(--radius-s);
+}
+
+.settings-dialog::backdrop {
+  background: rgba(12, 31, 24, .45);
+}
+
+/* Footer */
+.footer-brand {
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+/* Finished: one big, warm "Brush again" button */
+.app .timer-controls .start-button.again {
+  max-inline-size: none;
+  background: var(--sun);
+  color: var(--pine-deep);
+  box-shadow: 0 4px 0 #d9652b;
+}
+
+.app .timer-controls .start-button.again:active {
+  box-shadow: 0 1px 0 #d9652b;
+}
+
+#app.animations-on:not(.reduced-motion) .timer-controls .start-button.again {
+  animation: brushAgainNudge 2.4s ease-in-out 0.6s 2;
+}
+
+@keyframes brushAgainNudge {
+  0%, 100% { transform: translateY(0); }
+  12% { transform: translateY(-3px); }
+  24% { transform: translateY(0); }
+}
+
+.app .timer-controls .secondary-button[hidden] {
+  display: none;
+}
+
+.timer-controls .start-button span[aria-hidden],
+.timer-controls .secondary-button span[aria-hidden] {
+  font-size: 1.1em;
+}
+
+/* Text colours that need AA contrast on cream */
+.visitor-label,
+.eyebrow {
+  color: var(--leaf-ink);
+}
+
+/* Speech bubble (Simple mode) */
+.speech {
+  border-left: 0;
+  border-radius: var(--radius-m);
+  padding: .5rem .75rem;
+  font-weight: 700;
+}
+
+.app[data-mode="simple"] .speech {
+  background: var(--accent-soft);
+  border-radius: var(--radius-m) var(--radius-m) var(--radius-m) 4px;
+}
+
+.app[data-mode="simple"] .buddy-name {
+  font-family: var(--font-body);
+  font-weight: 800;
+}
+
+/* Toggles */
+.toggle,
+.toggle::after {
+  border-radius: 999px;
+}
+
+.toggle-row input:checked + .toggle {
+  background: var(--leaf);
+}
+
+html[data-scheme="dark"] .toggle-row input:checked + .toggle {
+  background: #4fae80;
+}
+
+.toggle-row input:focus-visible + .toggle {
+  outline-color: var(--sun);
+}
+
+/* Stage editor */
+.stage-edit-card {
+  padding: .75rem;
+  margin-block-end: .5rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-m);
+  background: var(--panel);
+}
+
+.stage-drag-handle {
+  border-radius: var(--radius-s);
+  border: 0;
+  background: var(--surface);
+  color: var(--muted);
+}
+
+.stage-edit-number {
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.stage-edit-card .select-control,
+.stage-fields input,
+.tip-field textarea {
+  background: var(--surface);
+}
+
+/* File pickers */
+input[type="file"] {
+  font-size: .8rem;
+  color: var(--muted);
+}
+
+input[type="file"]::file-selector-button {
+  min-block-size: 40px;
+  margin-inline-end: .75rem;
+  padding: .5rem .875rem;
+  border: 2px solid var(--line-strong);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+/* Treasure and journal */
+#treasure-dialog .secondary-button {
+  border: 2px solid var(--line-strong);
+  border-radius: var(--radius-m);
+  font-weight: 800;
+}
+
+.treasure-name {
+  font-weight: 600;
+}
+
+.journal-page {
+  padding: .75rem;
+  border: 0;
+  border-radius: var(--radius-m);
+  background: var(--panel);
+}
+
+.journal-page h3 {
+  font-weight: 600;
+}
+
+.sticker {
+  border-radius: var(--radius-s);
+  border: 2px dashed var(--line-strong);
+  color: var(--line-strong);
+  font-family: var(--font-display);
+  font-weight: 600;
+}
+
+.sticker.found {
+  border: 2px solid var(--done-line);
+  background: var(--surface);
+  box-shadow: 0 2px 0 var(--line);
+}
+
+/* Camera Assist */
+.camera-heading {
+  color: var(--leaf-ink);
+  font-family: var(--font-display);
+  font-weight: 600;
+}
+
+html[data-scheme="dark"] .camera-heading {
+  color: var(--mint);
+}
+
+.camera-frame,
+.camera-frame .motion-preview {
+  border-radius: var(--radius-l);
+  background: var(--pine-deep);
+}
+
+.camera-tools progress {
+  appearance: none;
+  -webkit-appearance: none;
+  block-size: 12px;
+  max-inline-size: none;
+  border: 0;
+  border-radius: 999px;
+  background: var(--panel);
+  overflow: hidden;
+}
+
+.camera-tools progress::-webkit-progress-bar {
+  background: var(--panel);
+  border-radius: 999px;
+}
+
+.camera-tools progress::-webkit-progress-value {
+  background: var(--leaf);
+  border-radius: 999px;
+}
+
+.camera-tools progress::-moz-progress-bar {
+  background: var(--leaf);
+  border-radius: 999px;
+}
+
+.camera-tools label {
+  font-size: .8rem;
+  font-weight: 800;
+  color: var(--muted);
+}
+
+.camera-tools .quick-button {
+  padding-inline: 1rem;
+  border-width: 2px;
+}
+
+.motion-status {
+  color: var(--ink);
+}
+
+/* Account and progress forms */
+#account-status:empty,
+#progress-status:empty {
+  display: none;
+}
+
+.collection-grid button {
+  border-radius: var(--radius-m);
+}
+
+.progress-entry summary,
+.art-credit summary {
+  font-weight: 700;
+}
+
+/* ---------------------------------------------------------------
+   Main screen focus: the scene, the timer and the big button lead.
+   Everything else is quieter and further down.
+   --------------------------------------------------------------- */
+
+/* Mode switch: a quiet text button. In Adventure it shares a line with "Today's visitor". */
+.app .experience-bar .quick-button,
+.app .experience-bar .mode-quick.enabled {
+  background: none;
+  padding-inline: .5rem;
+  color: var(--muted);
+  font-size: .8rem;
+  font-weight: 700;
+}
+
+.app .experience-bar .quick-button:hover {
+  background: var(--panel);
+}
+
+.app[data-mode="adventure"] .experience-bar {
+  justify-self: end;
+  margin-block: .5rem -56px;
+  position: relative;
+  z-index: 2;
+}
+
+.app[data-mode="adventure"] .visitor-label {
+  min-block-size: 48px;
+  display: flex;
+  align-items: center;
+  padding-inline-end: 11rem;
+}
+
+.app[data-mode="adventure"] .buddy-area {
+  min-block-size: 0;
+  gap: .375rem;
+}
+
+#app[data-mode="adventure"] .buddy-name {
+  margin-block-start: -.5rem;
+}
+
+/* A shorter scene so Start sits above the fold on a phone. */
+.app[data-mode="adventure"] .adv-scene {
+  flex: 0 0 auto;
+  min-block-size: 0;
+  block-size: clamp(260px, 30svh, 300px);
+}
+
+.app[data-mode="adventure"] .speech {
+  order: 0;
+  padding: 0;
+  background: none;
+  font-size: .9rem;
+  font-weight: 700;
+}
+
+.app[data-mode="adventure"] .adv-bar {
+  order: 1;
+  align-items: center;
+}
+
+.app[data-mode="adventure"] .buddy-status {
+  order: 2;
+  font-size: .75rem;
+  line-height: 1.4;
+}
+
+/* Journal button: a clear, labelled pill with a sticker count. */
+.app .adv-journal-open,
+.app[data-mode="adventure"] .adv-journal-open {
+  min-block-size: 48px;
+  padding: .25rem .75rem .25rem .625rem;
+  gap: .375rem;
+  border: 2px solid var(--line-strong);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink);
+  font-size: .9rem;
+  font-weight: 800;
+}
+
+.app .adv-journal-open:hover {
+  border-color: var(--leaf);
+  background: var(--mint-soft);
+}
+
+.journal-open-icon {
+  font-size: 1.15rem;
+}
+
+.journal-badge {
+  display: inline-grid;
+  place-items: center;
+  min-inline-size: 1.5rem;
+  block-size: 1.5rem;
+  padding-inline: .375rem;
+  border-radius: 999px;
+  background: var(--sun);
+  color: var(--pine-deep);
+  font-size: .75rem;
+  font-weight: 900;
+}
+
+.journal-badge:empty {
+  display: none;
+}
+
+/* Timer console: one panel that groups the ring, stages and Start. */
+.app .timer-card,
+.app[data-mode="adventure"] .timer-card {
+  padding: .75rem;
+  border: 0;
+  border-radius: var(--radius-l);
+  background: var(--panel);
+}
+
+.app[data-mode="adventure"] .timer-card {
+  grid-template-columns: 104px minmax(0, 1fr);
+  align-items: center;
+}
+
+.app[data-mode="adventure"] .timer-ring {
+  inline-size: 104px;
+  block-size: 104px;
+}
+
+.app[data-mode="adventure"] .timer-time {
+  font-size: 1.875rem;
+}
+
+.timer-caption {
+  max-inline-size: 76%;
+  text-align: center;
+  line-height: 1.15;
+}
+
+.app[data-mode="adventure"] .timer-caption {
+  font-size: .625rem;
+  white-space: nowrap;
+}
+
+.app[data-mode="adventure"] .zone-title {
+  font-size: 1.125rem;
+}
+
+.app .timer-card .total-row {
+  margin-block: .25rem 0;
+}
+
+/* Secondary controls and account prompt: smaller and muted. */
+.app .session-tools .quick-button {
+  font-size: .8rem;
+}
+
+.app .collection-save {
+  padding-block: .25rem;
+  border-block-start: 0;
+}
+
+.app .collection-save p {
+  font-size: .75rem;
+  color: var(--muted);
+}
+
+.app .collection-save .text-button {
+  font-size: .8rem;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.app .footer {
+  opacity: .85;
+}
+
+/* ---------------------------------------------------------------
+   Journal: two tabs and large buddy cards
+   --------------------------------------------------------------- */
+.journal-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  padding: 4px;
+  margin-block: .25rem .5rem;
+  border-radius: var(--radius-m);
+  background: var(--panel);
+}
+
+.journal-tab {
+  min-block-size: 48px;
+  border: 0;
+  border-radius: var(--radius-s);
+  background: transparent;
+  color: var(--muted);
+  font-size: .95rem;
+  font-weight: 800;
+}
+
+.journal-tab[aria-selected="true"] {
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: 0 1px 3px rgba(18, 51, 40, .18);
+}
+
+.journal-tab[hidden] {
+  display: none;
+}
+
+.journal-tab-count {
+  font-size: .75rem;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.journal-buddies .collection-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.journal-buddies .buddy-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: .375rem;
+  min-block-size: 140px;
+  padding: .75rem .5rem;
+  border: 2px solid var(--line);
+  border-radius: var(--radius-m);
+  background: var(--surface);
+  color: var(--ink);
+  text-align: center;
+}
+
+.journal-buddies .buddy-card img {
+  flex: 0 0 auto;
+  inline-size: 56px;
+  block-size: 56px;
+}
+
+.buddy-card-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .25rem;
+}
+
+.buddy-card strong {
+  font-size: .875rem;
+  line-height: 1.2;
+}
+
+.buddy-card small {
+  font-size: .75rem;
+  line-height: 1.25;
+  color: var(--muted);
+}
+
+.journal-buddies .buddy-card:not(:disabled):hover {
+  border-color: var(--leaf);
+}
+
+.journal-buddies .buddy-card.visitor {
+  border-color: var(--sun);
+  background: var(--sun-soft);
+}
+
+.journal-buddies .buddy-card.visitor small {
+  color: var(--hl-ink);
+  font-weight: 700;
+}
+
+.journal-buddies .buddy-card.current {
+  border-color: var(--leaf);
+  background: var(--mint-soft);
+  box-shadow: inset 0 0 0 1px var(--leaf);
+}
+
+.journal-buddies .buddy-card.current small {
+  color: var(--done-ink);
+  font-weight: 800;
+}
+
+.journal-buddies .buddy-card:disabled {
+  opacity: 1;
+  border-style: dashed;
+  background: var(--panel);
+  color: var(--muted);
+  cursor: default;
+}
+
+.journal-buddies .buddy-card:disabled img {
+  filter: grayscale(1);
+  opacity: .45;
+}
+
+.buddy-trips {
+  display: flex;
+  gap: 4px;
+}
+
+.buddy-trips i {
+  inline-size: 8px;
+  block-size: 8px;
+  border-radius: 50%;
+  background: var(--line-strong);
+}
+
+.buddy-trips i.on {
+  background: var(--sun);
+}
+
+.journal-list[hidden],
+.journal-buddies[hidden],
+#journal-summary[hidden] {
+  display: none;
+}

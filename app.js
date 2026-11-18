@@ -257,7 +257,7 @@
     const dark = settings.appearance === "dark" || (settings.appearance !== "light" && Boolean(darkQuery?.matches));
     document.documentElement.dataset.scheme = dark ? "dark" : "light";
     const meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) meta.setAttribute("content", dark ? "#172625" : "#fff5f7");
+    if (meta) meta.setAttribute("content", dark ? "#12291f" : "#fffaf0");
   }
 
   function randomTheme() {
@@ -348,7 +348,7 @@
     const on = settings.experience === "adventure";
     $("mode-toggle").setAttribute("aria-pressed", String(on));
     $("mode-toggle").classList.toggle("enabled", on);
-    $("mode-toggle").textContent = on ? 'Adventure · Switch to timer' : 'Simple timer · Switch to adventure';
+    $("mode-toggle").textContent = on ? '⏱️ Switch to timer' : '🗺️ Switch to adventure';
     $("mode-toggle").setAttribute('aria-label', on ? 'Switch to simple timer' : 'Switch to adventure');
   }
 
@@ -743,19 +743,21 @@
 
     $("time").textContent = fmt(br ? breakLeft : stageLeft);
     $("total-time").textContent = fmt(left) + " left";
-    $("status-text").textContent = "Adventure time " + fmt(sessionElapsed);
+    $("status-text").textContent = "Brushing time " + fmt(sessionElapsed);
 
     // CSS Custom Property update instead of inline style attribute mutation
     const strokeOffset = CIRC * (1 - (all ? Math.max(0, all - left) / all : 0));
     document.documentElement.style.setProperty("--stroke-dashoffset", String(strokeOffset));
 
+    // Adventure's small ring only has room for one short word; the speech line says the rest.
+    const compact = settings.experience === "adventure";
     $("time-caption").textContent =
-      phase === "done" ? "ALL DONE!" :
-      br ? "TINY BREAK" :
-      phase === "motion-wait" ? "WAITING TO BRUSH" :
-      phase === "motion-paused" ? "PAUSED — BRUSHING STOPPED" :
+      phase === "done" ? (compact ? "DONE!" : "ALL DONE!") :
+      br ? (compact ? "BREAK" : "TINY BREAK") :
+      phase === "motion-wait" ? (compact ? "WAITING" : "WAITING TO BRUSH") :
+      phase === "motion-paused" ? (compact ? "PAUSED" : "PAUSED — BRUSHING STOPPED") :
       phase === "paused" ? "PAUSED" :
-      phase === "ready" ? "READY TO BRUSH" : "THIS STAGE";
+      phase === "ready" ? (compact ? "READY" : "READY TO BRUSH") : (compact ? "BRUSH!" : "THIS STAGE");
 
     $("zone-title").textContent =
       phase === "done" ? "You did it! Sparkling smile!" :
@@ -767,7 +769,13 @@
       b.classList.toggle("done", phase === "done" || (i !== stageIndex && stageProgress[settings.stages[i].id] === 0));
     });
 
+    const done = phase === "done";
     $("start-button").hidden = !["ready", "done"].includes(phase);
+    $("start-button").classList.toggle("again", done);
+    $("start-button-icon").textContent = done ? "↻" : "▶";
+    $("start-button-label").textContent = done ? "Brush again" : "Start brushing";
+    // Once finished, Brush again is the one way forward; Start over would be a second button for the same thing.
+    $("reset-button").hidden = done;
     $("pause-button").hidden = !["running", "break", "paused", "motion-wait", "motion-paused"].includes(phase);
 
     const waitingForStart = phase === "motion-wait" && !motionArmed;
@@ -775,7 +783,7 @@
     $("pause-button-icon").textContent = canPause ? "Ⅱ" : "▶";
     $("pause-button-label").textContent = waitingForStart ? "Start brushing" : canPause ? "Pause" : "Resume";
     $("timer-ring").setAttribute("aria-label",
-      canPause ? "Pause brushing" : waitingForStart || ["ready", "done"].includes(phase) ? "Start brushing" : "Resume brushing");
+      done ? "Brush again" : canPause ? "Pause brushing" : waitingForStart || phase === "ready" ? "Start brushing" : "Resume brushing");
     $("pause-button").setAttribute("aria-label", waitingForStart ? "Start brushing" : canPause ? "Pause brushing" : "Resume brushing");
 
     $("motion-toggle").classList.toggle("enabled", motionOn);
@@ -806,7 +814,7 @@
     $("buddy-area").classList.remove("celebrate");
     emit("reset", null);
     render();
-    say(motionOn ? "Camera helper is ready. Press Start, then brush to begin." : "Ready, little superstar? Pick up your toothbrush!");
+    say(motionOn ? "Camera helper is ready. Press Start, then brush to begin." : "Ready for the trail? Grab your toothbrush!");
   }
 
   function speakStage() {
@@ -1532,9 +1540,12 @@
   });
 
   document.addEventListener("bb:choose", event => {
-    if (!COLLECTION?.unlocked(event.detail)) return;
+    // Today's visitor can always be picked again, even before it is unlocked.
+    const visitor = COLLECTION?.daily() === event.detail;
+    if (!COLLECTION?.unlocked(event.detail) && !visitor) return;
     selected = event.detail;
-    settings.theme = selected;
+    // A visitor is only here for today, so it never becomes the saved buddy.
+    if (COLLECTION.unlocked(selected)) settings.theme = selected;
     save();
     applyTheme();
     render();
@@ -1644,5 +1655,5 @@
   render();
   renderMusicButton();
   save();
-  say("Ready, little superstar? Pick up your toothbrush!");
+  say("Ready for the trail? Grab your toothbrush!");
 })();
