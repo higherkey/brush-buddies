@@ -225,7 +225,7 @@
           message('Password changed. Sign in with your new password.');
           return;
         }
-        await api.auth(intent === 'create' ? 'sign-up/email' : 'sign-in/email', { email, password, ...(intent === 'create' ? { name: 'Brush Buddies account' } : {}) });
+        await api.auth(intent === 'create' ? 'sign-up/email' : 'sign-in/email', { email, password, ...(intent === 'create' ? { name: 'Brushwood account' } : {}) });
         await checkedSession();
         if (!user) message('Check your email to finish creating your account, then sign in.');
       } finally { $('account-password').value = ''; }

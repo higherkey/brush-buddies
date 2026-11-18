@@ -1,0 +1,356 @@
+/* Brushwood brand layer.
+   Loaded after every other stylesheet. It sets the brand palette, type and
+   component shapes; per-buddy accents (ring, active stage) still come from
+   the buddy themes in styles.css. */
+
+@font-face {
+  font-family: "Fredoka";
+  src: url("fonts/fredoka-latin-wght.woff2") format("woff2");
+  font-weight: 300 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Nunito";
+  src: url("fonts/nunito-latin-wght.woff2") format("woff2");
+  font-weight: 200 1000;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --font-body: "Nunito", ui-rounded, system-ui, sans-serif;
+  --font-display: "Fredoka", "Nunito", ui-rounded, system-ui, sans-serif;
+
+  /* Brand palette */
+  --pine: #1d4a3a;
+  --pine-deep: #123328;
+  --leaf: #2f8a5f;
+  --mint: #a8ebcf;
+  --mint-soft: #e3f6ec;
+  --sun: #ff8a4c;
+  --sun-soft: #ffe8d9;
+  --sun-ink: #a8431a;
+
+  /* Surfaces and text (light) */
+  --page: #efe9da;
+  --surface: #fffaf0;
+  --panel: #f5eedf;
+  --ink: #1b3a2f;
+  --muted: #55695f;
+  --line: #e4dbc7;
+  --line-strong: #cbbfa5;
+  --toggle-off: #d9d0bd;
+  --hl-bg: var(--sun-soft);
+  --hl-line: #f2a57c;
+  --hl-ink: var(--sun-ink);
+  --done-bg: var(--mint-soft);
+  --done-line: #7fcca6;
+  --done-ink: #1f5f40;
+
+  --cta-bg: var(--pine);
+  --cta-ink: #fffaf0;
+  --cta-edge: var(--pine-deep);
+
+  --radius-s: 10px;
+  --radius-m: 14px;
+  --radius-l: 20px;
+
+  font-family: var(--font-body);
+}
+
+html[data-scheme="dark"] {
+  --page: #0c1f18;
+  --surface: #12291f;
+  --panel: #1a3529;
+  --ink: #eef6f0;
+  --muted: #b3c8bc;
+  --line: #2a4a3c;
+  --line-strong: #3f6553;
+  --toggle-off: #3f5a4d;
+  --hl-bg: #4a2c1a;
+  --hl-line: #e0855a;
+  --hl-ink: #ffd9c2;
+  --done-bg: #173f2d;
+  --done-line: #4fae80;
+  --done-ink: #c4f2d6;
+  --mint-soft: #173f2d;
+
+  --cta-bg: var(--mint);
+  --cta-ink: #0f2a20;
+  --cta-edge: #6fcf9f;
+}
+
+body {
+  background-color: var(--page);
+  background-image: none;
+  font-family: var(--font-body);
+}
+
+.app {
+  background: var(--surface);
+  box-shadow: 0 0 0 1px var(--line);
+}
+
+h1, h2, h3,
+.buddy-name,
+.zone-title,
+.timer-time,
+.treasure-name {
+  font-family: var(--font-display);
+}
+
+/* Header */
+.app .topbar {
+  align-items: center;
+  padding-block: .25rem .5rem;
+  border-block-end: 1px solid var(--line);
+}
+
+.brand {
+  gap: .5rem;
+  letter-spacing: 0;
+  font-size: 1rem;
+}
+
+.brand-mark,
+.app .brand-mark {
+  inline-size: 32px;
+  block-size: 32px;
+  border: 0;
+  border-radius: 9px;
+  display: block;
+}
+
+.brand-name {
+  font-family: var(--font-display);
+  font-size: 1.375rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+.app .top-actions .icon-button {
+  border-radius: 50%;
+  color: var(--ink);
+}
+
+.icon-button {
+  border-radius: 50%;
+}
+
+/* Mode switch */
+.experience-bar .quick-button,
+.app .experience-bar .quick-button {
+  justify-content: flex-start;
+  padding-inline: .875rem;
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--ink);
+  box-shadow: none;
+  font-weight: 700;
+}
+
+.mode-quick.enabled,
+.app .experience-bar .mode-quick.enabled {
+  background: var(--mint-soft);
+  color: var(--done-ink);
+  box-shadow: none;
+}
+
+/* Buddy and adventure scene */
+.app[data-mode="adventure"] .adv-scene,
+.adv-scene {
+  border-radius: var(--radius-l);
+}
+
+#app[data-mode="adventure"] .buddy-name {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.buddy-name {
+  font-weight: 600;
+}
+
+.visitor-label {
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  font-weight: 800;
+  color: var(--leaf);
+}
+
+html[data-scheme="dark"] .visitor-label {
+  color: var(--mint);
+}
+
+.speech {
+  border-radius: var(--radius-m);
+}
+
+.app[data-mode="simple"] .buddy-area {
+  border-radius: var(--radius-l);
+}
+
+/* Timer */
+.timer-time {
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.timer-caption {
+  font-weight: 800;
+  letter-spacing: .1em;
+}
+
+.zone-title {
+  font-weight: 600;
+  font-size: 1.125rem;
+}
+
+.app .zone,
+.zone {
+  border-radius: var(--radius-m);
+  background: var(--surface);
+  border-color: var(--line-strong);
+}
+
+.zone.active,
+.app .zone.active {
+  border-width: 2px;
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.zone.done,
+.app .zone.done {
+  background: var(--done-bg);
+  border-color: var(--done-line);
+}
+
+.total-row {
+  font-weight: 700;
+}
+
+/* Buttons */
+.app .timer-controls .start-button,
+.app .timer-controls .pause-button,
+.save-button,
+.settings-dialog .save-button {
+  border-radius: var(--radius-m);
+  background: var(--cta-bg);
+  color: var(--cta-ink);
+  box-shadow: 0 4px 0 var(--cta-edge);
+  font-weight: 800;
+  letter-spacing: .01em;
+  margin-block-end: 4px;
+  transition: transform .1s ease, box-shadow .1s ease;
+}
+
+.app .timer-controls .start-button:active,
+.app .timer-controls .pause-button:active,
+.save-button:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 var(--cta-edge);
+}
+
+.app .timer-controls .secondary-button,
+.secondary-button {
+  border-radius: var(--radius-m);
+  border: 2px solid var(--line-strong);
+  background: var(--surface);
+  color: var(--ink);
+  font-weight: 800;
+}
+
+.quick-button {
+  border-radius: 999px;
+}
+
+.session-tools .quick-button,
+.app .session-tools .quick-button {
+  padding-inline: .875rem;
+  font-weight: 700;
+}
+
+#music-toggle.enabled {
+  border-radius: 999px;
+}
+
+.text-button {
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.app .timer-ring:focus-visible,
+.timer-ring:focus-visible {
+  outline-color: var(--sun);
+}
+
+/* Dialogs */
+.settings-dialog {
+  border: 0;
+  border-radius: var(--radius-l) var(--radius-l) 0 0;
+  box-shadow: 0 -8px 40px rgba(18, 51, 40, .25);
+}
+
+.settings-dialog h2 {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.eyebrow {
+  color: var(--leaf);
+  font-weight: 800;
+  letter-spacing: .12em;
+}
+
+html[data-scheme="dark"] .eyebrow {
+  color: var(--mint);
+}
+
+.settings-tabs {
+  gap: 4px;
+  padding: 4px;
+  border: 0;
+  border-radius: var(--radius-m);
+  background: var(--panel);
+}
+
+.settings-tab {
+  border: 0;
+  border-radius: var(--radius-s);
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+.settings-tab.active {
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: 0 1px 3px rgba(18, 51, 40, .18);
+}
+
+.settings-dialog h3,
+.journal-list h3 {
+  font-weight: 600;
+}
+
+.select-control,
+.stage-edit-card,
+.collection-grid button {
+  border-radius: var(--radius-s);
+}
+
+.settings-dialog::backdrop {
+  background: rgba(12, 31, 24, .45);
+}
+
+/* Footer */
+.footer-brand {
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--ink);
+}

@@ -257,7 +257,7 @@
     const dark = settings.appearance === "dark" || (settings.appearance !== "light" && Boolean(darkQuery?.matches));
     document.documentElement.dataset.scheme = dark ? "dark" : "light";
     const meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) meta.setAttribute("content", dark ? "#172625" : "#fff5f7");
+    if (meta) meta.setAttribute("content", dark ? "#12291f" : "#fffaf0");
   }
 
   function randomTheme() {
