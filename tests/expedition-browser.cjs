@@ -100,7 +100,7 @@ test('daily visitor, creek travel and three-session unlock progression', async (
     await page.click('#mode-toggle');assert.equal(await page.evaluate(()=>BrushBuddies.snapshot().buddy),guest);
     for(let visit=1;visit<=3;visit++){
       await page.click('#start-button');
-      if(visit===1){const before=await page.getAttribute('.creek-avatar','transform');await page.waitForTimeout(2100);assert.notEqual(await page.getAttribute('.creek-avatar','transform'),before);await page.screenshot({path:process.env.TEMP+'/bbwork/shots/expedition-mobile.png',fullPage:true});}
+      if(visit===1){const before=await page.getAttribute('.creek-avatar','transform');await page.waitForTimeout(2100);assert.notEqual(await page.getAttribute('.creek-avatar','transform'),before);await page.screenshot({path:(process.env.TEMP||require('os').tmpdir())+'/bbwork/shots/expedition-mobile.png',fullPage:true});}
       await page.waitForSelector('#treasure-dialog[open]',{timeout:12000});await page.click('#treasure-close');
       assert.equal(await page.evaluate(id=>BB_BUDDIES.load().visits[id],guest),visit);
     }
@@ -119,7 +119,7 @@ test('daily visitor, creek travel and three-session unlock progression', async (
     await page.click('#start-button');
     assert.ok((await page.textContent('#adv-place')).includes(await page.evaluate(id=>BB_BUDDIES.home(id).name,guest)));
     await page.click('#pause-button');
-    await page.setViewportSize({width:1200,height:900});await page.screenshot({path:process.env.TEMP+'/bbwork/shots/expedition-desktop.png',fullPage:true});
+    await page.setViewportSize({width:1200,height:900});await page.screenshot({path:(process.env.TEMP||require('os').tmpdir())+'/bbwork/shots/expedition-desktop.png',fullPage:true});
     await page.reload();assert.equal(await page.evaluate(()=>BrushBuddies.snapshot().buddy),guest);
     assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
     await page.evaluate(()=>{const state=BB_BUDDIES.load();state.visits.fox=2;state.credits={a:'fox',b:'fox'};state.completed=['a','b'];BB_BUDDIES.save(state);});
