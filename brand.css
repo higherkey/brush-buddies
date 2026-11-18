@@ -585,3 +585,320 @@ html[data-scheme="dark"] .camera-heading {
 .art-credit summary {
   font-weight: 700;
 }
+
+/* ---------------------------------------------------------------
+   Main screen focus: the scene, the timer and the big button lead.
+   Everything else is quieter and further down.
+   --------------------------------------------------------------- */
+
+/* Mode switch: a quiet text button. In Adventure it shares a line with "Today's visitor". */
+.app .experience-bar .quick-button,
+.app .experience-bar .mode-quick.enabled {
+  background: none;
+  padding-inline: .5rem;
+  color: var(--muted);
+  font-size: .8rem;
+  font-weight: 700;
+}
+
+.app .experience-bar .quick-button:hover {
+  background: var(--panel);
+}
+
+.app[data-mode="adventure"] .experience-bar {
+  justify-self: end;
+  margin-block: .5rem -56px;
+  position: relative;
+  z-index: 2;
+}
+
+.app[data-mode="adventure"] .visitor-label {
+  min-block-size: 48px;
+  display: flex;
+  align-items: center;
+  padding-inline-end: 11rem;
+}
+
+.app[data-mode="adventure"] .buddy-area {
+  min-block-size: 0;
+  gap: .375rem;
+}
+
+#app[data-mode="adventure"] .buddy-name {
+  margin-block-start: -.5rem;
+}
+
+/* A shorter scene so Start sits above the fold on a phone. */
+.app[data-mode="adventure"] .adv-scene {
+  flex: 0 0 auto;
+  min-block-size: 0;
+  block-size: clamp(260px, 30svh, 300px);
+}
+
+.app[data-mode="adventure"] .speech {
+  order: 0;
+  padding: 0;
+  background: none;
+  font-size: .9rem;
+  font-weight: 700;
+}
+
+.app[data-mode="adventure"] .adv-bar {
+  order: 1;
+  align-items: center;
+}
+
+.app[data-mode="adventure"] .buddy-status {
+  order: 2;
+  font-size: .75rem;
+  line-height: 1.4;
+}
+
+/* Journal button: a clear, labelled pill with a sticker count. */
+.app .adv-journal-open,
+.app[data-mode="adventure"] .adv-journal-open {
+  min-block-size: 48px;
+  padding: .25rem .75rem .25rem .625rem;
+  gap: .375rem;
+  border: 2px solid var(--line-strong);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink);
+  font-size: .9rem;
+  font-weight: 800;
+}
+
+.app .adv-journal-open:hover {
+  border-color: var(--leaf);
+  background: var(--mint-soft);
+}
+
+.journal-open-icon {
+  font-size: 1.15rem;
+}
+
+.journal-badge {
+  display: inline-grid;
+  place-items: center;
+  min-inline-size: 1.5rem;
+  block-size: 1.5rem;
+  padding-inline: .375rem;
+  border-radius: 999px;
+  background: var(--sun);
+  color: var(--pine-deep);
+  font-size: .75rem;
+  font-weight: 900;
+}
+
+.journal-badge:empty {
+  display: none;
+}
+
+/* Timer console: one panel that groups the ring, stages and Start. */
+.app .timer-card,
+.app[data-mode="adventure"] .timer-card {
+  padding: .75rem;
+  border: 0;
+  border-radius: var(--radius-l);
+  background: var(--panel);
+}
+
+.app[data-mode="adventure"] .timer-card {
+  grid-template-columns: 104px minmax(0, 1fr);
+  align-items: center;
+}
+
+.app[data-mode="adventure"] .timer-ring {
+  inline-size: 104px;
+  block-size: 104px;
+}
+
+.app[data-mode="adventure"] .timer-time {
+  font-size: 1.875rem;
+}
+
+.timer-caption {
+  max-inline-size: 76%;
+  text-align: center;
+  line-height: 1.15;
+}
+
+.app[data-mode="adventure"] .timer-caption {
+  font-size: .625rem;
+  white-space: nowrap;
+}
+
+.app[data-mode="adventure"] .zone-title {
+  font-size: 1.125rem;
+}
+
+.app .timer-card .total-row {
+  margin-block: .25rem 0;
+}
+
+/* Secondary controls and account prompt: smaller and muted. */
+.app .session-tools .quick-button {
+  font-size: .8rem;
+}
+
+.app .collection-save {
+  padding-block: .25rem;
+  border-block-start: 0;
+}
+
+.app .collection-save p {
+  font-size: .75rem;
+  color: var(--muted);
+}
+
+.app .collection-save .text-button {
+  font-size: .8rem;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.app .footer {
+  opacity: .85;
+}
+
+/* ---------------------------------------------------------------
+   Journal: two tabs and large buddy cards
+   --------------------------------------------------------------- */
+.journal-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  padding: 4px;
+  margin-block: .25rem .5rem;
+  border-radius: var(--radius-m);
+  background: var(--panel);
+}
+
+.journal-tab {
+  min-block-size: 48px;
+  border: 0;
+  border-radius: var(--radius-s);
+  background: transparent;
+  color: var(--muted);
+  font-size: .95rem;
+  font-weight: 800;
+}
+
+.journal-tab[aria-selected="true"] {
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: 0 1px 3px rgba(18, 51, 40, .18);
+}
+
+.journal-tab[hidden] {
+  display: none;
+}
+
+.journal-tab-count {
+  font-size: .75rem;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.journal-buddies .collection-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.journal-buddies .buddy-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: .375rem;
+  min-block-size: 140px;
+  padding: .75rem .5rem;
+  border: 2px solid var(--line);
+  border-radius: var(--radius-m);
+  background: var(--surface);
+  color: var(--ink);
+  text-align: center;
+}
+
+.journal-buddies .buddy-card img {
+  flex: 0 0 auto;
+  inline-size: 56px;
+  block-size: 56px;
+}
+
+.buddy-card-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .25rem;
+}
+
+.buddy-card strong {
+  font-size: .875rem;
+  line-height: 1.2;
+}
+
+.buddy-card small {
+  font-size: .75rem;
+  line-height: 1.25;
+  color: var(--muted);
+}
+
+.journal-buddies .buddy-card:not(:disabled):hover {
+  border-color: var(--leaf);
+}
+
+.journal-buddies .buddy-card.visitor {
+  border-color: var(--sun);
+  background: var(--sun-soft);
+}
+
+.journal-buddies .buddy-card.visitor small {
+  color: var(--hl-ink);
+  font-weight: 700;
+}
+
+.journal-buddies .buddy-card.current {
+  border-color: var(--leaf);
+  background: var(--mint-soft);
+  box-shadow: inset 0 0 0 1px var(--leaf);
+}
+
+.journal-buddies .buddy-card.current small {
+  color: var(--done-ink);
+  font-weight: 800;
+}
+
+.journal-buddies .buddy-card:disabled {
+  opacity: 1;
+  border-style: dashed;
+  background: var(--panel);
+  color: var(--muted);
+  cursor: default;
+}
+
+.journal-buddies .buddy-card:disabled img {
+  filter: grayscale(1);
+  opacity: .45;
+}
+
+.buddy-trips {
+  display: flex;
+  gap: 4px;
+}
+
+.buddy-trips i {
+  inline-size: 8px;
+  block-size: 8px;
+  border-radius: 50%;
+  background: var(--line-strong);
+}
+
+.buddy-trips i.on {
+  background: var(--sun);
+}
+
+.journal-list[hidden],
+.journal-buddies[hidden],
+#journal-summary[hidden] {
+  display: none;
+}

@@ -348,7 +348,7 @@
     const on = settings.experience === "adventure";
     $("mode-toggle").setAttribute("aria-pressed", String(on));
     $("mode-toggle").classList.toggle("enabled", on);
-    $("mode-toggle").textContent = on ? 'Adventure · Switch to timer' : 'Simple timer · Switch to adventure';
+    $("mode-toggle").textContent = on ? '⏱️ Switch to timer' : '🗺️ Switch to adventure';
     $("mode-toggle").setAttribute('aria-label', on ? 'Switch to simple timer' : 'Switch to adventure');
   }
 
@@ -749,13 +749,15 @@
     const strokeOffset = CIRC * (1 - (all ? Math.max(0, all - left) / all : 0));
     document.documentElement.style.setProperty("--stroke-dashoffset", String(strokeOffset));
 
+    // Adventure's small ring only has room for one short word; the speech line says the rest.
+    const compact = settings.experience === "adventure";
     $("time-caption").textContent =
-      phase === "done" ? "ALL DONE!" :
-      br ? "TINY BREAK" :
-      phase === "motion-wait" ? "WAITING TO BRUSH" :
-      phase === "motion-paused" ? "PAUSED — BRUSHING STOPPED" :
+      phase === "done" ? (compact ? "DONE!" : "ALL DONE!") :
+      br ? (compact ? "BREAK" : "TINY BREAK") :
+      phase === "motion-wait" ? (compact ? "WAITING" : "WAITING TO BRUSH") :
+      phase === "motion-paused" ? (compact ? "PAUSED" : "PAUSED — BRUSHING STOPPED") :
       phase === "paused" ? "PAUSED" :
-      phase === "ready" ? "READY TO BRUSH" : "THIS STAGE";
+      phase === "ready" ? (compact ? "READY" : "READY TO BRUSH") : (compact ? "BRUSH!" : "THIS STAGE");
 
     $("zone-title").textContent =
       phase === "done" ? "You did it! Sparkling smile!" :
@@ -1538,9 +1540,12 @@
   });
 
   document.addEventListener("bb:choose", event => {
-    if (!COLLECTION?.unlocked(event.detail)) return;
+    // Today's visitor can always be picked again, even before it is unlocked.
+    const visitor = COLLECTION?.daily() === event.detail;
+    if (!COLLECTION?.unlocked(event.detail) && !visitor) return;
     selected = event.detail;
-    settings.theme = selected;
+    // A visitor is only here for today, so it never becomes the saved buddy.
+    if (COLLECTION.unlocked(selected)) settings.theme = selected;
     save();
     applyTheme();
     render();
