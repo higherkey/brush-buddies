@@ -1,9 +1,10 @@
 "use strict";
 
-const CACHE_NAME = "brush-buddies-shell-v13";
+const CACHE_NAME = "brush-buddies-shell-v14";
 const APP_SHELL = [
   "./home.css?v=0.8.3",
   "./brand.css?v=0.9.0",
+  "./move-home.js?v=0.9.1",
   "./fonts/fredoka-latin-wght.woff2",
   "./fonts/nunito-latin-wght.woff2",
   "./progress-tools.js?v=0.8.3",
