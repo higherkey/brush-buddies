@@ -8,7 +8,7 @@
   const captures = new WeakMap();
   const message = text => { $('account-status').textContent = text; };
   // fetch() rejects with a TypeError when the network is unreachable; say that in plain words.
-  const explain = error => error instanceof TypeError ? "Couldn't reach the Brushwood server. Check your connection and try again." : error.message;
+  const explain = error => error instanceof TypeError ? "Couldn't reach the Toothpaws server. Check your connection and try again." : error.message;
   const scoped = base => base + (window.BB_PROFILE_SCOPE ? ':' + window.BB_PROFILE_SCOPE : '');
   const cacheKey = () => 'brushAccount:' + window.BB_PROFILE_SCOPE;
   const locked = work => navigator.locks ? navigator.locks.request('brushBuddiesAdventureV1', work) : Promise.resolve(work());
@@ -227,7 +227,7 @@
           message('Password changed. Sign in with your new password.');
           return;
         }
-        await api.auth(intent === 'create' ? 'sign-up/email' : 'sign-in/email', { email, password, ...(intent === 'create' ? { name: 'Brushwood account' } : {}) });
+        await api.auth(intent === 'create' ? 'sign-up/email' : 'sign-in/email', { email, password, ...(intent === 'create' ? { name: 'Toothpaws account' } : {}) });
         await checkedSession();
         if (!user) message('Check your email to finish creating your account, then sign in.');
       } finally { $('account-password').value = ''; }

@@ -8,7 +8,7 @@
     const blob = new Blob([JSON.stringify({ version: 1, collection: collection.load(), journal: JSON.parse(localStorage.getItem(journalKey()) || '{}') })], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url; a.download = 'brushwood-collection.json'; a.click();
+    a.href = url; a.download = 'toothpaws-collection.json'; a.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
     status.textContent = 'Backup downloaded. Keep it somewhere safe.';
     } catch {
@@ -51,7 +51,7 @@
       collection.save(current);
       status.textContent = 'Collection restored. Open the journal to see your buddies.';
     } catch {
-      status.textContent = 'Could not restore that file. Choose a Brushwood backup; your existing collection is kept.';
+      status.textContent = 'Could not restore that file. Choose a Toothpaws backup; your existing collection is kept.';
     }
     event.target.value = '';
   });
