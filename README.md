@@ -1,8 +1,14 @@
 # Toothpaws
 
-Two-minute toothbrushing trails with an animal friend. A kid-friendly toothbrushing timer hosted as a static site on GitHub Pages.
+Two-minute toothbrushing trails with an animal friend. A kid-friendly toothbrushing timer at **https://eight1fivedesign.com/toothpaws/**.
 
-(Formerly Brush Buddies. The repository name, PWA id, cache prefix and saved-data keys keep the old name so installed apps and existing progress carry over.)
+(Formerly Brush Buddies. The cache prefix and saved-data keys keep the old name so existing progress carries over.)
+
+## Hosting
+
+- This repository publishes to GitHub Pages at `higherkey.github.io/toothpaws/`.
+- eight1fivedesign.com serves it at `/toothpaws/` through a Cloudflare Pages Function in the `eight-one-five-design` repository, which fetches each file from GitHub Pages at the edge. A merge here goes live on both addresses.
+- `move-home.js` runs first on every page load. On `higherkey.github.io` it forwards to eight1fivedesign.com, carrying this device's guest progress (settings, buddies, journal) in the link once. On the new address it imports that progress only where nothing is saved yet, then clears the link. Signed-in profiles sync from the account service instead, which must list eight1fivedesign.com as a trusted domain.
 
 ## Features
 
