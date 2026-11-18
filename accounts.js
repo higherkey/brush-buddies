@@ -7,6 +7,8 @@
   let pending = false;
   const captures = new WeakMap();
   const message = text => { $('account-status').textContent = text; };
+  // fetch() rejects with a TypeError when the network is unreachable; say that in plain words.
+  const explain = error => error instanceof TypeError ? "Couldn't reach the Brushwood server. Check your connection and try again." : error.message;
   const scoped = base => base + (window.BB_PROFILE_SCOPE ? ':' + window.BB_PROFILE_SCOPE : '');
   const cacheKey = () => 'brushAccount:' + window.BB_PROFILE_SCOPE;
   const locked = work => navigator.locks ? navigator.locks.request('brushBuddiesAdventureV1', work) : Promise.resolve(work());
@@ -109,7 +111,7 @@
         } while (pending && current());
         return current();
       } catch (error) {
-        if (current()) message('Not synced. Your device copy is kept. ' + error.message);
+        if (current()) message('Not synced. Your device copy is kept. ' + explain(error));
         return false;
       } finally {
         syncing = null;
@@ -202,7 +204,7 @@
   async function action(work) {
     const controls = [...$('account-dialog').querySelectorAll('button,input,select')];
     controls.forEach(control => { control.disabled = true; });
-    try { await work(); } catch (error) { message(error.message); }
+    try { await work(); } catch (error) { message(explain(error)); }
     finally { controls.forEach(control => { control.disabled = false; }); }
   }
   $('account-open').addEventListener('click', () => {

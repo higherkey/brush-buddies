@@ -11,6 +11,7 @@ Two-minute toothbrushing trails with an animal friend. A kid-friendly toothbrush
 
 - Customizable brushing stages: rename, change emoji, edit reminders, set each stage duration, add or remove stages
 - Tap a stage to jump to it; touch and hold a stage on the main screen to reorder it
+- When every stage is done, one big **Brush again** button starts a fresh session; **Start over** restarts a session in progress
 - Separate settings submenus for Buddy, Stages, Timer & sounds, and Motion
 - Configurable breaks between stages and independent sound toggles
 - Local MediaPipe camera Assist: face-following mouth target, small-motion detection, calibration, adjustable target and local video replay; optional automatic pausing for manual brushes
@@ -65,6 +66,7 @@ Animal calls and interface sounds are synthesized locally with the Web Audio API
 - **Mark:** two pine trees growing out of a toothbrush head, with a sunrise. Source is `icon.svg`; `icons/icon-maskable.svg` is the padded version for Android's adaptive icons and `icons/icon-full.svg` the full-bleed version for iOS. The PNGs in `icons/` are rendered from these.
 - **Palette:** Pine `#1d4a3a`, Leaf `#2f8a5f`, Mint `#a8ebcf`, Sunrise `#ff8a4c`, Cream `#fffaf0`. Each buddy keeps its own accent for the timer ring and the active stage.
 - **Type:** Fredoka for the wordmark, headings and timer; Nunito for body text. Both are bundled in `fonts/` (SIL Open Font License, see the license files there) and cached for offline use.
+- **Share preview:** `og-image.png` (1200×630) is used for link previews.
 - **Styles:** `brand.css` loads last and holds the palette, type and component shapes for light and dark mode.
 
 ## Run locally

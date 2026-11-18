@@ -27,6 +27,7 @@
   --pine: #1d4a3a;
   --pine-deep: #123328;
   --leaf: #2f8a5f;
+  --leaf-ink: #24704c;
   --mint: #a8ebcf;
   --mint-soft: #e3f6ec;
   --sun: #ff8a4c;
@@ -76,6 +77,7 @@ html[data-scheme="dark"] {
   --done-line: #4fae80;
   --done-ink: #c4f2d6;
   --mint-soft: #173f2d;
+  --leaf-ink: var(--mint);
 
   --cta-bg: var(--mint);
   --cta-ink: #0f2a20;
@@ -353,4 +355,233 @@ html[data-scheme="dark"] .eyebrow {
   font-family: var(--font-display);
   font-weight: 600;
   color: var(--ink);
+}
+
+/* Finished: one big, warm "Brush again" button */
+.app .timer-controls .start-button.again {
+  max-inline-size: none;
+  background: var(--sun);
+  color: var(--pine-deep);
+  box-shadow: 0 4px 0 #d9652b;
+}
+
+.app .timer-controls .start-button.again:active {
+  box-shadow: 0 1px 0 #d9652b;
+}
+
+#app.animations-on:not(.reduced-motion) .timer-controls .start-button.again {
+  animation: brushAgainNudge 2.4s ease-in-out 0.6s 2;
+}
+
+@keyframes brushAgainNudge {
+  0%, 100% { transform: translateY(0); }
+  12% { transform: translateY(-3px); }
+  24% { transform: translateY(0); }
+}
+
+.app .timer-controls .secondary-button[hidden] {
+  display: none;
+}
+
+.timer-controls .start-button span[aria-hidden],
+.timer-controls .secondary-button span[aria-hidden] {
+  font-size: 1.1em;
+}
+
+/* Text colours that need AA contrast on cream */
+.visitor-label,
+.eyebrow {
+  color: var(--leaf-ink);
+}
+
+/* Speech bubble (Simple mode) */
+.speech {
+  border-left: 0;
+  border-radius: var(--radius-m);
+  padding: .5rem .75rem;
+  font-weight: 700;
+}
+
+.app[data-mode="simple"] .speech {
+  background: var(--accent-soft);
+  border-radius: var(--radius-m) var(--radius-m) var(--radius-m) 4px;
+}
+
+.app[data-mode="simple"] .buddy-name {
+  font-family: var(--font-body);
+  font-weight: 800;
+}
+
+/* Toggles */
+.toggle,
+.toggle::after {
+  border-radius: 999px;
+}
+
+.toggle-row input:checked + .toggle {
+  background: var(--leaf);
+}
+
+html[data-scheme="dark"] .toggle-row input:checked + .toggle {
+  background: #4fae80;
+}
+
+.toggle-row input:focus-visible + .toggle {
+  outline-color: var(--sun);
+}
+
+/* Stage editor */
+.stage-edit-card {
+  padding: .75rem;
+  margin-block-end: .5rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-m);
+  background: var(--panel);
+}
+
+.stage-drag-handle {
+  border-radius: var(--radius-s);
+  border: 0;
+  background: var(--surface);
+  color: var(--muted);
+}
+
+.stage-edit-number {
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.stage-edit-card .select-control,
+.stage-fields input,
+.tip-field textarea {
+  background: var(--surface);
+}
+
+/* File pickers */
+input[type="file"] {
+  font-size: .8rem;
+  color: var(--muted);
+}
+
+input[type="file"]::file-selector-button {
+  min-block-size: 40px;
+  margin-inline-end: .75rem;
+  padding: .5rem .875rem;
+  border: 2px solid var(--line-strong);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+/* Treasure and journal */
+#treasure-dialog .secondary-button {
+  border: 2px solid var(--line-strong);
+  border-radius: var(--radius-m);
+  font-weight: 800;
+}
+
+.treasure-name {
+  font-weight: 600;
+}
+
+.journal-page {
+  padding: .75rem;
+  border: 0;
+  border-radius: var(--radius-m);
+  background: var(--panel);
+}
+
+.journal-page h3 {
+  font-weight: 600;
+}
+
+.sticker {
+  border-radius: var(--radius-s);
+  border: 2px dashed var(--line-strong);
+  color: var(--line-strong);
+  font-family: var(--font-display);
+  font-weight: 600;
+}
+
+.sticker.found {
+  border: 2px solid var(--done-line);
+  background: var(--surface);
+  box-shadow: 0 2px 0 var(--line);
+}
+
+/* Camera Assist */
+.camera-heading {
+  color: var(--leaf-ink);
+  font-family: var(--font-display);
+  font-weight: 600;
+}
+
+html[data-scheme="dark"] .camera-heading {
+  color: var(--mint);
+}
+
+.camera-frame,
+.camera-frame .motion-preview {
+  border-radius: var(--radius-l);
+  background: var(--pine-deep);
+}
+
+.camera-tools progress {
+  appearance: none;
+  -webkit-appearance: none;
+  block-size: 12px;
+  max-inline-size: none;
+  border: 0;
+  border-radius: 999px;
+  background: var(--panel);
+  overflow: hidden;
+}
+
+.camera-tools progress::-webkit-progress-bar {
+  background: var(--panel);
+  border-radius: 999px;
+}
+
+.camera-tools progress::-webkit-progress-value {
+  background: var(--leaf);
+  border-radius: 999px;
+}
+
+.camera-tools progress::-moz-progress-bar {
+  background: var(--leaf);
+  border-radius: 999px;
+}
+
+.camera-tools label {
+  font-size: .8rem;
+  font-weight: 800;
+  color: var(--muted);
+}
+
+.camera-tools .quick-button {
+  padding-inline: 1rem;
+  border-width: 2px;
+}
+
+.motion-status {
+  color: var(--ink);
+}
+
+/* Account and progress forms */
+#account-status:empty,
+#progress-status:empty {
+  display: none;
+}
+
+.collection-grid button {
+  border-radius: var(--radius-m);
+}
+
+.progress-entry summary,
+.art-credit summary {
+  font-weight: 700;
 }

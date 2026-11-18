@@ -43,6 +43,14 @@ test('live story preference and open journal update during a brushing session', 
     assert.ok(await page.locator('#journal-dialog').evaluate(dialog => dialog.open));
     assert.match(await page.textContent('#journal-summary'), /1 trip$/);
     assert.equal(await page.locator('.sticker.found').count(), 1);
+    await page.click('#journal-close');
+    assert.equal(await page.textContent('#start-button-label'), 'Brush again', 'a finished session offers Brush again');
+    assert.ok(await page.locator('#start-button').isVisible(), 'Brush again is visible');
+    assert.ok(await page.locator('#reset-button').isHidden(), 'Start over steps aside once finished');
+    assert.equal(await page.getAttribute('#timer-ring', 'aria-label'), 'Brush again');
+    await page.click('#start-button');
+    assert.equal(await page.evaluate(() => BrushBuddies.snapshot().phase), 'running', 'Brush again starts a fresh session');
+    assert.ok(await page.locator('#reset-button').isVisible(), 'Start over returns during a session');
   } finally {
     await browser?.close();
     await new Promise(resolve => server.close(resolve));

@@ -743,7 +743,7 @@
 
     $("time").textContent = fmt(br ? breakLeft : stageLeft);
     $("total-time").textContent = fmt(left) + " left";
-    $("status-text").textContent = "Adventure time " + fmt(sessionElapsed);
+    $("status-text").textContent = "Brushing time " + fmt(sessionElapsed);
 
     // CSS Custom Property update instead of inline style attribute mutation
     const strokeOffset = CIRC * (1 - (all ? Math.max(0, all - left) / all : 0));
@@ -767,7 +767,13 @@
       b.classList.toggle("done", phase === "done" || (i !== stageIndex && stageProgress[settings.stages[i].id] === 0));
     });
 
+    const done = phase === "done";
     $("start-button").hidden = !["ready", "done"].includes(phase);
+    $("start-button").classList.toggle("again", done);
+    $("start-button-icon").textContent = done ? "↻" : "▶";
+    $("start-button-label").textContent = done ? "Brush again" : "Start brushing";
+    // Once finished, Brush again is the one way forward; Start over would be a second button for the same thing.
+    $("reset-button").hidden = done;
     $("pause-button").hidden = !["running", "break", "paused", "motion-wait", "motion-paused"].includes(phase);
 
     const waitingForStart = phase === "motion-wait" && !motionArmed;
@@ -775,7 +781,7 @@
     $("pause-button-icon").textContent = canPause ? "Ⅱ" : "▶";
     $("pause-button-label").textContent = waitingForStart ? "Start brushing" : canPause ? "Pause" : "Resume";
     $("timer-ring").setAttribute("aria-label",
-      canPause ? "Pause brushing" : waitingForStart || ["ready", "done"].includes(phase) ? "Start brushing" : "Resume brushing");
+      done ? "Brush again" : canPause ? "Pause brushing" : waitingForStart || phase === "ready" ? "Start brushing" : "Resume brushing");
     $("pause-button").setAttribute("aria-label", waitingForStart ? "Start brushing" : canPause ? "Pause brushing" : "Resume brushing");
 
     $("motion-toggle").classList.toggle("enabled", motionOn);
@@ -806,7 +812,7 @@
     $("buddy-area").classList.remove("celebrate");
     emit("reset", null);
     render();
-    say(motionOn ? "Camera helper is ready. Press Start, then brush to begin." : "Ready, little superstar? Pick up your toothbrush!");
+    say(motionOn ? "Camera helper is ready. Press Start, then brush to begin." : "Ready for the trail? Grab your toothbrush!");
   }
 
   function speakStage() {
@@ -1644,5 +1650,5 @@
   render();
   renderMusicButton();
   save();
-  say("Ready, little superstar? Pick up your toothbrush!");
+  say("Ready for the trail? Grab your toothbrush!");
 })();
