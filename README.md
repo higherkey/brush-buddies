@@ -94,6 +94,9 @@ Adventure Mode is optional and can be switched on or off at any time without res
 
 - Each session follows your buddy's habitat trail; three completed trips unlock their own home route.
 - Each brushing stage is a stop on the trail. Your buddy moves through their habitat as the stage timer runs down.
+- Each of the 15 habitats is its own world (`adventure-habitats.js`, `adventure-habitats.css`), with its own sky, horizon, landmark and kind of path. Examples: stepping stones over a creek, lily pads across a lagoon, ice floes under an aurora, a rope bridge past a waterfall, paw prints on a savanna track, a switchback up the mountains, cloud puffs, and a sandy path past a sunken ship.
+- Animals that share a habitat get their own version of it: a different landmark, time of day, wiggle in the path, and birds, butterflies, a kite or falling leaves.
+- A buddy's home is the same place at golden hour, with their home on the horizon. Bubbles' clover burrow, a hollow tree, an igloo, a treehouse, a shell house and a cloud castle are some examples. Bunting, warm lights and fireflies complete it.
 - Finishing every stage awards a sticker for the Field Journal, with an occasional rare 🌟.
 - It's picture-first by default. Turn on **Story text** in Buddy settings to add a short line at each stop.
 - Journal progress is separate from timer settings, so "Reset settings" does not erase it. Sign in to save the collection across devices.
