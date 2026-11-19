@@ -154,8 +154,8 @@
 .route-bank { stroke: var(--water-edge); stroke-width: 104; }
 .route-water { stroke: var(--water); stroke-width: 76; }
 .route-ripple { stroke: var(--light); stroke-width: 3; stroke-dasharray: 26 70; opacity: .55; }
-.route-edge { stroke: var(--path-edge); stroke-width: 74; opacity: .55; }
-.route-dirt { stroke: var(--path); stroke-width: 62; }
+.route-edge { stroke: var(--path-edge); opacity: .55; }
+.route-dirt { stroke: var(--path); }
 .route-rut { stroke: var(--path-edge); stroke-width: 4; stroke-dasharray: 18 14; opacity: .7; }
 .route-branch { stroke: var(--bark); stroke-width: 36; }
 .route-branch-light { stroke: oklch(62% 0.06 60); stroke-width: 8; opacity: .7; }
@@ -205,3 +205,67 @@
 .h-temple-line { stroke: oklch(55% 0.04 110); stroke-width: 3; }
 .h-tower-leg, .h-stilt-line { stroke: var(--bark); stroke-width: 6; }
 .h-branch-line { stroke: var(--bark); stroke-width: 9; }
+
+/* Sections: path forms */
+.route-sand, .route-snow, .route-snow-edge, .route-bank-s, .route-water-s, .route-cave, .route-cave-edge,
+.route-band, .route-ripple-v { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.route-sand { stroke: oklch(88% 0.07 85); }
+.route-snow { stroke: oklch(97% 0.012 230); }
+.route-snow-edge { stroke: oklch(84% 0.04 235); }
+.route-bank-s { stroke: var(--water-edge); }
+.route-water-s { stroke: var(--water); }
+.route-cave { stroke: oklch(42% 0.05 270); }
+.route-cave-edge { stroke: oklch(32% 0.04 275); }
+.route-band { stroke-width: 7; }
+.route-band.h-band-1 { stroke: oklch(72% 0.17 25); } .route-band.h-band-2 { stroke: oklch(83% 0.15 75); }
+.route-band.h-band-3 { stroke: oklch(88% 0.15 105); } .route-band.h-band-4 { stroke: oklch(76% 0.12 160); }
+.route-band.h-band-5 { stroke: oklch(72% 0.12 250); }
+.route-stream { fill: var(--water); }
+.route-ripple-v { stroke: var(--light); stroke-width: 3; opacity: .6; }
+.step-bubble { fill: none; stroke: var(--light); stroke-width: 3; opacity: .8; }
+.step-sparkle { fill: var(--gold); }
+.step-sparkle-2 { fill: var(--light); }
+.step-stair { fill: var(--stone); stroke: var(--shadow); stroke-width: 2; }
+.step-stair-side { fill: oklch(60% 0.03 250 / 55%); }
+.step-log { fill: oklch(55% 0.08 55); stroke: var(--bark); stroke-width: 2; }
+.step-log-end { fill: oklch(76% 0.07 70); stroke: var(--bark); stroke-width: 2; }
+
+/* Sections: set pieces */
+.piece-hollow { fill: oklch(30% 0.04 60 / 70%); }
+.piece-bed { fill: oklch(72% 0.12 70); }
+.piece-zz { fill: var(--light); opacity: .85; }
+.piece-pool-rim { fill: var(--water-edge); }
+.piece-drop { fill: oklch(80% 0.08 230); }
+.piece-mud { fill: oklch(48% 0.06 60); }
+.piece-warmrock { fill: oklch(66% 0.11 45); }
+.piece-ripple-sand { fill: none; stroke: oklch(70% 0.06 80); stroke-width: 3; stroke-linecap: round; }
+.piece-sandmound { fill: oklch(84% 0.08 85); }
+.piece-ray { fill: none; stroke: var(--gold); stroke-width: 6; stroke-linecap: round; opacity: .55; }
+.piece-ball { fill: oklch(70% 0.17 25); }
+.piece-ball-line { fill: none; stroke: var(--light); stroke-width: 3; }
+.piece-post { fill: none; stroke: var(--bark); stroke-width: 8; stroke-linecap: round; }
+.piece-fish { fill: oklch(76% 0.14 60); }
+.h-coral-fill { fill: oklch(72% 0.13 25); }
+
+/* The animal */
+.creek-avatar-body, .avatar-mover, .avatar-breathe { transform-box: fill-box; }
+.avatar-breathe { transform-origin: 50% 100%; }
+#app.animations-on:not(.reduced-motion) .avatar-breathe { animation: avatar-breathe 2.6s ease-in-out infinite; }
+#app.animations-on:not(.reduced-motion) .creek-scene[data-phase="done"] .avatar-breathe { animation: avatar-cheer 0.7s ease-in-out 4; }
+@keyframes avatar-breathe { 0%, 100% { transform: scale(1, 1); } 50% { transform: scale(1.015, 0.985); } }
+@keyframes avatar-cheer { 0%, 100% { transform: translateY(0); } 40% { transform: translateY(-22px) rotate(-4deg); } 70% { transform: translateY(0) scale(1.06, 0.94); } }
+@media (prefers-reduced-motion: reduce) { .avatar-breathe { animation: none !important; } }
+
+/* Each section's ground has its own tint. */
+.section-zone { opacity: .55; }
+.section-zone-flowers { fill: color-mix(in oklch, var(--ground) 65%, oklch(70% 0.12 60)); }
+.section-zone-trail { fill: color-mix(in oklch, var(--ground) 70%, oklch(92% 0.08 100)); }
+.section-zone-nook { fill: color-mix(in oklch, var(--ground) 60%, oklch(40% 0.06 140)); }
+.section-zone-ledge, .section-zone-rock { fill: color-mix(in oklch, var(--ground) 55%, var(--stone)); }
+.section-zone-water { fill: color-mix(in oklch, var(--ground) 65%, var(--water)); }
+.section-zone-tree, .section-zone-grove { fill: color-mix(in oklch, var(--ground) 60%, var(--leaf)); }
+.section-zone-marsh { fill: color-mix(in oklch, var(--ground) 60%, oklch(50% 0.07 110)); }
+.section-zone-sea, .section-zone-beach { fill: color-mix(in oklch, var(--ground) 60%, oklch(88% 0.08 85)); }
+.section-zone-house { fill: color-mix(in oklch, var(--ground) 70%, oklch(90% 0.05 60)); }
+.section-zone-bridge, .section-zone-flight { fill: color-mix(in oklch, var(--ground) 70%, oklch(92% 0.06 300)); }
+.creek-scene[data-habitat="polar"] .section-zone, .creek-scene[data-habitat="wetland"] .section-zone { opacity: .3; }

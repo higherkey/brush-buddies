@@ -825,29 +825,31 @@
     if (home && kind !== "cave" && kind !== "underwater") fireflies(g, seed);
   }
 
-  function draw(layers, habitat, seed, home) {
+  function draw(layers, habitat, seed, home, { tiles = 1 } = {}) {
     const world = Object.hasOwn(worlds, habitat) ? worlds[habitat] : worlds.meadow;
     sky(layers.sky, world.sky, home, seed);
     world.horizon(layers.far);
-    // At home the house takes the landmark's place in the middle distance.
+    // The landmark stays on the horizon; at home the house waits at the end of the path.
+    const options = [world.landmark, ...(altLandmarks[habitat] || [])];
+    options[(seed >>> 3) % options.length](layers.far);
     if (home) {
-      // Some homes are drawn small; scale them up around their doorstep.
       const scale = world.homeScale || 1;
       world.home(scale === 1 ? layers.home : el(layers.home, "g", { transform: `translate(500 248) scale(${scale}) translate(-500 -248)` }));
       bunting(layers.home, 390, 150, 610, 150);
-      welcomeSign(layers.home, 930, 300);
-    } else {
-      const options = [world.landmark, ...(altLandmarks[habitat] || [])];
-      options[(seed >>> 3) % options.length](layers.far);
+      welcomeSign(layers.home, 330, 262);
     }
-    world.props(layers.details, seed, home);
+    // Scenery repeats across the walk, varied per stretch.
+    for (let k = 0; k < tiles; k++) {
+      world.props(el(layers.details, "g", { transform: `translate(${k * 1000} 0)` }), (seed + k * 2654435761) >>> 0, false);
+    }
     extras(layers.sky, world.sky, seed);
-    // Each animal's path wiggles a little differently, so animals sharing a habitat
-    // still get their own trail. The first and last steps stay put.
-    const points = world.points.map(([x, y], i) => [x, i === 0 || i === world.points.length - 1 ? y : y + (((seed >>> (i * 3)) % 25) - 12)]);
-    // Open-sky trails come in a few times of day (homes are always golden hour).
+    return world;
+  }
+
+  // Open-sky trails come in a few times of day; homes are always golden hour.
+  function timeOf(seed, home) {
     const times = ["noon", "morning", "breezy"];
-    return { ...world, points, time: home ? "golden" : times[(seed >>> 5) % times.length] };
+    return home ? "golden" : times[(seed >>> 5) % times.length];
   }
 
   // A per-animal touch of life in the sky, chosen from what suits the habitat.
@@ -883,5 +885,5 @@
     return Object.hasOwn(worlds, habitat) ? worlds[habitat] : worlds.meadow;
   }
 
-  window.BB_HABITATS = { draw, world, names: Object.keys(worlds) };
+  window.BB_HABITATS = { draw, world, timeOf, names: Object.keys(worlds) };
 })();
