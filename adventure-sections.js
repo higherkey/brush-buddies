@@ -53,13 +53,13 @@
 
   // How the path rises or falls across a section of each kind.
   const PROFILES = {
-    nook: { rise: 34, bump: 0, wiggle: 6 }, ledge: { rise: -70, bump: 0, wiggle: 0 },
-    bridge: { rise: 0, bump: -70, wiggle: 0 }, flight: { rise: -10, bump: -95, wiggle: 0 },
-    water: { rise: 0, bump: 26, wiggle: 0 }, tree: { rise: -64, bump: 0, wiggle: 4 },
-    rock: { rise: -10, bump: -46, wiggle: 0 }, marsh: { rise: 10, bump: 0, wiggle: 8 },
-    sea: { rise: 0, bump: 0, wiggle: 16 }, beach: { rise: 16, bump: 0, wiggle: 12 },
-    house: { rise: -20, bump: 0, wiggle: 8 }, grove: { rise: 0, bump: -18, wiggle: 12 },
-    flowers: { rise: 20, bump: 0, wiggle: 18 }, trail: { rise: -24, bump: 0, wiggle: 20 }
+    nook: { rise: 50, bump: 0, wiggle: 6 }, ledge: { rise: -90, bump: 0, wiggle: 0 },
+    bridge: { rise: 0, bump: -80, wiggle: 0 }, flight: { rise: -10, bump: -100, wiggle: 0 },
+    water: { rise: 0, bump: 40, wiggle: 0 }, tree: { rise: -80, bump: 0, wiggle: 4 },
+    rock: { rise: -10, bump: -60, wiggle: 0 }, marsh: { rise: 14, bump: 0, wiggle: 10 },
+    sea: { rise: 0, bump: 0, wiggle: 20 }, beach: { rise: 22, bump: 0, wiggle: 14 },
+    house: { rise: -26, bump: 0, wiggle: 8 }, grove: { rise: 0, bump: -26, wiggle: 12 },
+    flowers: { rise: 28, bump: 0, wiggle: 20 }, trail: { rise: -34, bump: 0, wiggle: 22 }
   };
 
   // The kind of path for a section, by stop kind and habitat.
@@ -106,6 +106,7 @@
     const sections = [];
     let y = 360;
     let previousForm = "";
+    const seen = {};
     for (let i = 0; i < n; i++) {
       const stop = stops.length ? stops[i % stops.length] : { name: "Trail" };
       const kind = kindOf(stop.name);
@@ -120,7 +121,8 @@
       if (form === previousForm) form = alternate(form, habitat);
       previousForm = form;
       const x0 = LEAD + i * SECTION;
-      sections.push({ i, stop, kind, form, x0, x1: x0 + SECTION, y0: y, y1, bump: profile.bump, wiggle: profile.wiggle + ((seed >>> (i * 2 + 5)) % 7), phase: (seed >>> (i + 3)) % 7 });
+      const variant = seen[kind] = (seen[kind] ?? -1) + 1;
+      sections.push({ i, stop, kind, form, variant, x0, x1: x0 + SECTION, y0: y, y1, bump: profile.bump, wiggle: profile.wiggle + ((seed >>> (i * 2 + 5)) % 7), phase: (seed >>> (i + 3)) % 7 });
       y = y1;
     }
     const width = LEAD + n * SECTION + (home ? 300 : 170);
@@ -228,6 +230,9 @@
         break;
       }
       case "branch": {
+        // A raised branch on forked supports, with its shadow on the ground.
+        E(g, (s.x0 + s.x1) / 2, 470, (s.x1 - s.x0) / 2, 12, "creek-stone-shadow");
+        for (let x = s.x0 + 90; x < s.x1 - 40; x += 180) P(g, `M${x - 14} 480L${x} ${yAt(x) + 22}L${x + 14} 480M${x} ${yAt(x) + 60}L${x - 26} ${yAt(x) + 30}`, "route-support");
         el(g, "path", { d: line(pts.map(([x, y]) => [x, y + 16])), class: "route-branch" });
         el(g, "path", { d: line(pts.map(([x, y]) => [x, y + 9])), class: "route-branch-light" });
         stepsAlong(g, s, yAt, 120, (g2, x, y) => { for (const r of [-30, 20]) P(g2, `M${x} ${y + 26}q-8-12 0-26q8 14 0 26Z`, "step-leaf").setAttribute("transform", `rotate(${r} ${x} ${y + 26})`); }, 0.15, 0.9);
@@ -314,7 +319,12 @@
       for (const [dx, dy, r] of [[-90, -150, 70], [70, -160, 74], [-10, -210, 76], [120, -100, 46]]) C(g, x + dx, y + dy, r, leaf);
       if (/fork/i.test(s.stop.name)) P(g, `M${x} ${y - 100}L${x - 60} ${y - 160}M${x} ${y - 100}L${x + 50} ${y - 170}`, "h-branch-line");
       if (/hollow/i.test(s.stop.name)) E(g, x, y - 50, 16, 24, "piece-hollow");
-      if (/nap|canopy/i.test(s.stop.name)) P(g, `M${x - 120} ${y - 80}Q${x - 70} ${y - 50} ${x - 30} ${y - 82}`, "h-hammock");
+      if (/nap|canopy/i.test(s.stop.name) || s.variant === 2) P(g, `M${x - 120} ${y - 80}Q${x - 70} ${y - 50} ${x - 30} ${y - 82}`, "h-hammock");
+      if (s.variant === 1) {
+        // A nest with eggs in the fork.
+        E(g, x - 40, y - 96, 30, 11, "h-nest");
+        for (const dx of [-50, -38, -26]) E(g, x + dx, y - 104, 6, 8, "piece-egg");
+      }
     },
     rock(g, s, yAt, habitat) {
       const x = s.x1 + 10, y = s.y1;
@@ -360,6 +370,17 @@
     },
     house(g, s, yAt) {
       const x = s.x1, y = s.y1;
+      if (/corner|play/i.test(s.stop.name)) {
+        // A playground: swing frame, swing and sandbox.
+        P(g, `M${x - 90} ${y + 20}L${x - 60} ${y - 130}L${x - 30} ${y + 20}M${x + 50} ${y + 20}L${x + 80} ${y - 130}L${x + 110} ${y + 20}M${x - 66} ${y - 128}H${x + 86}`, "piece-swing-frame");
+        P(g, `M${x - 10} ${y - 128}V${y - 40}M${x + 30} ${y - 128}V${y - 40}`, "h-string");
+        R(g, x - 18, y - 42, 56, 10, "h-plank", 3);
+        R(g, x - 200, y - 6, 110, 30, "piece-sandbox", 6);
+        E(g, x - 145, y - 2, 46, 10, "piece-sandmound");
+        C(g, x + 150, y, 20, "piece-ball");
+        P(g, `M${x + 130} ${y}h40M${x + 150} ${y - 20}v40`, "piece-ball-line");
+        return;
+      }
       R(g, x - 110, y - 170, 220, 190, "h-wall");
       P(g, `M${x - 130} ${y - 168}L${x} ${y - 240} ${x + 130} ${y - 168}Z`, "h-roof");
       if (/window/i.test(s.stop.name)) {
@@ -370,14 +391,12 @@
         for (const a of [-40, -20, 0]) P(g, `M${x + 150} ${y - 230}l${-60 * Math.cos(a / 57)} ${60 * Math.sin(-a / 57)}`, "piece-ray");
       } else {
         P(g, `M${x - 30} ${y + 20}V${y - 60}Q${x} ${y - 90} ${x + 30} ${y - 60}V${y + 20}Z`, "h-door");
-        C(g, x - 160, y - 10, 22, "piece-ball");
-        P(g, `M${x - 182} ${y - 10}h44M${x - 160} ${y - 32}v44`, "piece-ball-line");
-        for (const [dx, dy, cls] of [[110, 0, "h-band-1"], [140, 0, "h-band-4"], [124, -28, "h-band-2"]]) R(g, x + dx, y - 14 + dy, 26, 26, cls, 3);
       }
     },
     grove(g, s, yAt, habitat) {
       for (let k = s.x1 - 160; k < s.x1 + 160; k += 26) cane(g, k, yAt(Math.min(k, s.x1)) - 30 + ((k / 26) % 2) * 6, 1.3);
       if (/snack/i.test(s.stop.name)) for (const dx of [-50, -20, 10]) P(g, `M${s.x1 + dx} ${s.y1 + 10}q-14-20 0-40q14 20 0 40Z`, "h-leaf2");
+      if (s.variant === 1 || /grove/i.test(s.stop.name)) P(g, `M${s.x1 - 150} ${s.y1 + 10}Q${s.x1 - 150} ${s.y1 - 170} ${s.x1} ${s.y1 - 180}Q${s.x1 + 150} ${s.y1 - 170} ${s.x1 + 150} ${s.y1 + 10}`, "piece-arch-leaves");
     },
     flowers(g, s, yAt, habitat) {
       const name = s.stop.name;
@@ -389,6 +408,25 @@
       }
       if (/clearing/i.test(name)) P(g, `M${s.x1 - 120} 0L${s.x1 - 40} 0 ${s.x1 + 80} 420 ${s.x1 - 60} 420Z`, "h-beam");
       if (/bed|garden/i.test(name)) { R(g, s.x1 - 60, s.y1 - 26, 120, 14, "h-plank", 4); for (const dx of [-50, 46]) R(g, s.x1 + dx, s.y1 - 12, 8, 22, "h-plank"); }
+      // One big focal piece per flower stop, different in each habitat.
+      const fx = s.x1 + 60, fy = s.y1;
+      if (habitat === "mountain") {
+        P(g, `M${fx - 60} ${fy + 20}Q${fx - 64} ${fy - 50} ${fx} ${fy - 60}Q${fx + 64} ${fy - 50} ${fx + 60} ${fy + 20}Z`, "h-rock");
+        for (const [dx, dy] of [[-20, -66], [16, -70]]) { for (let k = 0; k < 6; k++) el(g, "ellipse", { cx: fx + dx, cy: fy + dy - 9, rx: 4, ry: 9, class: "piece-edelweiss", transform: `rotate(${k * 60} ${fx + dx} ${fy + dy})` }); C(g, fx + dx, fy + dy, 4, "h-gold"); }
+      } else if (habitat === "cottage") {
+        R(g, fx - 70, fy - 30, 140, 46, "piece-planter", 6);
+        for (const dx of [-46, -16, 14, 44]) { P(g, `M${fx + dx} ${fy - 30}l-6-26M${fx + dx} ${fy - 30}l6-24`, "h-stem"); C(g, fx + dx, fy - 36, 9, dx < 0 ? "piece-cabbage" : "h-carrot"); }
+      } else if (habitat === "rainbow") {
+        for (let k = 0; k < 6; k++) el(g, "ellipse", { cx: fx, cy: fy - 104, rx: 18, ry: 34, class: k % 2 ? "h-band-2" : "h-band-1", transform: `rotate(${k * 60} ${fx} ${fy - 74})` });
+        C(g, fx, fy - 74, 16, "h-gold");
+        P(g, `M${fx} ${fy + 10}V${fy - 60}`, "h-stem");
+      } else if (habitat === "meadow" || habitat === "cottage") {
+        P(g, `M${fx} ${fy + 20}V${fy - 60}`, "piece-post");
+        P(g, `M${fx - 30} ${fy - 60}Q${fx - 34} ${fy - 116} ${fx} ${fy - 120}Q${fx + 34} ${fy - 116} ${fx + 30} ${fy - 60}Z`, "piece-hive");
+        P(g, `M${fx - 30} ${fy - 74}H${fx + 30}M${fx - 32} ${fy - 90}H${fx + 32}M${fx - 26} ${fy - 106}H${fx + 26}`, "piece-hive-line");
+        E(g, fx, fy - 66, 8, 6, "h-door");
+        for (const [dx, dy] of [[44, -110], [58, -88]]) { E(g, fx + dx, fy + dy, 6, 4, "h-gold"); P(g, `M${fx + dx - 2} ${fy + dy - 2}l-4-6M${fx + dx + 2} ${fy + dy - 2}l4-6`, "piece-wing"); }
+      }
     },
     trail(g, s, yAt, habitat) {
       const x = s.x1 + 30, y = s.y1;
@@ -448,10 +486,19 @@
     for (const s of plan.sections) {
       // A tinted patch of ground marks each section as its own place.
       const top = Math.min(s.y0, s.y1) - 70;
-      P(zones, `M${s.x0 + 10} 520V${top + 40}Q${s.x0 + 10} ${top} ${s.x0 + 70} ${top}H${s.x1 - 60}Q${s.x1} ${top} ${s.x1} ${top + 40}V520Z`, "section-zone section-zone-" + s.kind);
+      P(zones, `M${s.x0 - 20} 520C${s.x0 - 40} ${top + 120} ${s.x0 + 30} ${top + 10} ${s.x0 + 120} ${top + 6}Q${(s.x0 + s.x1) / 2} ${top - 16} ${s.x1 - 100} ${top + 8}C${s.x1 + 10} ${top + 14} ${s.x1 + 50} ${top + 130} ${s.x1 + 30} 520Z`, "section-zone section-zone-" + s.kind);
       // At home the house replaces the last stop's set piece.
       if (!(home && s === last)) PIECES[s.kind](back, s, yAt, habitat, { waterGround });
       drawForm(path, s, yAt, habitat, waterGround);
+      if (home && s === last) {
+        // A lantern-lit welcome lane up to the front door.
+        for (let x = (s.x0 + s.x1) / 2; x <= s.x1 + 80; x += 90) {
+          const y = yAt(Math.min(x, s.x1));
+          P(back, `M${x} ${y - 30}V${y - 110}`, "piece-post");
+          C(back, x, y - 116, 14, "h-glow");
+          C(back, x, y - 116, 7, "h-gold");
+        }
+      }
     }
     ribbon(path, [[last.x1, last.y1], [plan.width + 40, last.y1]], "route-edge", endClass(habitat), 54);
     return {
@@ -459,7 +506,7 @@
       start: plan.start,
       end: plan.end,
       yAt,
-      goals: plan.sections.map(s => [s.x1, s.y1, s.kind, s.form]),
+      goals: plan.sections.map(s => [s.x1, s.y1, s.kind, s.form, s.stop.name]),
       forms: plan.sections.map(s => s.form),
       kinds: plan.sections.map(s => s.kind),
       // How far above the path the animal floats in each section (flying or swimming spots).

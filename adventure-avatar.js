@@ -26,7 +26,7 @@
     leopard: ["quad", "#e7b45a", "#5a4126", 1.05, "spots"], raccoon: ["quad", "#8b8f96", "#3b3d42", 0.95, "ringed"],
     skunk: ["quad", "#2f2f35", "#f4f4f4", 0.9, "skunk"], boar: ["quad", "#6e5545", "#4a382c", 1, "thin"],
     pig: ["quad", "#f4a7b9", "#f8c6d2", 0.95, "curly"], sheep: ["quad", "#f4f1ea", "#3a3a3a", 1, "wool"],
-    goat: ["quad", "#e9e2d6", "#8a7a66", 1, "thin"], koala: ["quad", "#9aa3ad", "#d8dde2", 0.9, "none"],
+    goat: ["quad", "#e9e2d6", "#8a7a66", 1, "thin"], koala: ["heavy", "#9aa3ad", "#d8dde2", 0.75, "none"],
     unicorn: ["tall", "#f6f0ff", "#f5a6d6", 1, "mane"], horse: ["tall", "#9a5f3a", "#3a2416", 1.05, "mane"],
     donkey: ["tall", "#9b9aa0", "#5a5a60", 1, "thin"], deer: ["tall", "#b8794a", "#f4e6d4", 1, "short"],
     zebra: ["tall", "#f4f4f4", "#2b2b2b", 1.05, "stripes"], llama: ["neck", "#efe3cf", "#c9b79a", 1, "short"],
@@ -63,7 +63,7 @@
 
   // Gait cycles per second while walking. Brushing moves the animal only a few
   // units a second, so the gait runs on time rather than distance.
-  const CADENCE = { quad: 1.7, heavy: 1.1, tall: 1.4, neck: 1.1, small: 2.6, low: 1.8, hop: 1.1, waddle: 2.2, wader: 1.2,
+  const CADENCE = { quad: 1.7, heavy: 0.9, tall: 1.4, neck: 1.1, small: 2.6, low: 1.8, hop: 1.1, waddle: 2.2, wader: 1.2,
     fly: 1.4, flutter: 2.6, swim: 0.9, ceph: 0.8, jelly: 0.6, crab: 2.4, turtle: 0.9, snail: 0.6, snake: 1.2, ape: 1.3, seal: 1.2 };
 
   function leg(parent, x, y, length, width, color) {
@@ -107,7 +107,7 @@
      how to pose the parts for a gait phase (radians). */
   const PLANS = {
     quad(rig, c, a, extra, o = {}) {
-      const legLen = o.legLen ?? 22, rx = o.rx ?? 30, ry = o.ry ?? 15, w = o.legWidth ?? 7;
+      const legLen = o.legLen ?? 26, rx = o.rx ?? 38, ry = o.ry ?? 18, w = o.legWidth ?? 9;
       const back = g(rig);
       const legs = [leg(back, -rx * 0.55, -legLen - 2, legLen + 2, w, a === "#2b2b2b" ? a : shade(c)), leg(back, rx * 0.55, -legLen - 2, legLen + 2, w, a === "#2b2b2b" ? a : shade(c))];
       const t = tail(rig, extra, -rx + 4, -legLen - ry * 0.6, c, a);
@@ -131,10 +131,10 @@
         }
       };
     },
-    heavy: (rig, c, a, e) => PLANS.quad(rig, c, a, e, { legLen: 22, rx: 38, ry: 20, legWidth: 12, amp: 18, bob: 1.5 }),
+    heavy: (rig, c, a, e) => PLANS.quad(rig, c, a, e, { legLen: 24, rx: 46, ry: 25, legWidth: 11, amp: 14, bob: 3 }),
     tall: (rig, c, a, e) => PLANS.quad(rig, c, a, e, { legLen: 34, rx: 32, ry: 15, legWidth: 7, amp: 26, bob: 3 }),
     neck: (rig, c, a, e) => PLANS.quad(rig, c, a, e, { legLen: 34, rx: 30, ry: 15, legWidth: 7, amp: 24, bob: 2, neck: 30 }),
-    small: (rig, c, a, e) => PLANS.quad(rig, c, a, e, { legLen: 10, rx: 22, ry: 13, legWidth: 6, amp: 40, bob: 3 }),
+    small: (rig, c, a, e) => PLANS.quad(rig, c, a, e, { legLen: 12, rx: 28, ry: 15, legWidth: 7, amp: 40, bob: 3 }),
     low: (rig, c, a, e) => {
       const r = PLANS.quad(rig, c, a, e, { legLen: 9, rx: 36, ry: 11, legWidth: 7, amp: 34, bob: 1 });
       return { head: [40, -40], pose: p => ({ ...r.pose(p), rotate: Math.sin(p) * 2 }) };
@@ -385,35 +385,94 @@
 
   /* Build an animal into `group` (cleared first). The head image keeps the
      existing class and 64px size. Returns { pose(distance, moving), hover }. */
+  /* Animals whose Twemoji art is only a face get a drawn body (above). The rest
+     are already whole animals, so the art itself is the body and moves as one.
+     Most whole animals in Twemoji face left; they are mirrored to walk right. */
+  const FACES = new Set(["cat", "bunny", "koala", "dog", "fox", "bear", "panda", "lion", "frog", "tiger", "unicorn", "mouse",
+    "hamster", "wolf", "raccoon", "deer", "moose", "gorilla", "orangutan", "boar", "cow", "pig", "horse"]);
+  const FRONT = new Set(["owl", "penguin", "bat", "chicken", "hedgehog", "peacock", "octopus", "squid", "crab", "lobster",
+    "jellyfish", "butterfly", "bee", "ladybug", "sloth", "otter", "dove"]);
+  // How a whole-animal sprite moves, by body plan.
+  const SPRITE_MOTION = { hop: "hop", waddle: "waddle", wader: "waddle", fly: "fly", flutter: "fly", swim: "swim",
+    ceph: "pulse", jelly: "pulse", crab: "shuffle", snake: "slither", snail: "slither", turtle: "walk", seal: "walk" };
+  const SPRITE_HOVER = { fly: 40, swim: 26, pulse: 30 };
+
+  function spriteMotion(motion, p) {
+    const s = Math.sin(p);
+    switch (motion) {
+      case "hop": {
+        // Crouch, launch, airborne arc, land with a squash, settle.
+        const t = ((p / (Math.PI * 2)) % 1 + 1) % 1;
+        if (t < 0.15) return { y: 0, rotate: 0, sx: 1.1, sy: 0.88 };
+        if (t < 0.25) return { y: -4, rotate: -10, sx: 0.92, sy: 1.12 };
+        if (t < 0.75) return { y: -24 * Math.sin(Math.PI * (t - 0.25) / 0.5), rotate: -8 + 16 * (t - 0.25) / 0.5, sx: 1, sy: 1 };
+        if (t < 0.85) return { y: 0, rotate: 0, sx: 1.1, sy: 0.9 };
+        return { y: 0, rotate: 0, sx: 1, sy: 1 };
+      }
+      case "waddle": return { y: -Math.abs(s) * 3, rotate: s * 9, sx: 1, sy: 1, pivot: s > 0 ? 8 : -8 };
+      case "fly": return { y: Math.sin(p * 0.7) * 7, rotate: Math.sin(p * 0.7) * 3, sx: 1, sy: 1 + Math.sin(p * 2) * 0.06 };
+      case "swim": return { y: s * 6, rotate: s * 6, sx: 1, sy: 1 };
+      case "pulse": return { y: -Math.abs(s) * 10, rotate: 0, sx: 1 + Math.sin(p * 2) * 0.05, sy: 1 - Math.sin(p * 2) * 0.07 };
+      case "shuffle": return { y: -Math.abs(Math.sin(p * 2)) * 2, rotate: Math.sin(p * 2) * 3, sx: 1, sy: 1, dx: Math.sin(p * 2) * 3 };
+      case "slither": return { y: 0, rotate: 0, sx: 1 + s * 0.06, sy: 1 - s * 0.03, skew: s * 6 };
+      default: return { y: -Math.abs(s) * 4, rotate: s * 3, sx: 1, sy: 1 - Math.abs(Math.cos(p)) * 0.035 };
+    }
+  }
+
+  /* Build an animal into `group` (cleared first). The head image keeps its
+     class and 64px size; whole animals are scaled by a wrapper instead.
+     Returns { pose(distance, moving), hover, sprite }. */
   function build(group, id, head) {
     group.replaceChildren();
     const [plan, color, accent, scale, extra] = ANIMALS[id] || ANIMALS.cat;
     const mover = el(group, "g", { class: "avatar-mover" });
     const breathe = el(mover, "g", { class: "avatar-breathe" });
+    const cadence = CADENCE[plan] || 1.5;
+    let phase = 0;
+    let clock = null;
+    const advance = moving => {
+      const now = typeof performance !== "undefined" ? performance.now() : 0;
+      if (moving && clock !== null) phase += Math.min(0.1, (now - clock) / 1000) * cadence * Math.PI * 2;
+      clock = moving ? now : null;
+    };
+
+    if (!FACES.has(id)) {
+      const size = Math.max(0.85, Math.min(1.5, scale * 1.15));
+      const motion = SPRITE_MOTION[plan] || "walk";
+      const hover = (SPRITE_HOVER[motion] || 0) * size;
+      const holder = el(breathe, "g", { class: "avatar-sprite", transform: `scale(${FRONT.has(id) ? size : -size} ${size})` });
+      head.setAttribute("x", -32);
+      head.setAttribute("y", -62);
+      holder.appendChild(head);
+      return {
+        plan, hover, sprite: true,
+        pose(distance, moving) {
+          advance(moving);
+          const m = spriteMotion(motion, moving || hover ? phase : 0);
+          const pivot = (m.pivot || 0) * size;
+          set(mover, `translate(${((m.dx || 0) * size).toFixed(1)} ${(-hover + m.y * size).toFixed(1)}) translate(${pivot} 0) rotate(${m.rotate.toFixed(1)}) translate(${-pivot} 0) skewX(${(m.skew || 0).toFixed(1)}) scale(${m.sx.toFixed(3)} ${m.sy.toFixed(3)})`);
+        }
+      };
+    }
+
     const rig = el(breathe, "g", { class: "avatar-rig", transform: `scale(${scale})` });
     const built = PLANS[plan](rig, color, accent, extra);
     const [hx, hy] = built.head;
-    const headSize = 64;
-    head.setAttribute("x", hx * scale - headSize / 2);
-    head.setAttribute("y", hy * scale - headSize / 2 - 6);
+    head.setAttribute("x", hx * scale - 32);
+    head.setAttribute("y", hy * scale - 38);
     breathe.appendChild(head);
-    const cadence = CADENCE[plan] || 1.5;
     const hover = (built.hover || 0) * scale;
-    let phase = 0;
-    let clock = null;
     return {
-      plan,
-      hover,
+      plan, hover, sprite: false,
       pose(distance, moving) {
-        const now = typeof performance !== "undefined" ? performance.now() : 0;
-        if (moving && clock !== null) phase += Math.min(0.1, (now - clock) / 1000) * cadence * Math.PI * 2;
-        clock = moving ? now : null;
+        advance(moving);
         // Flyers and swimmers keep moving gently even when resting.
         const { y, rotate } = built.pose(moving || built.hover ? phase : 0);
-        set(mover, `translate(0 ${(-hover + y * scale).toFixed(1)}) rotate(${rotate})`);
+        // Lean into the walk a little.
+        set(mover, `translate(0 ${(-hover + y * scale).toFixed(1)}) rotate(${(rotate + (moving ? 2 : 0)).toFixed(1)})`);
       }
     };
   }
 
-  window.BB_AVATAR = { build, plan: id => (ANIMALS[id] || ANIMALS.cat)[0], ids: Object.keys(ANIMALS) };
+  window.BB_AVATAR = { build, plan: id => (ANIMALS[id] || ANIMALS.cat)[0], ids: Object.keys(ANIMALS), faces: [...FACES] };
 })();

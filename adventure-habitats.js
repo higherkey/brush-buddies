@@ -110,18 +110,28 @@
   }
 
   // Keep decorations out of the path band and, at home, off the house.
+  // Props vary in spacing, size and direction so a row never looks like wallpaper.
+  function varied(g, seed, i, x, y) {
+    const scale = 0.8 + ((seed >>> (i * 5 + 2)) % 46) / 100;
+    const flip = (seed >>> (i + 9)) & 1 ? -1 : 1;
+    return el(g, "g", { transform: `translate(${x} ${y}) scale(${flip * scale} ${scale}) translate(${-x} ${-y})` });
+  }
   function band(g, seed, draw, { y = 244, count = 4, skipMiddle = false } = {}) {
+    const gap = 830 / Math.max(1, count - 1);
     for (let i = 0; i < count; i++) {
-      const jitter = ((seed >>> (i * 3)) % 31) - 15;
-      const x = 85 + i * (830 / Math.max(1, count - 1)) + jitter;
+      const jitter = (((seed >>> (i * 3)) % 61) - 30) / 100 * gap;
+      const x = 85 + i * gap + jitter;
       if (skipMiddle && x > 340 && x < 660) continue;
-      draw(g, x, y, i);
+      if (((seed >>> (i * 2 + 13)) % 5) === 0) continue;
+      draw(varied(g, seed, i, x, y), x, y, i);
     }
   }
   function frontBand(g, seed, draw) {
     for (let i = 0; i < 5; i++) {
-      const jitter = ((seed >>> (i * 4 + 1)) % 41) - 20;
-      draw(g, 70 + i * 215 + jitter, 492, i);
+      const jitter = ((seed >>> (i * 4 + 1)) % 121) - 60;
+      if (((seed >>> (i * 3 + 7)) % 4) === 0) continue;
+      const x = 70 + i * 215 + jitter;
+      draw(varied(g, seed, i + 7, x, 492), x, 492, i);
     }
   }
 

@@ -15,6 +15,9 @@
   let svg, avatar, body, emoji, flags, backdrop, destinationId, layers, track, rig;
   let worldKey = "";
   let avatarId = "";
+  let markers = [];
+  let reached = 0;
+  let cheerTimer = null;
   let frame = null;
   let position = 0;
   let target = 0;
@@ -39,11 +42,12 @@
     const y = track.yAt(x) + 4 - lift;
     avatar.setAttribute("transform", `translate(${x.toFixed(1)} ${y.toFixed(1)})`);
     rig?.pose(x, moving);
+    updateMarkers(x, moving);
     // The camera keeps the next goal in view; the sky stays put and the horizon drifts.
     const aspect = backdrop.clientHeight > 0 && backdrop.clientWidth > 0 ? backdrop.clientWidth / backdrop.clientHeight : 2;
     const width = Math.min(1000, 500 * aspect);
     const height = Math.min(500, 1000 / aspect);
-    const cameraX = Math.max(0, Math.min(track.width - width, x - width * 0.4));
+    const cameraX = Math.max(0, Math.min(track.width - width, x - width * 0.32));
     const cameraY = Math.max(0, Math.min(500 - height, y - 60 - height / 2));
     svg.setAttribute("viewBox", `${cameraX.toFixed(1)} ${cameraY.toFixed(1)} ${width.toFixed(1)} ${height.toFixed(1)}`);
     layers.skyHolder.setAttribute("transform", `translate(${(cameraX - (1000 - width) / 2).toFixed(1)} 0)`);
@@ -72,6 +76,8 @@
     };
     flags = element("g", { class: "creek-flags" }, svg);
     avatar = element("g", { class: "creek-avatar" }, svg);
+    // A soft light under the animal keeps it readable in dark worlds.
+    element("ellipse", { cx: 0, cy: -20, rx: 52, ry: 44, class: "creek-avatar-glow" }, avatar);
     element("ellipse", { cx: 0, cy: 2, rx: 26, ry: 6, class: "creek-avatar-shadow" }, avatar);
     body = element("g", { class: "creek-avatar-body" }, avatar);
     emoji = element("image", { x: -32, y: -60, width: 64, height: 64, class: "creek-buddy" }, body);
@@ -118,7 +124,7 @@
     const seed = seedFor(buddy);
     const sections = window.BB_SECTIONS;
     track = sections?.build
-      ? sections.build(layers.sections, { stops, count, habitat, seed, home, waterGround: habitat === "polar" || habitat === "wetland" })
+      ? sections.build(layers.sections, { stops, count, habitat, seed: home ? (seed ^ 0x9e3779b9) >>> 0 : seed, home, waterGround: habitat === "polar" || habitat === "wetland" })
       : simpleTrack(layers.sections);
     // Ground under the whole walk, with a soft horizon line.
     let ground = "M-200 500V256";
@@ -135,6 +141,26 @@
     svg.dataset.home = home ? "true" : "false";
     svg.dataset.time = habitats?.timeOf ? habitats.timeOf(seed, home) : "noon";
     return true;
+  }
+
+  function updateMarkers(x, moving) {
+    let count = 0;
+    markers.forEach((marker, index) => {
+      const done = x >= marker.x - 2;
+      if (done) count = index + 1;
+      const state = done ? "reached" : index === count ? "next" : "";
+      if (state !== marker.state) {
+        marker.state = state;
+        marker.node.setAttribute("class", "goal-marker" + (state ? " " + state : ""));
+      }
+    });
+    // Arriving at a goal is a moment: the animal cheers.
+    if (reached >= 0 && count > reached && moving && svg && typeof setTimeout === "function") {
+      svg.dataset.cheer = "true";
+      clearTimeout(cheerTimer);
+      cheerTimer = setTimeout(() => { if (svg) svg.dataset.cheer = "false"; }, 900);
+    }
+    reached = count;
   }
 
   function render(snapshot, destination) {
@@ -158,13 +184,24 @@
       rig = window.BB_AVATAR?.build ? window.BB_AVATAR.build(body, animalId, emoji) : null;
     }
     if (changed) {
+      // A numbered sign at each goal; it turns into a gold star once reached,
+      // and the next goal shows its name.
       flags.replaceChildren();
-      track.goals.forEach(([x, y], index) => {
-        const flag = element("g", { transform: `translate(${x} ${y - 30})` }, flags);
-        path("M0 17v-49", "creek-flagpole", flag);
-        path("M1-32h29l-7 10 7 10H1Z", "creek-flag", flag);
-        element("text", { x: 12, y: -17, class: "creek-flag-number", "text-anchor": "middle" }, flag, index + 1);
+      markers = track.goals.map(([x, y, , , name], index) => {
+        const marker = element("g", { class: "goal-marker", transform: `translate(${x} ${y - 20})` }, flags);
+        // Sized to stay readable on a phone, where the scene draws at about half size.
+        path("M0 20V-46", "creek-flagpole", marker);
+        element("circle", { cx: 0, cy: -70, r: 26, class: "goal-sign" }, marker);
+        path("M0-94l7 15 16 2-12 11 4 16-15-8-15 8 4-16-12-11 16-2Z", "goal-star", marker);
+        element("text", { x: 0, y: -61, class: "creek-flag-number goal-number", "text-anchor": "middle" }, marker, index + 1);
+        const label = element("g", { class: "goal-label" }, marker);
+        const text = String(name || "").slice(0, 20);
+        const w = Math.max(90, text.length * 13.5 + 32);
+        element("rect", { x: -w / 2, y: -150, width: w, height: 40, rx: 20, class: "goal-label-bg" }, label);
+        element("text", { x: 0, y: -122, class: "goal-label-text", "text-anchor": "middle" }, label, text);
+        return { node: marker, x, state: "" };
       });
+      reached = -1;
     }
     const progress = Number.isFinite(snapshot.progress) ? Math.max(0, Math.min(1, snapshot.progress)) : 0;
     const running = snapshot.phase === "running";

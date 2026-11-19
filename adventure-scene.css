@@ -269,3 +269,36 @@
 .section-zone-house { fill: color-mix(in oklch, var(--ground) 70%, oklch(90% 0.05 60)); }
 .section-zone-bridge, .section-zone-flight { fill: color-mix(in oklch, var(--ground) 70%, oklch(92% 0.06 300)); }
 .creek-scene[data-habitat="polar"] .section-zone, .creek-scene[data-habitat="wetland"] .section-zone { opacity: .3; }
+
+/* Goal markers */
+.goal-sign { fill: var(--light); stroke: var(--flag); stroke-width: 4; }
+.goal-star { fill: var(--gold); stroke: oklch(62% 0.13 70); stroke-width: 2; opacity: 0; }
+.goal-number { fill: var(--flag); font: 800 26px "Nunito", system-ui, sans-serif; }
+.goal-marker.reached .goal-sign { fill: var(--gold); stroke: oklch(62% 0.13 70); }
+.goal-marker.reached .goal-star { opacity: 1; }
+.goal-marker.reached .goal-number { opacity: 0; }
+.goal-label { opacity: 0; }
+.goal-marker.next .goal-label { opacity: 1; }
+.goal-label-bg { fill: oklch(99% 0.01 95 / 94%); stroke: var(--flag); stroke-width: 3; }
+.goal-label-text { fill: oklch(30% 0.04 160); font: 800 22px "Nunito", system-ui, sans-serif; }
+#app.animations-on:not(.reduced-motion) .goal-marker.reached .goal-sign { animation: goal-pop .3s ease-out; transform-box: fill-box; transform-origin: center; }
+@keyframes goal-pop { 0% { transform: scale(.6); } 70% { transform: scale(1.2); } 100% { transform: scale(1); } }
+#app.animations-on:not(.reduced-motion) .creek-scene[data-cheer="true"] .avatar-breathe { animation: avatar-cheer .7s ease-in-out 1; }
+
+/* Light under the animal in dark worlds */
+.creek-avatar-glow { fill: oklch(95% 0.05 90 / 0); }
+.creek-scene:is([data-habitat="cave"], [data-habitat="polar"], [data-habitat="ocean"], [data-habitat="forest"], [data-habitat="jungle"]) .creek-avatar-glow { fill: oklch(95% 0.06 90 / 28%); }
+
+/* New set-piece parts */
+.route-support { fill: none; stroke: var(--bark); stroke-width: 9; stroke-linecap: round; stroke-linejoin: round; }
+.piece-egg { fill: oklch(94% 0.03 200); }
+.piece-swing-frame { fill: none; stroke: oklch(60% 0.13 30); stroke-width: 8; stroke-linecap: round; stroke-linejoin: round; }
+.piece-sandbox { fill: oklch(60% 0.08 60); }
+.piece-arch-leaves { fill: none; stroke: var(--leaf); stroke-width: 22; stroke-linecap: round; opacity: .85; }
+.piece-edelweiss { fill: oklch(97% 0.01 100); }
+.piece-planter { fill: oklch(52% 0.08 55); }
+.piece-cabbage { fill: oklch(72% 0.13 135); }
+.piece-hive { fill: oklch(80% 0.13 80); }
+.piece-hive-line { fill: none; stroke: oklch(62% 0.12 70); stroke-width: 3; }
+.piece-wing { fill: none; stroke: var(--light); stroke-width: 2; }
+.piece-pool-rim { fill: oklch(96% 0.02 220); }
