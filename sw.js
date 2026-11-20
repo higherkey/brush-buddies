@@ -1,6 +1,6 @@
 "use strict";
 
-const CACHE_NAME = "brush-buddies-shell-v14";
+const CACHE_NAME = "brush-buddies-shell-v16";
 const APP_SHELL = [
   "./home.css?v=0.8.3",
   "./brand.css?v=0.9.0",
@@ -86,15 +86,17 @@ const APP_SHELL = [
   "./animals/bee.svg",
   "./animals/ladybug.svg",
   "./animals/snail.svg",
-  "./adventure-habitats.js?v=0.8.1",
-  "./adventure-habitats.css?v=0.8.1",
+  "./adventure-habitats.js?v=0.11.0",
+  "./adventure-habitats.css?v=0.11.0",
   "./account-progress.js?v=0.8.0",
   "./neon-config.js?v=0.8.0",
   "./neon-api.js?v=0.8.3",
   "./accounts.js?v=0.9.0",
   "./buddies.js?v=0.8.3",
-  "./adventure-scene.js?v=0.8.3",
-  "./adventure-scene.css?v=0.8.3",
+  "./adventure-avatar.js?v=0.11.0",
+  "./adventure-sections.js?v=0.11.0",
+  "./adventure-scene.js?v=0.11.0",
+  "./adventure-scene.css?v=0.11.0",
   "./expedition.css?v=0.8.2",
   "./collection-backup.js?v=0.9.0",
   "./styles.css?v=0.8.2",

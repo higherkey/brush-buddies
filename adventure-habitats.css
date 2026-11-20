@@ -1,47 +1,101 @@
-.creek-habitat-details {
-  --habitat-sand: oklch(85% 0.09 80);
-  --habitat-ice: oklch(87% 0.065 230);
-  --habitat-crystal: oklch(71% 0.16 300);
-  --habitat-gum: oklch(64% 0.075 165);
-  --habitat-cave: oklch(28% 0.04 275);
-  pointer-events: none;
+/* Habitat palettes. Each world sets the colours adventure-scene.css uses.
+   [data-home="true"] is the buddy's home: the same place in golden-hour light. */
+.creek-habitat-details { pointer-events: none; }
+
+.creek-scene[data-habitat="cottage"] {
+  --far: oklch(82% 0.08 140); --hill: oklch(76% 0.11 140); --ground: oklch(78% 0.12 135);
+  --path: oklch(86% 0.03 80); --path-edge: oklch(70% 0.03 80);
+}
+.creek-scene[data-habitat="forest"] {
+  --sky-top: oklch(84% 0.07 150); --sky-bottom: oklch(92% 0.05 120);
+  --far: oklch(52% 0.08 165); --far2: oklch(66% 0.07 160); --ground: oklch(58% 0.1 140);
+  --path: oklch(62% 0.07 60); --path-edge: oklch(48% 0.06 55); --leaf2: oklch(48% 0.1 145);
+}
+.creek-scene[data-habitat="eucalyptus"] {
+  --sky-top: oklch(84% 0.07 220); --sky-bottom: oklch(93% 0.05 80);
+  --far: oklch(74% 0.09 55); --hill: oklch(70% 0.1 50); --ground: oklch(72% 0.11 60);
+  --leaf2: oklch(64% 0.07 165); --bark: oklch(70% 0.04 70);
+}
+.creek-scene[data-habitat="bamboo"] {
+  --sky-top: oklch(90% 0.03 160); --sky-bottom: oklch(96% 0.02 120);
+  --far: oklch(68% 0.05 170); --far2: oklch(82% 0.03 170); --ground: oklch(70% 0.1 140);
+  --water: oklch(70% 0.08 190); --water-edge: oklch(80% 0.07 150); --stone: oklch(72% 0.02 200);
+}
+.creek-scene[data-habitat="polar"] {
+  --sky-top: oklch(30% 0.08 270); --sky-bottom: oklch(55% 0.08 240);
+  --water: oklch(48% 0.09 240); --light: oklch(98% 0.01 230);
+}
+.creek-scene[data-habitat="savanna"] {
+  --sky-top: oklch(82% 0.1 70); --sky-bottom: oklch(92% 0.08 85);
+  --far: oklch(80% 0.1 80); --far2: oklch(66% 0.08 60); --ground: oklch(82% 0.12 85);
+  --path: oklch(66% 0.12 45); --path-edge: oklch(52% 0.1 40); --leaf2: oklch(55% 0.1 135);
+  --stone: oklch(68% 0.06 60);
+}
+.creek-scene[data-habitat="wetland"] {
+  --sky-top: oklch(86% 0.05 200); --sky-bottom: oklch(94% 0.04 150);
+  --far: oklch(68% 0.08 160); --hill: oklch(62% 0.1 150); --water: oklch(62% 0.08 195);
+  --leaf2: oklch(60% 0.13 140);
+}
+.creek-scene[data-habitat="jungle"] {
+  --sky-top: oklch(80% 0.08 160); --sky-bottom: oklch(90% 0.07 130);
+  --far: oklch(46% 0.09 160); --far2: oklch(56% 0.1 150); --leaf: oklch(40% 0.1 160);
+  --water: oklch(62% 0.1 200);
+}
+.creek-scene[data-habitat="rainbow"] {
+  --sky-top: oklch(82% 0.08 300); --sky-bottom: oklch(93% 0.05 250);
+  --wall: oklch(97% 0.02 300); --light: oklch(99% 0.01 300); --bark: oklch(70% 0.07 300);
+  --ground: oklch(93% 0.04 300); --water-edge: oklch(88% 0.06 250);
+}
+.creek-scene[data-habitat="cave"] {
+  --sky-top: oklch(24% 0.04 280); --sky-bottom: oklch(34% 0.05 270);
+  --far: oklch(30% 0.04 275); --ground: oklch(36% 0.04 270); --water: oklch(48% 0.09 220);
+  --water-edge: oklch(40% 0.05 250); --stone: oklch(55% 0.04 270); --door: oklch(20% 0.03 280);
+}
+.creek-scene[data-habitat="desert"] {
+  --sky-top: oklch(84% 0.08 230); --sky-bottom: oklch(94% 0.06 80);
+  --far: oklch(84% 0.1 75); --ground: oklch(88% 0.09 85);
+  --path: oklch(80% 0.1 70); --path-edge: oklch(70% 0.1 60); --stone: oklch(70% 0.09 50);
+  --wall: oklch(80% 0.09 60);
+}
+.creek-scene[data-habitat="mountain"] {
+  --sky-top: oklch(78% 0.08 240); --sky-bottom: oklch(92% 0.04 230);
+  --far: oklch(66% 0.05 250); --stone: oklch(72% 0.03 250); --ground: oklch(72% 0.1 140);
+  --path: oklch(74% 0.03 80); --path-edge: oklch(60% 0.03 80); --bark: oklch(50% 0.07 55);
+}
+.creek-scene[data-habitat="ocean"] {
+  --sky-top: oklch(46% 0.11 240); --sky-bottom: oklch(68% 0.1 215);
+  --far: oklch(62% 0.07 210); --ground: oklch(84% 0.07 85); --leaf: oklch(48% 0.1 170);
+  --path: oklch(78% 0.07 80); --path-edge: oklch(68% 0.07 75); --bark: oklch(42% 0.05 60);
+}
+.creek-scene[data-habitat="shore"] {
+  --sky-top: oklch(84% 0.08 225); --sky-bottom: oklch(94% 0.04 210);
+  --ground: oklch(88% 0.08 85); --water: oklch(68% 0.11 210);
 }
 
-.creek-habitat-details .habitat-leaf { fill: var(--creek-leaf); }
-.creek-habitat-details .habitat-hill { fill: var(--creek-hill); }
-.creek-habitat-details .habitat-bark,
-.creek-habitat-details .habitat-soil { fill: var(--creek-bark); }
-.creek-habitat-details .habitat-petal { fill: var(--creek-petal); }
-.creek-habitat-details .habitat-gold { fill: var(--creek-gold); }
-.creek-habitat-details .habitat-light { fill: var(--creek-light); }
-.creek-habitat-details .habitat-water { fill: var(--creek-water); }
-.creek-habitat-details .habitat-roof { fill: var(--creek-flag); }
-.creek-habitat-details .habitat-rock { fill: var(--creek-stone); }
-.creek-habitat-details .habitat-facet { fill: var(--creek-shadow); }
-.creek-habitat-details .habitat-sand { fill: var(--habitat-sand); }
-.creek-habitat-details .habitat-ice { fill: var(--habitat-ice); }
-.creek-habitat-details .habitat-crystal { fill: var(--habitat-crystal); }
-.creek-habitat-details .habitat-gum { fill: var(--habitat-gum); }
-.creek-habitat-details .habitat-cave { fill: var(--habitat-cave); }
-.creek-habitat-details .habitat-golden-grass .habitat-leaf { fill: var(--creek-gold); }
-
-.creek-habitat-details .habitat-light-line,
-.creek-habitat-details .habitat-shell-line,
-.creek-habitat-details .habitat-stem,
-.creek-habitat-details .habitat-reed-head,
-.creek-habitat-details .habitat-fence,
-.creek-habitat-details .habitat-vine,
-.creek-habitat-details .habitat-coral,
-.creek-habitat-details .habitat-bubble {
-  fill: none;
-  stroke-linecap: round;
-  stroke-linejoin: round;
+/* Home: golden hour, wherever the sky is open. */
+.creek-scene[data-home="true"]:not([data-habitat="cave"]):not([data-habitat="ocean"]):not([data-habitat="polar"]) {
+  --sky-top: oklch(76% 0.11 45);
+  --sky-bottom: oklch(90% 0.1 80);
+  --window: oklch(86% 0.16 85);
 }
-.creek-habitat-details .habitat-light-line { stroke: var(--creek-light); stroke-width: 2; opacity: 0.65; }
-.creek-habitat-details .habitat-shell-line { stroke: var(--creek-bark); stroke-width: 2; opacity: 0.5; }
-.creek-habitat-details .habitat-stem,
-.creek-habitat-details .habitat-vine { stroke: var(--creek-leaf); stroke-width: 5; }
-.creek-habitat-details .habitat-reed-head { stroke: var(--creek-bark); stroke-width: 9; }
-.creek-habitat-details .habitat-fence { stroke: var(--creek-light); stroke-width: 6; }
-.creek-habitat-details .habitat-coral { stroke: var(--creek-petal); stroke-width: 11; }
-.creek-habitat-details .habitat-bubble { stroke: var(--creek-light); stroke-width: 3; opacity: 0.7; }
+.creek-scene[data-home="true"][data-habitat="polar"] { --sky-top: oklch(36% 0.1 300); --sky-bottom: oklch(66% 0.1 40); }
+.creek-scene[data-home="true"][data-habitat="ocean"] { --sky-top: oklch(52% 0.11 220); --sky-bottom: oklch(74% 0.1 180); }
+.creek-scene[data-home="true"] .h-window { filter: drop-shadow(0 0 6px oklch(86% 0.16 85)); }
+
+/* Cloud steps need a tint to show against the cloud sea. */
+.creek-scene[data-habitat="rainbow"] .step-cloud { fill: oklch(90% 0.06 310); opacity: 1; }
+.creek-scene[data-habitat="rainbow"] .h-cloudsea { fill: oklch(97% 0.025 280); }
+
+/* Times of day for open-sky trails, picked per animal. */
+:is(.creek-scene[data-habitat="meadow"], .creek-scene[data-habitat="cottage"], .creek-scene[data-habitat="wetland"], .creek-scene[data-habitat="shore"], .creek-scene[data-habitat="mountain"])[data-time="morning"] {
+  --sky-top: oklch(84% 0.07 340);
+  --sky-bottom: oklch(95% 0.05 70);
+}
+:is(.creek-scene[data-habitat="meadow"], .creek-scene[data-habitat="cottage"], .creek-scene[data-habitat="wetland"], .creek-scene[data-habitat="shore"], .creek-scene[data-habitat="mountain"])[data-time="breezy"] {
+  --sky-top: oklch(86% 0.035 240);
+  --sky-bottom: oklch(96% 0.015 220);
+}
+:is(.creek-scene[data-habitat="forest"], .creek-scene[data-habitat="jungle"])[data-time="morning"] {
+  --sky-top: oklch(86% 0.06 90);
+  --sky-bottom: oklch(94% 0.05 110);
+}

@@ -1,17 +1,29 @@
+/* Adventure scene drawing. Colours come from the habitat palettes in
+   adventure-habitats.css; this file maps them onto the shapes. */
 .creek-scene {
-  --creek-sky: oklch(92% 0.045 225);
-  --creek-far: oklch(80% 0.09 150);
-  --creek-hill: oklch(71% 0.12 145);
-  --creek-bank: oklch(83% 0.12 120);
-  --creek-water: oklch(69% 0.1 220);
-  --creek-light: oklch(97% 0.02 95);
-  --creek-leaf: oklch(43% 0.095 155);
-  --creek-bark: oklch(43% 0.065 65);
-  --creek-stone: oklch(78% 0.025 90);
-  --creek-shadow: oklch(38% 0.055 210 / 28%);
-  --creek-gold: oklch(89% 0.15 90);
-  --creek-petal: oklch(74% 0.15 25);
-  --creek-flag: oklch(57% 0.15 30);
+  --sky-top: oklch(88% 0.06 230);
+  --sky-bottom: oklch(95% 0.035 200);
+  --far: oklch(80% 0.09 150);
+  --far2: oklch(86% 0.06 160);
+  --hill: oklch(71% 0.12 145);
+  --ground: oklch(74% 0.13 135);
+  --water: oklch(69% 0.1 220);
+  --water-edge: oklch(83% 0.12 120);
+  --path: oklch(78% 0.06 75);
+  --path-edge: oklch(64% 0.07 65);
+  --stone: oklch(78% 0.025 90);
+  --leaf: oklch(43% 0.095 155);
+  --leaf2: oklch(52% 0.11 150);
+  --bark: oklch(43% 0.065 65);
+  --petal: oklch(74% 0.15 25);
+  --gold: oklch(89% 0.15 90);
+  --light: oklch(97% 0.02 95);
+  --shadow: oklch(38% 0.055 210 / 28%);
+  --flag: oklch(57% 0.15 30);
+  --wall: oklch(92% 0.04 80);
+  --roof: oklch(57% 0.15 30);
+  --door: oklch(45% 0.08 50);
+  --window: oklch(90% 0.13 90);
   display: block;
   inline-size: 100%;
   block-size: 100%;
@@ -19,103 +31,274 @@
   aspect-ratio: 2 / 1;
   overflow: hidden;
   pointer-events: none;
-  background: var(--creek-sky);
+  background: var(--sky-bottom);
 }
 
-.creek-scene[data-scene="forest"],
-.creek-scene[data-scene="jungle"] {
-  --creek-sky: oklch(89% 0.055 140);
-  --creek-far: oklch(66% 0.09 160);
-  --creek-hill: oklch(57% 0.11 150);
-  --creek-bank: oklch(74% 0.12 125);
-}
+.scene-sky-top { stop-color: var(--sky-top); }
+.scene-sky-bottom { stop-color: var(--sky-bottom); }
 
-.creek-scene[data-scene="snow"] {
-  --creek-sky: oklch(91% 0.04 250);
-  --creek-far: oklch(78% 0.055 255);
-  --creek-hill: oklch(87% 0.035 235);
-  --creek-bank: oklch(96% 0.015 240);
-  --creek-stone: oklch(88% 0.025 240);
-  --creek-water: oklch(70% 0.085 245);
-}
+/* Fills */
+.h-sun, .h-gold, .h-firefly, .creek-flower-heart, .step-blossom-heart { fill: var(--gold); }
+.h-sun-halo { fill: var(--gold); opacity: .22; }
+.h-cloud, .step-cloud { fill: var(--light); opacity: .9; }
+.h-star { fill: var(--light); }
+.h-moon { fill: var(--light); }
+.h-moon-halo { fill: var(--light); opacity: .12; }
+.h-far { fill: var(--far); }
+.h-far2 { fill: var(--far2); }
+.h-hill { fill: var(--hill); }
+.h-ground { fill: var(--ground); }
+.h-leaf, .h-pine, .h-kelp { fill: var(--leaf); }
+.h-leaf2, .h-gum, .h-acacia { fill: var(--leaf2); }
+.h-bark, .h-gumbark, .h-stalk, .h-logs, .h-mast, .h-wreck, .h-stilt { fill: var(--bark); }
+.h-petal, .step-blossom { fill: var(--petal); }
+.h-rock, .h-peak { fill: var(--stone); }
+.h-wall, .h-wall-far, .h-castle, .h-hut, .h-lighthouse, .h-adobe { fill: var(--wall); }
+.h-roof, .h-roof-far, .h-flag, .h-lantern-red { fill: var(--roof); }
+.h-roof-pink { fill: var(--petal); }
+.h-door, .h-cave, .h-cave-mouth { fill: var(--door); }
+.h-window, .h-porthole { fill: var(--window); }
+.h-water, .h-sea, .h-pool { fill: var(--water); }
+.h-glow { fill: var(--gold); opacity: .3; }
+.h-glow-door { fill: var(--gold); }
+.h-cap { fill: var(--petal); }
+.h-spot, .h-sail { fill: var(--light); }
+.h-sign, .h-plank, .h-chimney { fill: var(--path); }
+.h-heart { fill: var(--petal); }
+.h-pennant-0 { fill: var(--petal); }
+.h-pennant-1 { fill: var(--gold); }
+.h-pennant-2 { fill: var(--water); }
+.h-firefly-glow { fill: var(--gold); opacity: .28; }
+.h-hedge { fill: var(--leaf2); }
+.h-mound { fill: var(--hill); }
+.h-door-frame { fill: var(--bark); }
+.h-carrot { fill: oklch(70% 0.17 50); }
+.h-beam { fill: var(--light); opacity: .18; }
+.h-redrock { fill: oklch(58% 0.14 40); }
+.h-nest, .h-lodge { fill: oklch(55% 0.07 65); }
+.h-ice, .h-igloo { fill: oklch(96% 0.02 230); }
+.h-ice-shade { fill: oklch(84% 0.05 235); }
+.h-snowcap, .h-snow-roof { fill: var(--light); }
+.h-gorge, .h-cliff { fill: oklch(48% 0.06 120); }
+.h-fall { fill: oklch(88% 0.06 215); }
+.h-foam { fill: var(--light); opacity: .8; }
+.h-cloudsea { fill: var(--light); }
+.h-island { fill: var(--bark); }
+.h-band-1 { fill: oklch(72% 0.17 25); }
+.h-band-2 { fill: oklch(83% 0.15 75); }
+.h-band-3 { fill: oklch(88% 0.15 105); }
+.h-band-4 { fill: oklch(76% 0.12 160); }
+.h-band-5 { fill: oklch(72% 0.12 250); }
+.h-ceiling, .h-stalactite { fill: var(--far); }
+.h-moonbeam { fill: var(--light); opacity: .14; }
+.h-butte { fill: oklch(64% 0.12 45); }
+.h-light-ray { fill: var(--light); opacity: .12; }
+.h-seabed-far { fill: var(--far); }
+.h-shellhouse { fill: oklch(86% 0.07 40); }
+.h-crystal { fill: oklch(74% 0.15 300); }
+.h-glow-cap { fill: oklch(80% 0.14 190); }
+.h-cactus { fill: oklch(55% 0.11 145); }
+.h-shell { fill: oklch(86% 0.07 50); }
+.h-starfish { fill: oklch(72% 0.15 45); }
+.h-pad { fill: var(--leaf2); }
+.h-cane { fill: oklch(66% 0.12 135); }
+.h-aurora-1 { fill: oklch(80% 0.16 160); opacity: .45; }
+.h-aurora-2 { fill: oklch(70% 0.14 300); opacity: .35; }
+.h-mist { fill: var(--light); opacity: .55; }
+.h-bubble { fill: none; stroke: var(--light); stroke-width: 3; opacity: .7; }
 
-.creek-scene[data-scene="beach"],
-.creek-scene[data-scene="desert"] {
-  --creek-sky: oklch(92% 0.055 220);
-  --creek-far: oklch(84% 0.07 105);
-  --creek-hill: oklch(86% 0.095 90);
-  --creek-bank: oklch(91% 0.085 90);
-  --creek-water: oklch(72% 0.115 205);
-}
-
-.creek-scene[data-scene="night"] {
-  --creek-sky: oklch(30% 0.075 275);
-  --creek-far: oklch(38% 0.065 265);
-  --creek-hill: oklch(42% 0.06 180);
-  --creek-bank: oklch(51% 0.07 160);
-  --creek-water: oklch(49% 0.075 250);
-  --creek-leaf: oklch(32% 0.045 170);
-}
-
-.creek-scene[data-scene="sky"] {
-  --creek-far: oklch(85% 0.065 290);
-  --creek-hill: oklch(80% 0.075 180);
-  --creek-bank: oklch(91% 0.055 135);
-}
-
-.creek-sky { fill: var(--creek-sky); }
-.creek-hill-far { fill: var(--creek-far); }
-.creek-hill { fill: var(--creek-hill); }
-.creek-bank { fill: var(--creek-bank); }
-.creek-water { fill: var(--creek-water); }
-.creek-sun-halo { fill: var(--creek-gold); opacity: 0.2; }
-.creek-sun, .creek-flower-heart { fill: var(--creek-gold); }
-.creek-cloud { fill: var(--creek-light); opacity: 0.8; }
-.creek-tree { fill: var(--creek-leaf); }
-.creek-trunk { fill: var(--creek-bark); }
-.creek-stone { fill: var(--creek-stone); }
-.creek-stone-shadow, .creek-avatar-shadow { fill: var(--creek-shadow); }
-.creek-flower, .creek-shell { fill: var(--creek-petal); }
-.creek-moon, .creek-star, .creek-snowcap { fill: var(--creek-light); }
-.creek-flag { fill: var(--creek-flag); }
-.creek-ripple, .creek-stone-glint, .creek-snowflake {
+/* Lines */
+.h-stem, .h-cattail, .h-rock-line, .h-string, .h-smoke, .h-window-line, .h-fence, .h-mound-line,
+.h-ice-line, .h-igloo-line, .h-lodge-line, .h-fall-line, .h-vine, .h-ladder, .h-cloud-line, .h-dune-line,
+.h-butte-line, .h-log-line, .h-shell-swirl, .h-wave, .h-stripe, .h-hut-stripe, .h-cane-line, .h-bark-line,
+.h-leaf-line, .h-crystal-line, .h-coral, .h-shell-line, .h-redrock-line, .h-nest-line, .h-hammock, .h-ripple,
+.h-bridge-arch, .h-bridge-rail {
   fill: none;
-  stroke: var(--creek-light);
-  stroke-width: 3;
   stroke-linecap: round;
-  opacity: 0.6;
+  stroke-linejoin: round;
 }
-.creek-reed, .creek-grass {
+.h-stem, .h-vine { stroke: var(--leaf); stroke-width: 5; }
+.h-cattail { stroke: var(--bark); stroke-width: 9; }
+.h-rock-line, .h-butte-line, .h-redrock-line, .h-dune-line { stroke: var(--shadow); stroke-width: 3; }
+.h-string { stroke: var(--bark); stroke-width: 2; }
+.h-smoke { stroke: var(--light); stroke-width: 6; opacity: .6; }
+.h-window-line { stroke: var(--wall); stroke-width: 3; }
+.h-fence { stroke: var(--light); stroke-width: 6; }
+.h-mound-line { stroke: var(--leaf2); stroke-width: 5; opacity: .6; }
+.h-ice-line, .h-igloo-line { stroke: oklch(80% 0.04 235); stroke-width: 3; }
+.h-lodge-line, .h-nest-line, .h-log-line { stroke: var(--bark); stroke-width: 4; }
+.h-fall-line { stroke: var(--light); stroke-width: 4; opacity: .7; }
+.h-ladder { stroke: var(--bark); stroke-width: 4; }
+.h-cloud-line { stroke: oklch(88% 0.03 260); stroke-width: 4; }
+.h-shell-swirl { stroke: oklch(70% 0.09 40); stroke-width: 4; }
+.h-wave, .h-ripple { stroke: var(--light); stroke-width: 3; opacity: .7; }
+.h-stripe { stroke: var(--roof); stroke-width: 9; }
+.h-hut-stripe { stroke: var(--water); stroke-width: 7; }
+.h-cane-line { stroke: oklch(52% 0.1 135); stroke-width: 2; }
+.h-bark-line { stroke: var(--bark); stroke-width: 3; }
+.h-leaf-line { stroke: var(--light); stroke-width: 2; opacity: .5; }
+.h-crystal-line { stroke: var(--light); stroke-width: 2; opacity: .65; }
+.h-coral { stroke: var(--petal); stroke-width: 11; }
+.h-shell-line { stroke: var(--bark); stroke-width: 2; opacity: .5; }
+.h-hammock { stroke: var(--petal); stroke-width: 6; }
+.h-bridge-arch { stroke: var(--roof); stroke-width: 10; }
+.h-bridge-rail { stroke: var(--roof); stroke-width: 4; }
+
+/* The path */
+.route-bank, .route-water, .route-ripple, .route-edge, .route-dirt, .route-rut, .route-branch,
+.route-branch-light, .route-rope, .route-rope-under, .route-post {
   fill: none;
-  stroke: var(--creek-leaf);
-  stroke-width: 5;
   stroke-linecap: round;
+  stroke-linejoin: round;
 }
-.creek-cattail, .creek-flagpole {
-  fill: none;
-  stroke: var(--creek-bark);
-  stroke-width: 4;
-  stroke-linecap: round;
-}
-.creek-cattail { stroke-width: 8; }
-.creek-flag-number { fill: var(--creek-light); font: 700 13px system-ui, sans-serif; }
+.route-bank { stroke: var(--water-edge); stroke-width: 104; }
+.route-water { stroke: var(--water); stroke-width: 76; }
+.route-ripple { stroke: var(--light); stroke-width: 3; stroke-dasharray: 26 70; opacity: .55; }
+.route-edge { stroke: var(--path-edge); opacity: .55; }
+.route-dirt { stroke: var(--path); }
+.route-rut { stroke: var(--path-edge); stroke-width: 4; stroke-dasharray: 18 14; opacity: .7; }
+.route-branch { stroke: var(--bark); stroke-width: 36; }
+.route-branch-light { stroke: oklch(62% 0.06 60); stroke-width: 8; opacity: .7; }
+.route-rope, .route-rope-under { stroke: var(--bark); stroke-width: 4; }
+.route-post { stroke: var(--bark); stroke-width: 9; }
+.route-plank { fill: oklch(66% 0.08 65); stroke: var(--bark); stroke-width: 2; }
+
+/* Steps */
+.creek-stone { fill: var(--stone); }
+.creek-stone-shadow, .creek-avatar-shadow, .step-paver-shadow, .step-pad-shadow { fill: var(--shadow); }
+.creek-stone-glint { fill: none; stroke: var(--light); stroke-width: 3; stroke-linecap: round; opacity: .6; }
+.step-pad { fill: var(--leaf2); }
+.step-pad-vein { fill: none; stroke: var(--leaf); stroke-width: 2; }
+.step-floe { fill: oklch(97% 0.015 230); }
+.step-floe-side { fill: oklch(80% 0.05 235); }
+.step-paver { fill: oklch(88% 0.02 80); stroke: var(--path-edge); stroke-width: 2; }
+.step-stump { fill: oklch(76% 0.07 70); }
+.step-stump-side { fill: var(--bark); }
+.step-stump-ring { fill: none; stroke: oklch(58% 0.07 60); stroke-width: 2; }
+.step-print { fill: var(--path-edge); opacity: .75; }
+.step-flatrock { fill: var(--stone); }
+.step-leaf { fill: var(--leaf2); }
+.step-glow { fill: oklch(80% 0.14 190); opacity: .25; }
+.step-crystal { fill: oklch(78% 0.13 200); }
+.step-crystal-line { fill: none; stroke: var(--light); stroke-width: 2; opacity: .7; }
+.step-sanddollar { fill: oklch(90% 0.04 80); }
+.step-sanddollar-line { fill: none; stroke: oklch(72% 0.05 70); stroke-width: 2; stroke-linecap: round; }
+.step-tiderock { fill: oklch(48% 0.03 230); }
+.step-seaweed { fill: none; stroke: var(--leaf2); stroke-width: 4; stroke-linecap: round; }
+
+.creek-flag { fill: var(--flag); }
+.creek-flagpole { fill: none; stroke: var(--bark); stroke-width: 4; stroke-linecap: round; }
+.creek-flag-number { fill: var(--light); font: 700 13px system-ui, sans-serif; }
 .creek-avatar { transition: none; }
-.creek-scene[data-habitat] .creek-forest { display: none; }
-.creek-scene[data-habitat="forest"] .creek-forest,
-.creek-scene[data-habitat="mountain"] .creek-forest { display: inline; }
 
-.creek-beach, .creek-night, .creek-snow, .creek-snowcap { display: none; }
-.creek-scene[data-scene="snow"] .creek-snow,
-.creek-scene[data-scene="snow"] .creek-snowcap,
-.creek-scene[data-scene="beach"] .creek-beach,
-.creek-scene[data-scene="night"] .creek-night { display: inline; }
-.creek-scene[data-scene="beach"] .creek-forest,
-.creek-scene[data-scene="desert"] .creek-forest,
-.creek-scene[data-scene="night"] .creek-sun,
-.creek-scene[data-scene="night"] .creek-sun-halo,
-.creek-scene[data-scene="night"] .creek-cloud { display: none; }
-.creek-scene[data-habitat="ocean"] .creek-beach { display: none; }
+.h-grass-gold { fill: oklch(80% 0.13 85); }
+.h-lantern { fill: var(--bark); stroke: var(--bark); stroke-width: 3; stroke-linecap: round; }
+.h-bird { fill: none; stroke: var(--bark); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; opacity: .7; }
+.h-falling-leaf { fill: oklch(70% 0.14 60); }
+.h-barn { fill: oklch(55% 0.16 28); }
+.h-barn-door { fill: none; stroke: var(--light); stroke-width: 4; }
+.h-gold-fill { fill: var(--gold); }
+.h-chest { fill: oklch(52% 0.09 55); }
+.h-chest-band { fill: none; stroke: var(--gold); stroke-width: 4; }
+.h-temple { fill: oklch(70% 0.04 110); }
+.h-temple-line, .h-tower-leg, .h-stilt-line, .h-branch-line { fill: none; stroke-linecap: round; }
+.h-temple-line { stroke: oklch(55% 0.04 110); stroke-width: 3; }
+.h-tower-leg, .h-stilt-line { stroke: var(--bark); stroke-width: 6; }
+.h-branch-line { stroke: var(--bark); stroke-width: 9; }
 
-@media (prefers-reduced-motion: reduce) {
-  .creek-avatar { transition: none; }
-}
+/* Sections: path forms */
+.route-sand, .route-snow, .route-snow-edge, .route-bank-s, .route-water-s, .route-cave, .route-cave-edge,
+.route-band, .route-ripple-v { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.route-sand { stroke: oklch(88% 0.07 85); }
+.route-snow { stroke: oklch(97% 0.012 230); }
+.route-snow-edge { stroke: oklch(84% 0.04 235); }
+.route-bank-s { stroke: var(--water-edge); }
+.route-water-s { stroke: var(--water); }
+.route-cave { stroke: oklch(42% 0.05 270); }
+.route-cave-edge { stroke: oklch(32% 0.04 275); }
+.route-band { stroke-width: 7; }
+.route-band.h-band-1 { stroke: oklch(72% 0.17 25); } .route-band.h-band-2 { stroke: oklch(83% 0.15 75); }
+.route-band.h-band-3 { stroke: oklch(88% 0.15 105); } .route-band.h-band-4 { stroke: oklch(76% 0.12 160); }
+.route-band.h-band-5 { stroke: oklch(72% 0.12 250); }
+.route-stream { fill: var(--water); }
+.route-ripple-v { stroke: var(--light); stroke-width: 3; opacity: .6; }
+.step-bubble { fill: none; stroke: var(--light); stroke-width: 3; opacity: .8; }
+.step-sparkle { fill: var(--gold); }
+.step-sparkle-2 { fill: var(--light); }
+.step-stair { fill: var(--stone); stroke: var(--shadow); stroke-width: 2; }
+.step-stair-side { fill: oklch(60% 0.03 250 / 55%); }
+.step-log { fill: oklch(55% 0.08 55); stroke: var(--bark); stroke-width: 2; }
+.step-log-end { fill: oklch(76% 0.07 70); stroke: var(--bark); stroke-width: 2; }
+
+/* Sections: set pieces */
+.piece-hollow { fill: oklch(30% 0.04 60 / 70%); }
+.piece-bed { fill: oklch(72% 0.12 70); }
+.piece-zz { fill: var(--light); opacity: .85; }
+.piece-pool-rim { fill: var(--water-edge); }
+.piece-drop { fill: oklch(80% 0.08 230); }
+.piece-mud { fill: oklch(48% 0.06 60); }
+.piece-warmrock { fill: oklch(66% 0.11 45); }
+.piece-ripple-sand { fill: none; stroke: oklch(70% 0.06 80); stroke-width: 3; stroke-linecap: round; }
+.piece-sandmound { fill: oklch(84% 0.08 85); }
+.piece-ray { fill: none; stroke: var(--gold); stroke-width: 6; stroke-linecap: round; opacity: .55; }
+.piece-ball { fill: oklch(70% 0.17 25); }
+.piece-ball-line { fill: none; stroke: var(--light); stroke-width: 3; }
+.piece-post { fill: none; stroke: var(--bark); stroke-width: 8; stroke-linecap: round; }
+.piece-fish { fill: oklch(76% 0.14 60); }
+.h-coral-fill { fill: oklch(72% 0.13 25); }
+
+/* The animal */
+.creek-avatar-body, .avatar-mover, .avatar-breathe { transform-box: fill-box; }
+.avatar-breathe { transform-origin: 50% 100%; }
+#app.animations-on:not(.reduced-motion) .avatar-breathe { animation: avatar-breathe 2.6s ease-in-out infinite; }
+#app.animations-on:not(.reduced-motion) .creek-scene[data-phase="done"] .avatar-breathe { animation: avatar-cheer 0.7s ease-in-out 4; }
+@keyframes avatar-breathe { 0%, 100% { transform: scale(1, 1); } 50% { transform: scale(1.015, 0.985); } }
+@keyframes avatar-cheer { 0%, 100% { transform: translateY(0); } 40% { transform: translateY(-22px) rotate(-4deg); } 70% { transform: translateY(0) scale(1.06, 0.94); } }
+@media (prefers-reduced-motion: reduce) { .avatar-breathe { animation: none !important; } }
+
+/* Each section's ground has its own tint. */
+.section-zone { opacity: .55; }
+.section-zone-flowers { fill: color-mix(in oklch, var(--ground) 65%, oklch(70% 0.12 60)); }
+.section-zone-trail { fill: color-mix(in oklch, var(--ground) 70%, oklch(92% 0.08 100)); }
+.section-zone-nook { fill: color-mix(in oklch, var(--ground) 60%, oklch(40% 0.06 140)); }
+.section-zone-ledge, .section-zone-rock { fill: color-mix(in oklch, var(--ground) 55%, var(--stone)); }
+.section-zone-water { fill: color-mix(in oklch, var(--ground) 65%, var(--water)); }
+.section-zone-tree, .section-zone-grove { fill: color-mix(in oklch, var(--ground) 60%, var(--leaf)); }
+.section-zone-marsh { fill: color-mix(in oklch, var(--ground) 60%, oklch(50% 0.07 110)); }
+.section-zone-sea, .section-zone-beach { fill: color-mix(in oklch, var(--ground) 60%, oklch(88% 0.08 85)); }
+.section-zone-house { fill: color-mix(in oklch, var(--ground) 70%, oklch(90% 0.05 60)); }
+.section-zone-bridge, .section-zone-flight { fill: color-mix(in oklch, var(--ground) 70%, oklch(92% 0.06 300)); }
+.creek-scene[data-habitat="polar"] .section-zone, .creek-scene[data-habitat="wetland"] .section-zone { opacity: .3; }
+
+/* Goal markers */
+.goal-sign { fill: var(--light); stroke: var(--flag); stroke-width: 4; }
+.goal-star { fill: var(--gold); stroke: oklch(62% 0.13 70); stroke-width: 2; opacity: 0; }
+.goal-number { fill: var(--flag); font: 800 26px "Nunito", system-ui, sans-serif; }
+.goal-marker.reached .goal-sign { fill: var(--gold); stroke: oklch(62% 0.13 70); }
+.goal-marker.reached .goal-star { opacity: 1; }
+.goal-marker.reached .goal-number { opacity: 0; }
+.goal-label { opacity: 0; }
+.goal-marker.next .goal-label { opacity: 1; }
+.goal-label-bg { fill: oklch(99% 0.01 95 / 94%); stroke: var(--flag); stroke-width: 3; }
+.goal-label-text { fill: oklch(30% 0.04 160); font: 800 22px "Nunito", system-ui, sans-serif; }
+#app.animations-on:not(.reduced-motion) .goal-marker.reached .goal-sign { animation: goal-pop .3s ease-out; transform-box: fill-box; transform-origin: center; }
+@keyframes goal-pop { 0% { transform: scale(.6); } 70% { transform: scale(1.2); } 100% { transform: scale(1); } }
+#app.animations-on:not(.reduced-motion) .creek-scene[data-cheer="true"] .avatar-breathe { animation: avatar-cheer .7s ease-in-out 1; }
+
+/* Light under the animal in dark worlds */
+.creek-avatar-glow { fill: oklch(95% 0.05 90 / 0); }
+.creek-scene:is([data-habitat="cave"], [data-habitat="polar"], [data-habitat="ocean"], [data-habitat="forest"], [data-habitat="jungle"]) .creek-avatar-glow { fill: oklch(95% 0.06 90 / 28%); }
+
+/* New set-piece parts */
+.route-support { fill: none; stroke: var(--bark); stroke-width: 9; stroke-linecap: round; stroke-linejoin: round; }
+.piece-egg { fill: oklch(94% 0.03 200); }
+.piece-swing-frame { fill: none; stroke: oklch(60% 0.13 30); stroke-width: 8; stroke-linecap: round; stroke-linejoin: round; }
+.piece-sandbox { fill: oklch(60% 0.08 60); }
+.piece-arch-leaves { fill: none; stroke: var(--leaf); stroke-width: 22; stroke-linecap: round; opacity: .85; }
+.piece-edelweiss { fill: oklch(97% 0.01 100); }
+.piece-planter { fill: oklch(52% 0.08 55); }
+.piece-cabbage { fill: oklch(72% 0.13 135); }
+.piece-hive { fill: oklch(80% 0.13 80); }
+.piece-hive-line { fill: none; stroke: oklch(62% 0.12 70); stroke-width: 3; }
+.piece-wing { fill: none; stroke: var(--light); stroke-width: 2; }
+.piece-pool-rim { fill: oklch(96% 0.02 220); }
