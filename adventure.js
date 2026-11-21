@@ -6,6 +6,7 @@
 
   const DATA = window.BB_ADVENTURE_DATA;
   const COLLECTION = window.BB_BUDDIES;
+  const STORIES = window.BB_STORYBOOK;
   if (!DATA) return;
 
   const KEY = "brushBuddiesAdventureV1";
@@ -16,7 +17,7 @@
   const destinations = new Map();
   [...DATA.shared, ...Object.values(DATA.homes), ...(COLLECTION ? COLLECTION.catalog.map(a => COLLECTION.home(a.id)) : [])].forEach(d => {
     const existing = destinations.get(d.id);
-    destinations.set(d.id, existing ? { ...d, stickers: [...existing.stickers, ...d.stickers] } : d);
+    destinations.set(d.id, existing ? { ...existing, stickers: [...existing.stickers, ...d.stickers] } : d); // Preserve named home metadata; keep previously earned legacy stickers.
   });
   const ALL = [...destinations.values()];
 
@@ -49,6 +50,8 @@
   let trip = null; // { dest, started, spokenStage, restKey, awarded }
   let treasureTimer = null;
   let pendingTreasure = null; // shown when Adventure Mode is next on screen
+  let lastAwardStory = null;
+  let readerTicket = 0;
   const rewardedSessions = new Set();
 
   function persist(scope = window.BB_PROFILE_SCOPE) {
@@ -71,6 +74,7 @@
 
   function chooseDestination(buddy) {
     if (COLLECTION) {
+      if (STORIES) return STORIES.destinationFor(buddy, COLLECTION.load().visits[buddy] || 0);
       const animal = COLLECTION.get(buddy);
       const home = { ...COLLECTION.home(buddy), habitat: animal.habitat };
       if (COLLECTION.homeUnlocked(buddy)) return home;
@@ -172,22 +176,25 @@
     clearTimeout(treasureTimer);
     treasureTimer = null;
     pendingTreasure = null;
+    lastAwardStory = null;
     trip = null;
   }
 
   function award(dest, s) {
-    store = loadStore(s.profileScope); // Persist to the owner at completion, even if a profile switch queued first.
+    store = loadStore(s.profileScope); // Profile scope captured before an asynchronous finish.
+    // Reward the same item named in the newly unlocked story, then retain the usual sticker pool.
+    const progress = COLLECTION?.completeInScope(s.sessionId, s.buddy, s.profileScope);
+    const newStory = progress && STORIES?.unlockedAt(s.buddy, progress.visits)
+      .find(chapter => chapter.destinationId === dest.id) || null;
+    const storySticker = newStory && dest.stickers.find(st => st.name === newStory.goal);
     const missing = dest.stickers.filter(st => !store.stickers[st.id]);
-    const sticker = Math.random() < RARE_CHANCE ? RARE : missing.length ? missing[0] : pick(dest.stickers);
+    const sticker = storySticker || (Math.random() < RARE_CHANCE ? RARE : missing.length ? missing[0] : pick(dest.stickers));
     store.stickers[sticker.id] = (store.stickers[sticker.id] || 0) + 1;
     store.sessions += 1;
     store.last = dest.id;
     persist(s.profileScope);
-    if (COLLECTION) {
-      COLLECTION.completeInScope(s.sessionId, s.buddy, s.profileScope);
-    }
     document.dispatchEvent(new CustomEvent('bb:reward', { detail: { session_id: s.sessionId, buddy_id: s.buddy, sticker_id: sticker.id, profile_scope: s.profileScope } }));
-    return { sticker, count: store.stickers[sticker.id] };
+    return { sticker, count: store.stickers[sticker.id], newStory, buddyId: s.buddy, profileScope: s.profileScope };
   }
 
   // One sticker per session: jumping back to a stage after finishing does not earn another.
@@ -216,6 +223,8 @@
     if (!found || !s || s.experience !== "adventure") return; // waits until Adventure Mode is back
     pendingTreasure = null;
     const { sticker, count } = found;
+    lastAwardStory = found.newStory && found.profileScope === (window.BB_PROFILE_SCOPE || "") ? found.newStory : null;
+    $("treasure-story").hidden = !lastAwardStory;
     $("treasure-dialog").classList.toggle("animate", !s.calm);
     $("treasure-emoji").textContent = sticker.emoji;
     $("treasure-name").textContent = sticker.name + (count > 1 ? " ×" + count : "");
@@ -268,12 +277,91 @@
   }
 
   function showJournalTab(tab) {
-    const buddies = tab === "buddies";
+    const buddies = tab === "buddies", stories = tab === "stories" && !!STORIES;
     $("journal-tab-buddies").setAttribute("aria-selected", String(buddies));
-    $("journal-tab-stickers").setAttribute("aria-selected", String(!buddies));
+    $("journal-tab-stickers").setAttribute("aria-selected", String(!buddies && !stories));
+    $("journal-tab-stories").setAttribute("aria-selected", String(stories));
     $("journal-buddies").hidden = !buddies;
-    $("journal-list").hidden = buddies;
-    $("journal-summary").hidden = buddies;
+    $("journal-list").hidden = buddies || stories;
+    $("journal-stories").hidden = !stories;
+    $("journal-summary").hidden = buddies || stories;
+  }
+  function storyParagraphs(text) {
+    const parent = $("story-reader-body");
+    parent.replaceChildren(...text.split(/\n\s*\n/).filter(Boolean).map(part => {
+      const p = document.createElement("p");
+      p.textContent = part.replace(/\*\*/g, "").replace(/\*/g, "").replace(/\n/g, " ");
+      return p;
+    }));
+  }
+  async function openStory(chapter) {
+    const visits = COLLECTION.load().visits[chapter.buddyId] || 0;
+    if (visits < chapter.unlockAfter) return;
+    const scope = window.BB_PROFILE_SCOPE || "";
+    const ticket = ++readerTicket;
+    const dialog = $("story-reader-dialog");
+    if ($("journal-dialog").open) $("journal-dialog").close();
+    $("story-reader-title").textContent = chapter.title;
+    $("story-reader-route").textContent = chapter.destination + " · " + chapter.stops.join(" → ") + " · " + chapter.goal;
+    storyParagraphs(chapter.text || "Opening this chapter…");
+    if (!dialog.open) dialog.showModal();
+    if (!chapter.path) return;
+    try {
+      const response = await fetch(chapter.path, { cache: "no-cache" });
+      if (!response.ok) throw new Error("Story unavailable");
+      const markdown = await response.text();
+      if (ticket !== readerTicket || !dialog.open || scope !== (window.BB_PROFILE_SCOPE || "")) return;
+      const marker = markdown.indexOf("**Read-aloud time:**");
+      const bodyStart = marker < 0 ? 0 : markdown.indexOf("\n\n", marker);
+      storyParagraphs(bodyStart < 0 ? markdown : markdown.slice(bodyStart).trim());
+    } catch (_) {
+      if (ticket === readerTicket && dialog.open) storyParagraphs("This story is not available offline yet. Connect to the internet, then try opening it again.");
+    }
+  }
+  function renderStories() {
+    const container = $("journal-stories");
+    if (!STORIES) {
+      container.textContent = "Stories are not available on this version of Toothpaws.";
+      return;
+    }
+    const counts = COLLECTION.load().visits;
+    const intro = document.createElement("p");
+    intro.className = "panel-intro";
+    intro.textContent = "Every buddy has a first story after one completed adventure. New chapters appear here when they are written and earned. Tap any unlocked story to read it again.";
+    const current = api()?.snapshot()?.buddy;
+    const ordered = COLLECTION.catalog.slice().sort((a, b) => {
+      const ax = STORIES.unlocked(a.id, counts[a.id] || 0).length, bx = STORIES.unlocked(b.id, counts[b.id] || 0).length;
+      return bx - ax || Number(b.id === current) - Number(a.id === current);
+    });
+    const entries = ordered.map(animal => {
+      const visits = counts[animal.id] || 0, chapters = STORIES.chaptersFor(animal.id);
+      const available = chapters.filter(ch => visits >= ch.unlockAfter);
+      const section = document.createElement("details");
+      section.className = "storybook-buddy";
+      section.open = animal.id === current && available.length > 0;
+      const summary = document.createElement("summary");
+      summary.textContent = animal.emoji + " " + animal.name + " · " + available.length + "/" + chapters.length + " stories";
+      section.append(summary);
+      const profile = STORIES.characters.get(animal.id);
+      const profileText = document.createElement("p");
+      profileText.className = "storybook-biography";
+      profileText.textContent = profile.personality + " " + profile.background + " " + profile.environment;
+      section.append(profileText);
+      chapters.forEach(ch => {
+        const button = document.createElement("button");
+        const earned = visits >= ch.unlockAfter;
+        button.type = "button";
+        button.className = "quick-button storybook-chapter";
+        button.disabled = !earned;
+        button.textContent = earned ? "📖 " + ch.title : "🔒 Chapter unlocks after adventure " + ch.unlockAfter;
+        if (earned) button.addEventListener("click", () => { void openStory(ch); });
+        section.append(button);
+      });
+      return section;
+    });
+    container.replaceChildren(intro, ...entries);
+    $("journal-story-count").textContent = String(ordered.reduce((count, animal) =>
+      count + STORIES.unlocked(animal.id, counts[animal.id] || 0).length, 0));
   }
 
   function buddyCard(a, current, visitor) {
@@ -343,14 +431,16 @@
     $("journal-list").replaceChildren(...list);
     $("journal-tab-buddies").hidden = !COLLECTION;
     if (COLLECTION) renderBuddies();
+    renderStories();
 
     const { found, total } = stickerTotals();
     $("journal-sticker-count").textContent = found + "/" + total;
     $("journal-summary").textContent =
       found + " of " + total + " stickers found · " + store.sessions + (store.sessions === 1 ? " trip" : " trips");
     // Refreshing an open journal keeps the tab the child is looking at.
-    if (!tab && $("journal-dialog").open) tab = $("journal-tab-buddies").getAttribute("aria-selected") === "true" ? "buddies" : "stickers";
-    showJournalTab(tab === "buddies" && COLLECTION ? "buddies" : "stickers");
+    if (!tab && $("journal-dialog").open) tab = ["stories", "buddies", "stickers"].find(name =>
+      $("journal-tab-" + name).getAttribute("aria-selected") === "true") || "stickers";
+    showJournalTab(tab === "buddies" && COLLECTION ? "buddies" : tab === "stories" ? "stories" : "stickers");
     if (!$("journal-dialog").open) $("journal-dialog").showModal();
   }
 
@@ -362,9 +452,14 @@
   $("journal-open").addEventListener("click", () => openJournal());
   $("journal-tab-stickers").addEventListener("click", () => showJournalTab("stickers"));
   $("journal-tab-buddies").addEventListener("click", () => showJournalTab("buddies"));
+  $("journal-tab-stories").addEventListener("click", () => { renderStories(); showJournalTab("stories"); });
   $("journal-dialog").addEventListener("keydown", e => {
     if (!e.target.classList.contains("journal-tab") || !["ArrowLeft", "ArrowRight"].includes(e.key)) return;
-    const next = e.target.id === "journal-tab-stickers" ? "buddies" : "stickers";
+    const tabs = ["stickers", "buddies", "stories"];
+    const current = e.target.id.replace("journal-tab-", "");
+    const next = tabs[(tabs.indexOf(current) + (e.key === "ArrowRight" ? 1 : tabs.length - 1)) % tabs.length];
+    e.preventDefault();
+    if (next === "stories") renderStories();
     showJournalTab(next);
     $("journal-tab-" + next).focus();
   });
@@ -374,6 +469,20 @@
     if (!$("journal-dialog").open) $("start-button").focus();
   });
   $("treasure-close").addEventListener("click", () => $("treasure-dialog").close());
+  $("treasure-story").addEventListener("click", () => {
+    const chapter = lastAwardStory;
+    $("treasure-dialog").close();
+    if (chapter) void openStory(chapter);
+  });
+  $("story-reader-close").addEventListener("click", () => $("story-reader-dialog").close());
+  $("story-reader-done").addEventListener("click", () => $("story-reader-dialog").close());
+  $("story-reader-dialog").addEventListener("close", () => {
+    readerTicket++;
+    openJournal("stories");
+  });
+  $("story-reader-dialog").addEventListener("click", e => {
+    if (e.target === $("story-reader-dialog")) $("story-reader-dialog").close();
+  });
   $("treasure-journal").addEventListener("click", () => {
     $("treasure-dialog").close();
     openJournal("stickers");

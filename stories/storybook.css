@@ -1,0 +1,70 @@
+/* Toothpaws Storybook — mobile-first, large touch targets and accessible reading. */
+#journal-dialog .journal-tabs { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+#journal-dialog .journal-tab { min-width: 0; min-height: 48px; font-size: .83rem; padding: 4px 2px; }
+#journal-dialog .journal-tab-count { font-size: .72rem; }
+.journal-stories[hidden] { display: none; }
+.journal-stories { display: grid; gap: .65rem; text-align: left; }
+.storybook-buddy {
+  padding: .7rem;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-m, 12px);
+  background: var(--panel);
+}
+.storybook-buddy summary {
+  min-height: 44px;
+  display: list-item;
+  padding: .5rem .2rem;
+  font-size: .92rem;
+  line-height: 1.4;
+  font-weight: 800;
+  cursor: pointer;
+  color: var(--ink);
+}
+.storybook-biography {
+  font-size: .87rem;
+  line-height: 1.55;
+  color: var(--ink);
+  margin: .5rem 0;
+}
+.storybook-chapter {
+  display: block;
+  width: 100%;
+  min-height: 48px;
+  margin: .5rem 0 0;
+  text-align: left;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+.storybook-chapter:disabled {
+  opacity: .7;
+  color: var(--muted);
+  background: var(--surface);
+  cursor: default;
+}
+#treasure-story[hidden] { display: none; }
+#treasure-dialog .settings-actions { flex-wrap: wrap; }
+.story-reader-dialog { max-height: min(95dvh, 900px); }
+.story-reader-shell { max-height: min(92dvh, 860px); }
+.story-reader-route {
+  font-size: .78rem;
+  font-weight: 700;
+  line-height: 1.5;
+  color: var(--muted);
+  border-bottom: 1px solid var(--line);
+  padding-bottom: .7rem;
+}
+.story-reader-body {
+  font-family: Nunito, system-ui, sans-serif;
+  font-size: 1.01rem;
+  line-height: 1.7;
+  letter-spacing: .005em;
+  text-align: left;
+  overflow-wrap: break-word;
+}
+.story-reader-body p { margin: 0 0 1rem; }
+.story-reader-body p:last-child { margin-bottom: .25rem; }
+#story-reader-done { width: 100%; }
+@media (max-width: 350px) {
+  #journal-dialog .journal-tab { font-size: .75rem; }
+  #journal-dialog .journal-tab-count { display: block; }
+}
