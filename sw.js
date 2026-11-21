@@ -1,6 +1,6 @@
 "use strict";
 
-const CACHE_NAME = "brush-buddies-shell-v16";
+const CACHE_NAME = "brush-buddies-shell-v17";
 const APP_SHELL = [
   "./home.css?v=0.8.3",
   "./brand.css?v=0.9.0",
@@ -101,7 +101,15 @@ const APP_SHELL = [
   "./collection-backup.js?v=0.9.0",
   "./styles.css?v=0.8.2",
   "./adventure-data.js?v=0.6.0",
-  "./adventure.js?v=0.8.3",
+  "./adventure.js?v=0.9.0",
+  "./stories/characters.js?v=1",
+  "./stories/story-library.js?v=1",
+  "./stories/storybook.css?v=1",
+  "./stories/01-kitty-yarn-cottage.md",
+  "./stories/02-bubbles-clover-burrow.md",
+  "./stories/03-scout-backyard-park.md",
+  "./stories/04-finn-maple-den.md",
+  "./stories/05-pebble-ice-caves.md",
   "./app.js?v=0.9.0",
   "./camera-helper.js?v=0.8.0",
   "./camera-worker.js?v=0.8.0",
