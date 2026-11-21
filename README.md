@@ -12,7 +12,7 @@ Two-minute toothbrushing trails with an animal friend. A kid-friendly toothbrush
 
 ## Features
 
-- 14 animal buddies with a quick switcher on the main screen
+- 75 animal buddies in the collection, including Cat and Bunny as starters; the buddy switcher and Field Journal support unlocking more animals through completed adventures
 - Two experiences: a Simple timer, or Adventure Mode, where each brush is a short trip with scenery to explore and stickers to collect in a Field Journal (switch with the 🗺️ button or in Buddy settings)
 
 - Customizable brushing stages: rename, change emoji, edit reminders, set each stage duration, add or remove stages
