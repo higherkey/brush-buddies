@@ -13,12 +13,15 @@
     rainbow: 'Rainbow Run', cave: 'Moonlit Creek', desert: 'Oasis Trail',
     mountain: 'Alpine Stream', ocean: 'Coral Crossing', shore: 'Tidepool Trail'
   });
-  const homeManuscripts = Object.freeze({
-    cat: ['01-kitty-yarn-cottage.md', 'Kitty and the Runaway Ball of Yarn', 'Ball of Yarn'],
-    bunny: ['02-bubbles-clover-burrow.md', 'Bubbles and the Lucky Clover', 'Lucky Clover'],
-    dog: ['03-scout-backyard-park.md', 'Scout and the Bouncy Ball Mystery', 'Bouncy Ball'],
-    fox: ['04-finn-maple-den.md', 'Finn and the Little Acorn', 'Little Acorn'],
-    penguin: ['05-pebble-ice-caves.md', 'Pebble and the Sparkly Ice', 'Sparkly Ice']
+  // Add future chapters here with unlockAfter: 2, 3, 5, etc. A chapter becomes
+  // available after that buddy's Nth completed adventure, never before.
+  // 'trail' chapters must match a trail route; 'home' chapters start on visit 4+.
+  const authoredChapters = Object.freeze({
+    cat: [{ path: '01-kitty-yarn-cottage.md', title: 'Kitty and the Runaway Ball of Yarn', goal: 'Ball of Yarn', kind: 'home', unlockAfter: 4 }],
+    bunny: [{ path: '02-bubbles-clover-burrow.md', title: 'Bubbles and the Lucky Clover', goal: 'Lucky Clover', kind: 'home', unlockAfter: 4 }],
+    dog: [{ path: '03-scout-backyard-park.md', title: 'Scout and the Bouncy Ball Mystery', goal: 'Bouncy Ball', kind: 'home', unlockAfter: 4 }],
+    fox: [{ path: '04-finn-maple-den.md', title: 'Finn and the Little Acorn', goal: 'Little Acorn', kind: 'home', unlockAfter: 4 }],
+    penguin: [{ path: '05-pebble-ice-caves.md', title: 'Pebble and the Sparkly Ice', goal: 'Sparkly Ice', kind: 'home', unlockAfter: 4 }]
   });
   const companions = {
     cottage: 'a curious mouse', meadow: 'a young field mouse', eucalyptus: 'a shy tree frog',
@@ -105,17 +108,22 @@
         unlockAfter: 1, destination: trail.name, destinationId: trail.id,
         stops: trail.stops.map(s => s.name), goal: trail.stickers[0].name,
         text: trailStory(id), kind: 'trail' };
-      const manuscript = homeManuscripts[id];
-      if (!manuscript) {
-        chapterCache.set(id, [first]);
-        return chapterCache.get(id);
-      }
-      const home = homeFor(id);
-      chapterCache.set(id, [first, { id: 'home-' + id + '-1', buddyId: id, title: manuscript[1],
-        unlockAfter: 4, destination: home.name, destinationId: home.id,
-        stops: home.stops.map(s => s.name), goal: manuscript[2],
-        path: 'stories/' + manuscript[0], kind: 'home' }]);
-      return chapterCache.get(id);
+      const extra = (authoredChapters[id] || []).map((entry, index) => {
+        const destination = entry.kind === 'home' ? homeFor(id) : destinationFor(id, 0);
+        if (!destination.stickers.some(st => st.name === entry.goal))
+          throw new Error('Chapter goal does not exist on route: ' + id + ' / ' + entry.title);
+        if (entry.kind === 'home' && entry.unlockAfter < 4)
+          throw new Error('Home story cannot unlock before first home adventure: ' + id);
+        return { id: entry.kind + '-' + id + '-' + (index + 1), buddyId: id, title: entry.title,
+          unlockAfter: entry.unlockAfter, destination: destination.name, destinationId: destination.id,
+          stops: destination.stops.map(st => st.name), goal: entry.goal,
+          path: 'stories/' + entry.path, kind: entry.kind };
+      });
+      const all = [first, ...extra].sort((a, b) => a.unlockAfter - b.unlockAfter);
+      if (new Set(all.map(ch => ch.unlockAfter)).size !== all.length)
+        throw new Error('Only one story can unlock at each visit count for ' + id);
+      chapterCache.set(id, all);
+      return all;
     }
     function unlockedAt(id, visits) {
       return chaptersFor(id).filter(ch => ch.unlockAfter === visits);
