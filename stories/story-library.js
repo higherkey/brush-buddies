@@ -104,12 +104,14 @@
       if (!byId.has(id)) return [];
       if (chapterCache.has(id)) return chapterCache.get(id);
       const trail = destinationFor(id, 0);
-      const first = { id: 'trail-' + id + '-1', buddyId: id, title: firstName(id) + ' and the ' + trail.stickers[0].name,
+      const draftFirst = { id: 'trail-' + id + '-1', buddyId: id, title: firstName(id) + ' and the ' + trail.stickers[0].name,
         unlockAfter: 1, destination: trail.name, destinationId: trail.id,
         stops: trail.stops.map(s => s.name), goal: trail.stickers[0].name,
         text: trailStory(id), kind: 'trail' };
-      const extra = (authoredChapters[id] || []).map((entry, index) => {
+      const authored = (authoredChapters[id] || []).map((entry, index) => {
         const destination = entry.kind === 'home' ? homeFor(id) : destinationFor(id, 0);
+        if (!Number.isSafeInteger(entry.unlockAfter) || entry.unlockAfter < 1)
+          throw new Error('Chapter milestone must be a positive visit count: ' + id);
         if (!destination.stickers.some(st => st.name === entry.goal))
           throw new Error('Chapter goal does not exist on route: ' + id + ' / ' + entry.title);
         if (entry.kind === 'home' && entry.unlockAfter < 4)
@@ -119,7 +121,9 @@
           stops: destination.stops.map(st => st.name), goal: entry.goal,
           path: 'stories/' + entry.path, kind: entry.kind };
       });
-      const all = [first, ...extra].sort((a, b) => a.unlockAfter - b.unlockAfter);
+      const replacement = authored.find(ch => ch.unlockAfter === 1);
+      const all = [replacement || draftFirst, ...authored.filter(ch => ch.unlockAfter !== 1)]
+        .sort((a, b) => a.unlockAfter - b.unlockAfter);
       if (new Set(all.map(ch => ch.unlockAfter)).size !== all.length)
         throw new Error('Only one story can unlock at each visit count for ' + id);
       chapterCache.set(id, all);
