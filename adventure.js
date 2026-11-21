@@ -17,7 +17,7 @@
   const destinations = new Map();
   [...DATA.shared, ...Object.values(DATA.homes), ...(COLLECTION ? COLLECTION.catalog.map(a => COLLECTION.home(a.id)) : [])].forEach(d => {
     const existing = destinations.get(d.id);
-    destinations.set(d.id, existing ? { ...d, stickers: [...existing.stickers, ...d.stickers] } : d);
+    destinations.set(d.id, existing ? { ...existing, stickers: [...existing.stickers, ...d.stickers] } : d); // Preserve named home metadata; keep previously earned legacy stickers.
   });
   const ALL = [...destinations.values()];
 
