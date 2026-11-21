@@ -475,6 +475,7 @@
     if (chapter) void openStory(chapter);
   });
   $("story-reader-close").addEventListener("click", () => $("story-reader-dialog").close());
+  $("story-reader-done").addEventListener("click", () => $("story-reader-dialog").close());
   $("story-reader-dialog").addEventListener("close", () => {
     readerTicket++;
     openJournal("stories");
