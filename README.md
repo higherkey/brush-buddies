@@ -14,6 +14,7 @@ Two-minute toothbrushing trails with an animal friend. A kid-friendly toothbrush
 
 - 75 animal buddies in the collection, including Cat and Bunny as starters; the buddy switcher and Field Journal support unlocking more animals through completed adventures
 - Two experiences: a Simple timer, or Adventure Mode, where each brush is a short trip with scenery to explore and stickers to collect in a Field Journal (switch with the 🗺️ button or in Buddy settings)
+- A Stories tab in the Field Journal: each of the 75 buddies has a story after their first completed adventure, and additional chapters unlock as more stories are authored
 
 - Customizable brushing stages: rename, change emoji, edit reminders, set each stage duration, add or remove stages
 - Tap a stage to jump to it; touch and hold a stage on the main screen to reorder it
@@ -102,6 +103,19 @@ Adventure Mode is optional and can be switched on or off at any time without res
 - Finishing every stage awards a sticker for the Field Journal, with an occasional rare 🌟.
 - It's picture-first by default. Turn on **Story text** in Buddy settings to add a short line at each stop.
 - Journal progress is separate from timer settings, so "Reset settings" does not erase it. Sign in to save the collection across devices.
+
+## Toothpaws Storybook
+
+The Field Journal now includes a **Stories** tab and a five-minute read-aloud reader. All **75 buddies** have a distinct personality, background, home environment, motivation, and gentle growth challenge in [the character bible](stories/CHARACTER_BIBLE.md). The application uses these profiles to compose an initial trail story for each animal; the first-story narratives are structured drafts intended to be polished with individual manuscripts later.
+
+- **First completed adventure with a buddy:** their first trail story unlocks, built from the actual habitat route and stops.
+- **Third completed adventure:** the animal and its home route unlock for future trips, as before.
+- **Fourth completed adventure:** the first home trip is finished; the five existing authored home stories (Kitty, Bubbles, Scout, Finn, and Pebble) unlock at this point. Each uses the special home destination, ordered stops, and exact goal sticker.
+- **Later adventures:** additional authored chapters can be assigned a specific completed-visit milestone (2, 3, 5, and so on). Only manuscripts that actually exist appear as unlockable chapters.
+- **Rereading:** unlocked stories stay readable indefinitely, regardless of today's visitor. Unlocks follow existing per-buddy completed visits, so guest backups and signed-in child profiles work without a new saved-data format.
+- **Rewards:** the sticker awarded on a story-unlocking trip matches its story goal when that item belongs to the route.
+
+See [stories/README.md](stories/README.md) for authoring and future-chapter instructions. Run `npm test` to check the story catalog, progression thresholds, and route/sticker consistency.
 
 ## Animal expeditions
 
