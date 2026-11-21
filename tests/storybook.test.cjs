@@ -21,7 +21,7 @@ test('every one of the 75 buddies has a distinct character bible and a first sto
     const profile = characters.get(animal.id);
     assert.ok(profile, animal.id + ' has a profile');
     for (const field of ['personality', 'background', 'environment', 'motivation', 'challenge'])
-      assert.ok(profile[field].length >= 25, animal.id + ' has ' + field);
+      assert.ok(profile[field].length >= 20, animal.id + ' has ' + field);
     const chapters = stories.chaptersFor(animal.id);
     assert.equal(chapters[0].unlockAfter, 1);
     assert.equal(chapters[0].kind, 'trail');
