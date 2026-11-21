@@ -27,7 +27,7 @@ Story rewards and collectible goals are deliberately aligned. On a chapter-unloc
 3. Write a Markdown manuscript in this folder with `# Title`, then **Buddy**, **Destination**, **Stops**, **Goal item**, **Read-aloud time**, and a story of roughly **600–750 words**. Feelings, challenges, agency, and gentle endings should suit young children.
 4. Add an entry to `authoredChapters` in `story-library.js`:
    `buddyId: [{ path: 'filename.md', title: 'Your title', goal: 'Exact Sticker Name', kind: 'trail', unlockAfter: 2 }]`
-   If the buddy already has an entry, append to its array instead. Use a **unique milestone number** for each chapter with that buddy. Home manuscripts must be at visit 4 or later.
+   If the buddy already has an entry, append to its array instead. Use a **unique milestone number** for each chapter with that buddy. Home manuscripts must be at visit 4 or later. An authored trail manuscript with `unlockAfter: 1` **replaces** the generated starter story for that buddy.
 5. Add the Markdown file to `APP_SHELL` in `sw.js` if it should read offline, and increment the cache version. If updating JS/CSS, also update their versioned references in `index.html` and `sw.js`.
 6. Run `npm test`, then manually check the Stories tab, reward screen, returning to an old story, and guest/account profile switching.
 
