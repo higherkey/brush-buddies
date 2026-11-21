@@ -82,8 +82,8 @@
       const idx = catalog.findIndex(a => a.id === id);
       const beats = stopBeats[idx % stopBeats.length];
       const paragraphs = [];
-      paragraphs.push(`One morning, ${name} woke with the feeling that something lovely was waiting to be discovered. Outside was ${person.environment.charAt(0).toLowerCase() + person.environment.slice(1)} It was a place full of familiar sounds and secret corners, but today even the most ordinary things seemed to be whispering, "Come and look!"\n\n${name} was known for being special in a very particular way. ${person.personality} ${person.background} Some days that made adventures feel easy. Other days it meant taking a little longer to decide what to do.\n\nToday there was an important reason to set off. ${person.motivation} A traveler had spoken of a ${goal} somewhere along ${place.name}. If ${name} could spot it, there would be a wonderful new picture to add to the Field Journal. So ${name} packed a small snack, checked the weather, and started down the trail.`);
-      paragraphs.push(`Not far from the beginning, ${name} met ${companion}. "May I come?" the visitor asked. "I love looking for wonderful things, but I'm not very good at finding my way."\n\n"Of course," said ${name}. "We can look together." And just like that, the quiet walk became a shared adventure. They agreed on one rule: if either friend needed to stop, the other would stop too. A good journey, they decided, should have room for everyone.`);
+      paragraphs.push(`At dawn, ${name} looked out on ${person.environment.charAt(0).toLowerCase() + person.environment.slice(1)} Today even the smallest things seemed to whisper, "Come and look!"\n\n${name} was known for one special quality: ${person.personality.charAt(0).toLowerCase() + person.personality.slice(1)} ${person.background}\n\n${person.motivation} Someone had spotted a ${goal} along ${place.name}. ${name} decided to find it and draw it in the Field Journal. A snack went into the bag, and the adventure began.`);
+      paragraphs.push(`Along the way, ${name} met ${companion}. "May I join?" asked the visitor. "I sometimes lose my way."\n\n"We can help each other," said ${name}. They agreed to stop whenever either friend needed a rest. Together, they set off toward their first landmark.`);
       place.stops.forEach((stop, i) => {
         const beat = beats[i % beats.length];
         const extra = i === 0
@@ -91,25 +91,31 @@
           : i === place.stops.length - 1
             ? `At ${stop.name}, the last landmark, the visitor stopped and looked back. They had come farther than either expected. "${name}, even if we don't find the ${goal}, I'm glad we came," the visitor said.`
             : `When they reached ${stop.name}, they found more signs of life than they had expected. It was tempting to investigate every little thing, but ${name} remembered the purpose of the trip and chose one clue to follow.`;
-        paragraphs.push(`Their next stop was **${stop.name}**. ${extra}\n\n${beat}\n\n${name} tried to remember something important about growing up: ${person.challenge} Perhaps today's walk was a chance to practice doing things differently. The two companions took one more careful look around, then continued along the trail.`);
+        paragraphs.push(`Their next stop was **${stop.name}**. ${extra}\n\n${beat}\n\n${name} remembered one difficult truth: ${person.challenge} Today was a good day to try something different. Then the two friends continued.`);
       });
-      paragraphs.push(`Just beyond the last stop, the light changed. Something gleamed near the path, and the visitor made a delighted little sound. There it was: a **${goal}**! Not a rumor, not a mistaken flash, but the very thing they had hoped to find.\n\n${name} leaned close and studied it carefully. Some treasures are meant to be carried home, and some are best enjoyed exactly where they are. They made a careful drawing so the Field Journal could remember the discovery either way. Then they sat together for a snack and watched the trail settle into the gentle colors of evening.\n\n"I thought I was looking for one special thing," ${name} said, "but we found something else too."\n\n"What was that?" asked the visitor.\n\n"How much easier a hard moment becomes when we listen, help, and try again."\n\nOn the way home, they named each landmark they passed, this time without getting lost. Back in ${person.environment.charAt(0).toLowerCase() + person.environment.slice(1)} ${name} placed the drawing in the Field Journal and smiled at the new sticker beside it.\n\nTomorrow could bring a different adventure. But this one would always belong to the two friends who had walked it together.`);
+      paragraphs.push(`Just beyond the last stop, something gleamed near the path. The visitor gasped. There it was: a **${goal}**! Not a rumor or a mistaken flash, but the very thing they had hoped to find.\n\nSome treasures are meant to be carried home. Others are best admired where they belong. ${name} made a drawing for the Field Journal, and the friends sat together to share their snack.\n\n"I thought I was looking for only one special thing," said ${name}.\n\n"And you found it!" said the visitor.\n\n"Yes," said ${name}, "but I also learned that a hard moment gets easier when someone listens, helps, and tries again."\n\nThey followed the landmarks back home, naming each stop as they passed. In ${person.environment.charAt(0).toLowerCase() + person.environment.slice(1)} ${name} placed the drawing in the Field Journal and smiled at the new sticker beside it.\n\nTomorrow might bring another adventure. This one would always belong to two friends who had made the journey together.`);
       return paragraphs.join('\n\n');
     }
+    const chapterCache = new Map();
     function chaptersFor(id) {
       if (!byId.has(id)) return [];
+      if (chapterCache.has(id)) return chapterCache.get(id);
       const trail = destinationFor(id, 0);
       const first = { id: 'trail-' + id + '-1', buddyId: id, title: firstName(id) + ' and the ' + trail.stickers[0].name,
         unlockAfter: 1, destination: trail.name, destinationId: trail.id,
         stops: trail.stops.map(s => s.name), goal: trail.stickers[0].name,
         text: trailStory(id), kind: 'trail' };
       const manuscript = homeManuscripts[id];
-      if (!manuscript) return [first];
+      if (!manuscript) {
+        chapterCache.set(id, [first]);
+        return chapterCache.get(id);
+      }
       const home = homeFor(id);
-      return [first, { id: 'home-' + id + '-1', buddyId: id, title: manuscript[1],
+      chapterCache.set(id, [first, { id: 'home-' + id + '-1', buddyId: id, title: manuscript[1],
         unlockAfter: 4, destination: home.name, destinationId: home.id,
         stops: home.stops.map(s => s.name), goal: manuscript[2],
-        path: 'stories/' + manuscript[0], kind: 'home' }];
+        path: 'stories/' + manuscript[0], kind: 'home' }]);
+      return chapterCache.get(id);
     }
     function unlockedAt(id, visits) {
       return chaptersFor(id).filter(ch => ch.unlockAfter === visits);
