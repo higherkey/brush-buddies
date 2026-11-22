@@ -65,7 +65,7 @@
   }
 
   function firstName(s) {
-    return String(s.buddyName || "Buddy").split(" ")[0];
+    return COLLECTION?.nickname(s.buddy) || String(s.buddyName || "Buddy").split(" ")[0];
   }
 
   function fill(line, s) {
@@ -158,7 +158,7 @@
         $('visitor-label').textContent = visiting ? "Today's visitor" : 'Your adventure buddy';
         $("buddy-status").textContent = COLLECTION.homeUnlocked(s.buddy)
           ? firstName(s) + " and their home are unlocked. Choose them any time."
-          : Math.min(visits, 3) + '/3 trips · Complete 3 to keep ' + firstName(s) + ' and unlock their home.' + (visiting ? ' A new visitor arrives tomorrow.' : '');
+          : visits + '/3 trips · Complete 3 to ' + (COLLECTION.unlocked(s.buddy) ? 'unlock ' + firstName(s) + '’s home.' : 'keep ' + firstName(s) + ' and unlock their home.') + (visiting ? ' A new visitor arrives tomorrow.' : '');
       }
       document.querySelectorAll(".zone").forEach((button, i) => {
         if (!button.dataset.baseLabel) button.dataset.baseLabel = button.getAttribute("aria-label");
@@ -168,6 +168,7 @@
       updateJournalBadge();
       if (pendingTreasure && !treasureTimer) showTreasure(pendingTreasure);
     } else {
+      renderSimpleProgress();
       document.querySelectorAll(".zone[data-base-label]").forEach(button => button.setAttribute("aria-label", button.dataset.baseLabel));
     }
   }
@@ -178,6 +179,17 @@
     pendingTreasure = null;
     lastAwardStory = null;
     trip = null;
+  }
+
+  function renderSimpleProgress() {
+    const next = COLLECTION?.nextSimpleBuddy();
+    $("buddy-status").textContent = next
+      ? "Next buddy: " + next.name + " · " + COLLECTION.simpleBrushes(next.id) + "/" + COLLECTION.simpleGoal + " brushes"
+      : COLLECTION ? "All buddies unlocked!" : "";
+  }
+
+  function saveReward(s, sessionId, buddyId, stickerId) {
+    document.dispatchEvent(new CustomEvent('bb:reward', { detail: { session_id: sessionId, buddy_id: buddyId, sticker_id: stickerId, profile_scope: s.profileScope } }));
   }
 
   function award(dest, s) {
@@ -193,20 +205,37 @@
     store.sessions += 1;
     store.last = dest.id;
     persist(s.profileScope);
-    document.dispatchEvent(new CustomEvent('bb:reward', { detail: { session_id: s.sessionId, buddy_id: s.buddy, sticker_id: sticker.id, profile_scope: s.profileScope } }));
+    saveReward(s, s.sessionId, s.buddy, sticker.id);
     return { sticker, count: store.stickers[sticker.id], newStory, buddyId: s.buddy, profileScope: s.profileScope };
   }
 
-  // One sticker per session: jumping back to a stage after finishing does not earn another.
+  function awardSimple(s) {
+    const reward = COLLECTION?.completeSimpleInScope(s.sessionId, s.profileScope);
+    if (reward) saveReward(s, reward.creditId, reward.buddy.id, 'simple-brush');
+    return reward;
+  }
+
+  // Redoing a stage or switching experiences after finishing can't earn a second reward.
   async function onFinish(e) {
     const s = e.detail;
-    if (s.experience !== "adventure" || !trip || trip.awarded || rewardedSessions.has(s.sessionId)) return;
+    const adventure = s.experience === "adventure";
+    if (rewardedSessions.has(s.sessionId) || (adventure && (!trip || trip.awarded))) return;
     rewardedSessions.add(s.sessionId);
     const finishedTrip = trip;
-    finishedTrip.awarded = true;
+    if (adventure) finishedTrip.awarded = true;
+    const reward = () => adventure ? award(finishedTrip.dest, s) : awardSimple(s);
     const found = navigator.locks
-      ? await navigator.locks.request(KEY, () => award(finishedTrip.dest, s))
-      : award(finishedTrip.dest, s);
+      ? await navigator.locks.request(KEY, reward)
+      : reward();
+    if (!adventure) {
+      const current = api()?.snapshot();
+      if (current?.experience !== "simple" || current.profileScope !== s.profileScope) return;
+      renderSimpleProgress();
+      if (found?.unlocked && current.sessionId === s.sessionId && current.phase === "done") {
+        api()?.say("You unlocked " + found.buddy.name + "! Choose your new buddy in Buddy settings.");
+      }
+      return;
+    }
     updateJournalBadge();
     if ($("journal-dialog").open) openJournal();
     if (trip !== finishedTrip) return;
@@ -383,7 +412,7 @@
     const note = document.createElement("small");
     note.textContent = a.id === current ? "Brushing with you"
       : a.id === visitor ? "Today's visitor · tap to brush together"
-      : unlocked ? (COLLECTION.homeUnlocked(a.id) ? "Home unlocked" : "Starter buddy")
+      : unlocked ? (COLLECTION.homeUnlocked(a.id) ? "Home unlocked" : COLLECTION.starters.includes(a.id) ? "Starter buddy" : "Unlocked")
       : visits + " of 3 trips";
     const trips = document.createElement("span");
     trips.className = "buddy-trips";
@@ -412,7 +441,7 @@
     const ordered = COLLECTION.catalog.slice().sort((x, y) => rank(x) - rank(y));
     const help = document.createElement("p");
     help.className = "panel-intro";
-    help.textContent = "Tap a buddy to brush with them. Brush 3 times with a visitor to keep them and unlock their home.";
+    help.textContent = "Finish 3 Simple timer brushes to meet the next buddy, or take 3 adventures with a visitor to keep them and unlock their home.";
     const grid = document.createElement("div");
     grid.className = "collection-grid";
     grid.append(...ordered.map(a => buddyCard(a, current, visitor)));

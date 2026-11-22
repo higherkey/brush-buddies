@@ -71,6 +71,18 @@ test('either baseline completed or credits prevents all double counting', () => 
   assert.deepEqual(result.collection.completed, ['old-completed', 'new']);
 });
 
+test('Simple timer events survive sync without incrementing adventure visits or journal rewards', () => {
+  const adventure = event('adventure', 'koala', 'leaf');
+  const first = event('simple:brush-1', 'koala', 'simple-brush');
+  const second = event('simple:brush-2', 'koala', 'simple-brush');
+  const baseline = materialize(snapshot(), [adventure, first]);
+  const result = materialize(baseline, [first, second, adventure]);
+  assert.deepEqual(result.collection.credits, { adventure: 'koala', 'simple:brush-1': 'koala', 'simple:brush-2': 'koala' });
+  assert.deepEqual(result.collection.completed, ['adventure', 'simple:brush-1', 'simple:brush-2']);
+  assert.deepEqual(result.collection.visits, { koala: 1 });
+  assert.deepEqual(result.journal, { stickers: { leaf: 1 }, sessions: 1, last: '' });
+});
+
 test('unknown catalog animals, fields and malformed snapshots throw', () => {
   const unknown = snapshot();
   unknown.collection.visits.dragon = 1;

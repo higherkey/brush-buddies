@@ -4,7 +4,6 @@
 .collection-grid button { display: flex; align-items: center; gap: .5rem; }
 .collection-grid img { flex: 0 0 36px; }
 .buddy-quick img { display: block; inline-size: 24px; block-size: 24px; }
-.app[data-mode="simple"] .buddy-status { display: none; }
 #app[data-mode="adventure"] .buddy-name { order: -2; font-size: 1rem; letter-spacing: 0; text-transform: none; color: var(--ink); background: none; padding: 0; margin: 0; font-weight: 800; }
 .buddy-status { font-size: .8rem; color: var(--muted); }
 .footer-link { display: inline-flex; align-items: center; min-inline-size: 48px; min-block-size: 48px; }

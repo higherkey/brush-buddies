@@ -4,7 +4,7 @@ These are the canonical storytelling profiles for all 75 buddies. Every characte
 
 **Story principles:** Warm, imaginative, readable aloud to young children; problems are small, feelings are respected, helpers are capable, and each resolution comes from the character's choices. Keep settings and names stable across future chapters. No reward should require extra brushing beyond the normal timer.
 
-## Kitty the Cat
+## Toebean the Cat (Tobee)
 
 - **Personality:** Gentle, observant, and stubbornly kind.
 - **Background:** She learned to mend neighbors' worn belongings from Aunt Mallow.
@@ -436,7 +436,7 @@ These are the canonical storytelling profiles for all 75 buddies. Every characte
 - **Motivation:** She wants to guide travelers around an incoming storm.
 - **Growth edge:** She forgets that friends on the ground need directions.
 
-## Toby the Turkey
+## Gobbles the Turkey
 
 - **Personality:** Good-humored, resourceful, and loyal.
 - **Background:** He learned woodland cooking from his extended family.

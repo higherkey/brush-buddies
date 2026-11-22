@@ -12,7 +12,7 @@ Two-minute toothbrushing trails with an animal friend. A kid-friendly toothbrush
 
 ## Features
 
-- 75 animal buddies in the collection, including Cat and Bunny as starters; the buddy switcher and Field Journal support unlocking more animals through completed adventures
+- 75 animal buddies, including Toebean (Tobee) and Bubbles as starters. Every three completed Simple timer brushes unlock the next buddy in the collection. Three completed adventures with a visitor also unlock that buddy and their home.
 - Two experiences: a Simple timer, or Adventure Mode, where each brush is a short trip with scenery to explore and stickers to collect in a Field Journal (switch with the 🗺️ button or in Buddy settings)
 - A Stories tab in the Field Journal: each of the 75 buddies has a story after their first completed adventure, and additional chapters unlock as more stories are authored
 
@@ -110,7 +110,7 @@ The Field Journal now includes a **Stories** tab and a five-minute read-aloud re
 
 - **First completed adventure with a buddy:** their first trail story unlocks, built from the actual habitat route and stops.
 - **Third completed adventure:** the animal and its home route unlock for future trips, as before.
-- **Fourth completed adventure:** the first home trip is finished; the five existing authored home stories (Kitty, Bubbles, Scout, Finn, and Pebble) unlock at this point. Each uses the special home destination, ordered stops, and exact goal sticker.
+- **Fourth completed adventure:** the first home trip is finished; the five existing authored home stories (Tobee, Bubbles, Scout, Finn, and Pebble) unlock at this point. Each uses the special home destination, ordered stops, and exact goal sticker.
 - **Later adventures:** additional authored chapters can be assigned a specific completed-visit milestone (2, 3, 5, and so on). Only manuscripts that actually exist appear as unlockable chapters.
 - **Rereading:** unlocked stories stay readable indefinitely, regardless of today's visitor. Unlocks follow existing per-buddy completed visits, so guest backups and signed-in child profiles work without a new saved-data format.
 - **Rewards:** the sticker awarded on a story-unlocking trip matches its story goal when that item belongs to the route.
