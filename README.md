@@ -12,7 +12,7 @@ Two-minute toothbrushing trails with an animal friend. A kid-friendly toothbrush
 
 ## Features
 
-- 75 animal buddies, including Toebean (Tobee) and Bubbles as starters. Every three completed Simple timer brushes unlock the next buddy in the collection. Three completed adventures with a visitor also unlock that buddy and their home.
+- 75 animal buddies, including Toebean (Tobee) and Bubbles as starters. Each other buddy has its own discovery, from brushing milestones to collectible stories, trail encounters, and secrets in the app.
 - Two experiences: a Simple timer, or Adventure Mode, where each brush is a short trip with scenery to explore and stickers to collect in a Field Journal (switch with the 🗺️ button or in Buddy settings)
 - A Stories tab in the Field Journal: each of the 75 buddies has a story after their first completed adventure, and additional chapters unlock as more stories are authored
 
@@ -109,7 +109,7 @@ Adventure Mode is optional and can be switched on or off at any time without res
 The Field Journal now includes a **Stories** tab and a five-minute read-aloud reader. All **75 buddies** have a distinct personality, background, home environment, motivation, and gentle growth challenge in [the character bible](stories/CHARACTER_BIBLE.md). The application uses these profiles to compose an initial trail story for each animal; the first-story narratives are structured drafts intended to be polished with individual manuscripts later.
 
 - **First completed adventure with a buddy:** their first trail story unlocks, built from the actual habitat route and stops.
-- **Third completed adventure:** the animal and its home route unlock for future trips, as before.
+- **Third completed adventure:** the buddy’s home route opens. The Buddies tab shows how to add each friend to your collection.
 - **Fourth completed adventure:** the first home trip is finished; the five existing authored home stories (Tobee, Bubbles, Scout, Finn, and Pebble) unlock at this point. Each uses the special home destination, ordered stops, and exact goal sticker.
 - **Later adventures:** additional authored chapters can be assigned a specific completed-visit milestone (2, 3, 5, and so on). Only manuscripts that actually exist appear as unlockable chapters.
 - **Rereading:** unlocked stories stay readable indefinitely, regardless of today's visitor. Unlocks follow existing per-buddy completed visits, so guest backups and signed-in child profiles work without a new saved-data format.
@@ -117,9 +117,15 @@ The Field Journal now includes a **Stories** tab and a five-minute read-aloud re
 
 See [stories/README.md](stories/README.md) for authoring and future-chapter instructions. Run `npm test` to check the story catalog, progression thresholds, and route/sticker consistency.
 
+## Buddy discoveries
+
+The Journal’s Buddies tab is available in both modes. A completed brush in either mode counts toward milestones, starting at 1, 5, 15, and 30. Other goals use visits, homes, and stickers. Finding certain stickers opens a short story about meeting the new buddy. A few trail friends only appear with a particular buddy, at a certain point in the walk, or under special conditions. Tap the animal in the scene to say hello. Camera Assist and other controls hide a few more discoveries.
+
+Unlocks are kept with the profile’s existing reward history, including account sync and backups. Earlier permanent unlocks still count.
+
 ## Animal expeditions
 
-Adventure is the default for new settings. Each local calendar day chooses a visiting buddy from the locked collection. Cat and Bunny are starter choices; the 75-animal field journal unlocks each visitor and its habitat after three completed sessions. Unlocked animals can be chosen in Simple mode or from the collection for another adventure. Switching animals updates the journey immediately. Existing stickers are preserved.
+Adventure is the default for new settings. Each local calendar day chooses a visiting buddy from the locked collection. Tobee and Bubbles are starter choices. A visitor can join that day’s trips, and three completed trips with any buddy open their home route. Permanent buddies are earned through their own discoveries. Unlocked animals can be chosen in Simple mode or from the collection for another adventure. Switching animals updates the journey immediately. Existing stickers are preserved.
 
 The creek avatar follows completed brushing time, with reduced-motion support. Collection backup/restore is available because clearing browser storage can erase guest progress. Neon accounts save completed expeditions across devices. One account can own a single profile or separate child profiles. Guest progress is imported only when explicitly checked while creating a profile.
 
@@ -137,7 +143,7 @@ Run npm test for deterministic tests. Live-service tests require explicit NEON_L
 
 Adventure scenery follows each animal’s habitat (15 illustrated environments). The portrait camera follows the buddy across the entire path; narration sits below the scene, and germs are no longer shown.
 
-The mobile layout is capped at 430px on every screen. Today's visitor is labeled above the animal; three trips unlock that buddy and its home. Visitors change with the local calendar day, including when the app stays open overnight, without interrupting an active trip. Consecutive days avoid the same visitor. Camera and music controls sit beneath the timer; collection backups are in Settings.
+The mobile layout is capped at 430px on every screen. Today's visitor is labeled above the animal. Look in the Buddies tab for clues to permanent unlocks. Visitors change with the local calendar day, including when the app stays open overnight, without interrupting an active trip. Consecutive days avoid the same visitor. Camera and music controls sit beneath the timer; collection backups are in Settings.
 
 ## Current-profile progress tools
 

@@ -82,7 +82,7 @@
     status('New visitor chosen. Save to use them today.');
   });
   $('progress-unlock-all').addEventListener('click', () => {
-    buddies.catalog.forEach(animal => { draft.collection.visits[animal.id] = Math.max(3, draft.collection.visits[animal.id] || 0); });
+    buddies.catalog.forEach(animal => { draft.collection.visits[animal.id] = Math.max(3 + buddies.newAdventureVisits(animal.id, draft.collection), draft.collection.visits[animal.id] || 0); });
     showDraft();
     status('All animals and homes will unlock when you save.');
   });

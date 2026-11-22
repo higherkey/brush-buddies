@@ -29,7 +29,7 @@ test('mobile tools edit and undo guest progress without losing newer rewards',as
     assert.equal(await page.locator('.creek-avatar-badge').count(),0);
     assert.equal(await page.getAttribute('.creek-buddy','width'),'64');
     assert.equal(await page.textContent('#visitor-label'),"Today's visitor");
-    assert.match(await page.textContent('#buddy-status'),/Complete 3.*new visitor arrives tomorrow/);
+    assert.match(await page.textContent('#buddy-status'),/0\/3 trips to open .*’s home/);
     assert.equal(await page.locator('.topbar button').count(),1,'only settings in header');
     assert.equal(await page.locator('.collection-save #backup-export').count(),0);
     assert.ok((await page.locator('#start-button').boundingBox()).height<=49,'compact primary button');

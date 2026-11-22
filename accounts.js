@@ -102,6 +102,7 @@
             remember();
             if (latest.revision >= profile.revision) profile = latest;
             apply(progress.materialize(profile.baseline, events));
+            document.dispatchEvent(new Event('bb:progress-loaded'));
             remember();
             const saved = new Set(remote.map(event => event.session_id));
             if (events.some(event => !saved.has(event.session_id))) pending = true;
@@ -134,6 +135,7 @@
     window.BB_PROFILE_SCOPE = nextScope;
     events = nextEvents;
     apply(nextSnapshot);
+    document.dispatchEvent(new Event('bb:progress-loaded'));
     remember();
     window.BrushBuddies.refreshCollection();
     $('account-profile').value = selected.id;

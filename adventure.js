@@ -7,6 +7,7 @@
   const DATA = window.BB_ADVENTURE_DATA;
   const COLLECTION = window.BB_BUDDIES;
   const STORIES = window.BB_STORYBOOK;
+  const ACHIEVEMENTS = window.BB_ACHIEVEMENTS;
   if (!DATA) return;
 
   const KEY = "brushBuddiesAdventureV1";
@@ -51,8 +52,10 @@
   let treasureTimer = null;
   let pendingTreasure = null; // shown when Adventure Mode is next on screen
   let lastAwardStory = null;
+  let lastDiscovery = null;
   let readerTicket = 0;
   const rewardedSessions = new Set();
+  let activeEncounter, displayedScope;
 
   function persist(scope = window.BB_PROFILE_SCOPE) {
     try {
@@ -139,6 +142,11 @@
   function onRender(e) {
     const s = e.detail;
     const on = s.experience === "adventure";
+    if (displayedScope !== s.profileScope) {
+      displayedScope = s.profileScope;
+      $("unlock-status").textContent = "";
+    }
+    $("simple-journal-open").hidden = on;
     $("adv-scene").hidden = !on;
     $("adv-bar").hidden = !on;
     if (on) {
@@ -151,14 +159,15 @@
         $("adv-scene").classList.add("departing");
       }
       renderScene(s);
+      renderEncounter(s);
       if (COLLECTION) {
         const visits = COLLECTION.load().visits[s.buddy] || 0;
         $("buddy-name").textContent = s.buddyName;
         const visiting = s.buddy === COLLECTION.daily();
         $('visitor-label').textContent = visiting ? "Today's visitor" : 'Your adventure buddy';
         $("buddy-status").textContent = COLLECTION.homeUnlocked(s.buddy)
-          ? firstName(s) + " and their home are unlocked. Choose them any time."
-          : visits + '/3 trips · Complete 3 to ' + (COLLECTION.unlocked(s.buddy) ? 'unlock ' + firstName(s) + '’s home.' : 'keep ' + firstName(s) + ' and unlock their home.') + (visiting ? ' A new visitor arrives tomorrow.' : '');
+          ? firstName(s) + '’s home is open.'
+          : visits + '/3 trips to open ' + firstName(s) + '’s home.';
       }
       document.querySelectorAll(".zone").forEach((button, i) => {
         if (!button.dataset.baseLabel) button.dataset.baseLabel = button.getAttribute("aria-label");
@@ -168,6 +177,7 @@
       updateJournalBadge();
       if (pendingTreasure && !treasureTimer) showTreasure(pendingTreasure);
     } else {
+      activeEncounter = null;
       renderSimpleProgress();
       document.querySelectorAll(".zone[data-base-label]").forEach(button => button.setAttribute("aria-label", button.dataset.baseLabel));
     }
@@ -178,24 +188,89 @@
     treasureTimer = null;
     pendingTreasure = null;
     lastAwardStory = null;
+    lastDiscovery = null;
     trip = null;
+    activeEncounter = null;
   }
 
   function renderSimpleProgress() {
-    const next = COLLECTION?.nextSimpleBuddy();
+    if (!COLLECTION || !ACHIEVEMENTS) return;
+    const collection = COLLECTION.load();
+    const total = COLLECTION.metrics(collection, loadStore()).brushes;
+    const next = ACHIEVEMENTS.milestones.find(rule => !COLLECTION.unlocked(rule.id, collection));
     $("buddy-status").textContent = next
-      ? "Next buddy: " + next.name + " · " + COLLECTION.simpleBrushes(next.id) + "/" + COLLECTION.simpleGoal + " brushes"
-      : COLLECTION ? "All buddies unlocked!" : "";
+      ? total + '/' + next.goal + ' brushes for ' + COLLECTION.get(next.id).name
+      : total + (total === 1 ? ' brush finished' : ' brushes finished');
   }
 
-  function saveReward(s, sessionId, buddyId, stickerId) {
-    document.dispatchEvent(new CustomEvent('bb:reward', { detail: { session_id: sessionId, buddy_id: buddyId, sticker_id: stickerId, profile_scope: s.profileScope } }));
+  function renderEncounter(s) {
+    const button = $("trail-encounter");
+    const rule = s.sessionElapsed > 0 && s.phase !== "done" && ACHIEVEMENTS?.encounter(
+      s.buddy, s.progress, COLLECTION.unlocked, {
+        dark: document.documentElement.dataset.scheme === "dark",
+        rest: s.phase === "paused" || s.phase === "break"
+      }
+    );
+    button.hidden = !rule;
+    if (!rule) { activeEncounter = null; return; }
+    if (activeEncounter?.rule !== rule) {
+      button.querySelector("img").src = "animals/" + rule.id + ".svg";
+      button.dataset.perch = String(ACHIEVEMENTS.rules.indexOf(rule) % 3);
+    }
+    activeEncounter = { rule, scope: s.profileScope };
+  }
+
+  function withRewardLock(work) {
+    return navigator.locks ? navigator.locks.request(KEY, work) : Promise.resolve(work());
+  }
+
+  function grant(scope, rules) {
+    if (!COLLECTION) return [];
+    const grants = COLLECTION.grantAchievements(rules.map(rule => rule.id), scope);
+    for (const { id, creditId } of grants) saveReward(scope, creditId, id, 'buddy-achievement');
+    return grants.map(({ id }) => COLLECTION.get(id).name);
+  }
+
+  function earnFromProgress(scope) {
+    if (!COLLECTION || !ACHIEVEMENTS) return [];
+    const journal = loadStore(scope);
+    const candidates = COLLECTION.inScope(scope, () =>
+      ACHIEVEMENTS.earned(COLLECTION.metrics(COLLECTION.load(), journal), journal.stickers));
+    return grant(scope, candidates);
+  }
+
+  function newFriends(names) {
+    return names.length > 2 ? names.slice(0, 2).join(', ') + ' and ' + (names.length - 2) + ' more' : names.join(', ');
+  }
+
+  function celebrate(names, scope) {
+    const s = api()?.snapshot();
+    if (!s || s.profileScope !== scope) return;
+    if (names.length) $("unlock-status").textContent = 'New ' + (names.length === 1 ? 'buddy' : 'buddies') + ' · ' + newFriends(names);
+    if (s.experience === "simple") renderSimpleProgress();
+    else renderEncounter(s);
+    if (names.length && $("journal-dialog").open) openJournal();
+  }
+
+  function reconcileProgress() {
+    const scope = window.BB_PROFILE_SCOPE || "";
+    void withRewardLock(() => earnFromProgress(scope)).then(names => celebrate(names, scope));
+  }
+
+  function discover(rule, scope) {
+    if (rule) void withRewardLock(() => grant(scope, [rule])).then(names => celebrate(names, scope));
+  }
+
+  function saveReward(scope, sessionId, buddyId, stickerId) {
+    document.dispatchEvent(new CustomEvent('bb:reward', { detail: { session_id: sessionId, buddy_id: buddyId, sticker_id: stickerId, profile_scope: scope } }));
   }
 
   function award(dest, s) {
     store = loadStore(s.profileScope); // Profile scope captured before an asynchronous finish.
     // Reward the same item named in the newly unlocked story, then retain the usual sticker pool.
-    const progress = COLLECTION?.completeInScope(s.sessionId, s.buddy, s.profileScope);
+    const creditId = 'adventure:' + s.sessionId;
+    const progress = COLLECTION?.completeInScope(creditId, s.buddy, s.profileScope);
+    if (COLLECTION && !progress) return null;
     const newStory = progress && STORIES?.unlockedAt(s.buddy, progress.visits)
       .find(chapter => chapter.destinationId === dest.id) || null;
     const storySticker = newStory && dest.stickers.find(st => st.name === newStory.goal);
@@ -205,14 +280,13 @@
     store.sessions += 1;
     store.last = dest.id;
     persist(s.profileScope);
-    saveReward(s, s.sessionId, s.buddy, sticker.id);
+    saveReward(s.profileScope, creditId, s.buddy, sticker.id);
     return { sticker, count: store.stickers[sticker.id], newStory, buddyId: s.buddy, profileScope: s.profileScope };
   }
 
   function awardSimple(s) {
-    const reward = COLLECTION?.completeSimpleInScope(s.sessionId, s.profileScope);
-    if (reward) saveReward(s, reward.creditId, reward.buddy.id, 'simple-brush');
-    return reward;
+    const creditId = COLLECTION?.completeSimpleInScope(s.sessionId, s.buddy, s.profileScope);
+    if (creditId) saveReward(s.profileScope, creditId, s.buddy, 'simple-brush');
   }
 
   // Redoing a stage or switching experiences after finishing can't earn a second reward.
@@ -223,19 +297,13 @@
     rewardedSessions.add(s.sessionId);
     const finishedTrip = trip;
     if (adventure) finishedTrip.awarded = true;
-    const reward = () => adventure ? award(finishedTrip.dest, s) : awardSimple(s);
-    const found = navigator.locks
-      ? await navigator.locks.request(KEY, reward)
-      : reward();
-    if (!adventure) {
-      const current = api()?.snapshot();
-      if (current?.experience !== "simple" || current.profileScope !== s.profileScope) return;
-      renderSimpleProgress();
-      if (found?.unlocked && current.sessionId === s.sessionId && current.phase === "done") {
-        api()?.say("You unlocked " + found.buddy.name + "! Choose your new buddy in Buddy settings.");
-      }
-      return;
-    }
+    const { found, names } = await withRewardLock(() => {
+      const found = adventure ? award(finishedTrip.dest, s) : awardSimple(s);
+      return { found, names: earnFromProgress(s.profileScope) };
+    });
+    celebrate(names, s.profileScope);
+    if (!adventure || !found) return;
+    found.unlocks = names;
     updateJournalBadge();
     if ($("journal-dialog").open) openJournal();
     if (trip !== finishedTrip) return;
@@ -254,10 +322,14 @@
     const { sticker, count } = found;
     lastAwardStory = found.newStory && found.profileScope === (window.BB_PROFILE_SCOPE || "") ? found.newStory : null;
     $("treasure-story").hidden = !lastAwardStory;
+    lastDiscovery = found.profileScope === s.profileScope && ACHIEVEMENTS?.rules.find(rule => rule.sticker === sticker.id);
+    $("treasure-discovery").hidden = !lastDiscovery;
     $("treasure-dialog").classList.toggle("animate", !s.calm);
     $("treasure-emoji").textContent = sticker.emoji;
     $("treasure-name").textContent = sticker.name + (count > 1 ? " ×" + count : "");
-    if (COLLECTION?.homeUnlocked(s.buddy)) $("treasure-name").textContent += " · " + s.buddyName + " and their home are unlocked!";
+    if (found.profileScope === s.profileScope && found.unlocks.length) {
+      $("treasure-name").textContent += " · New friends: " + newFriends(found.unlocks);
+    }
     $("treasure-dialog").classList.toggle("rare", sticker.id === RARE.id);
     api()?.say(firstName(s) + " found a " + sticker.name + "!");
     api()?.tone(1318, 0.18, "triangle", 0.04);
@@ -331,7 +403,7 @@
     const dialog = $("story-reader-dialog");
     if ($("journal-dialog").open) $("journal-dialog").close();
     $("story-reader-title").textContent = chapter.title;
-    $("story-reader-route").textContent = chapter.destination + " · " + chapter.stops.join(" → ") + " · " + chapter.goal;
+    $("story-reader-route").textContent = chapter.stops ? chapter.destination + " · " + chapter.stops.join(" → ") + " · " + chapter.goal : chapter.destination;
     storyParagraphs(chapter.text || "Opening this chapter…");
     if (!dialog.open) dialog.showModal();
     if (!chapter.path) return;
@@ -347,6 +419,13 @@
       if (ticket === readerTicket && dialog.open) storyParagraphs("This story is not available offline yet. Connect to the internet, then try opening it again.");
     }
   }
+  function openDiscoveryStory(rule) {
+    return openStory({
+      buddyId: rule.id, unlockAfter: 0, title: rule.title,
+      destination: "How we met " + COLLECTION.nickname(rule.id), text: rule.story
+    });
+  }
+
   function renderStories() {
     const container = $("journal-stories");
     if (!STORIES) {
@@ -356,7 +435,7 @@
     const counts = COLLECTION.load().visits;
     const intro = document.createElement("p");
     intro.className = "panel-intro";
-    intro.textContent = "Every buddy has a first story after one completed adventure. New chapters appear here when they are written and earned. Tap any unlocked story to read it again.";
+    intro.textContent = "Finish an adventure with a buddy to earn their first story. Some treasures also tell a short story about meeting a new friend.";
     const current = api()?.snapshot()?.buddy;
     const ordered = COLLECTION.catalog.slice().sort((a, b) => {
       const ax = STORIES.unlocked(a.id, counts[a.id] || 0).length, bx = STORIES.unlocked(b.id, counts[b.id] || 0).length;
@@ -388,18 +467,27 @@
       });
       return section;
     });
-    container.replaceChildren(intro, ...entries);
+    const discoveries = (ACHIEVEMENTS?.rules || []).filter(rule => rule.story && store.stickers[rule.sticker] > 0);
+    const discoveryButtons = discoveries.map(rule => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "quick-button storybook-chapter";
+      button.textContent = "📖 " + rule.title;
+      button.addEventListener("click", () => void openDiscoveryStory(rule));
+      return button;
+    });
+    container.replaceChildren(intro, ...discoveryButtons, ...entries);
     $("journal-story-count").textContent = String(ordered.reduce((count, animal) =>
-      count + STORIES.unlocked(animal.id, counts[animal.id] || 0).length, 0));
+      count + STORIES.unlocked(animal.id, counts[animal.id] || 0).length, discoveries.length));
   }
 
-  function buddyCard(a, current, visitor) {
+  function buddyCard(a, current, visitor, inAdventure, metrics) {
     const unlocked = COLLECTION.unlocked(a.id);
-    const choosable = unlocked || a.id === visitor;
-    const visits = Math.min(3, COLLECTION.load().visits[a.id] || 0);
+    const choosable = unlocked || (inAdventure && a.id === visitor);
+    const rule = ACHIEVEMENTS?.get(a.id);
     const button = document.createElement("button");
     button.type = "button";
-    button.className = "buddy-card" + (a.id === current ? " current" : "") + (a.id === visitor ? " visitor" : "") + (choosable ? "" : " locked");
+    button.className = "buddy-card" + (a.id === current ? " current" : "") + (inAdventure && a.id === visitor ? " visitor" : "") + (choosable ? "" : " locked");
     button.disabled = !choosable;
     button.setAttribute("aria-pressed", String(a.id === current));
     const art = document.createElement("img");
@@ -411,21 +499,16 @@
     name.textContent = a.name;
     const note = document.createElement("small");
     note.textContent = a.id === current ? "Brushing with you"
-      : a.id === visitor ? "Today's visitor · tap to brush together"
-      : unlocked ? (COLLECTION.homeUnlocked(a.id) ? "Home unlocked" : COLLECTION.starters.includes(a.id) ? "Starter buddy" : "Unlocked")
-      : visits + " of 3 trips";
-    const trips = document.createElement("span");
-    trips.className = "buddy-trips";
-    trips.setAttribute("aria-hidden", "true");
-    if (!unlocked) for (let i = 0; i < 3; i++) {
-      const dot = document.createElement("i");
-      if (i < visits) dot.className = "on";
-      trips.append(dot);
-    }
+      : unlocked ? (COLLECTION.homeUnlocked(a.id) ? "Home open" : COLLECTION.starters.includes(a.id) ? "Starter buddy" : "Unlocked")
+      : choosable ? "Today’s visitor · tap to brush together" : "Locked";
     const text = document.createElement("span");
     text.className = "buddy-card-text";
     text.append(name, note);
-    if (!unlocked) text.append(trips);
+    if (!unlocked && rule) {
+      const hint = document.createElement("small");
+      hint.textContent = rule.hint + (rule.metric ? " " + Math.min(metrics[rule.metric], rule.goal) + "/" + rule.goal : "");
+      text.append(hint);
+    }
     button.append(art, text);
     button.addEventListener("click", () => {
       $("journal-dialog").close();
@@ -435,16 +518,17 @@
   }
 
   function renderBuddies() {
-    const current = api()?.snapshot().buddy;
+    const { buddy: current, experience } = api().snapshot();
     const visitor = COLLECTION.daily();
-    const rank = a => a.id === visitor ? 0 : COLLECTION.unlocked(a.id) ? 1 : 2;
+    const metrics = COLLECTION.metrics(COLLECTION.load(), store);
+    const rank = a => experience === "adventure" && a.id === visitor ? 0 : COLLECTION.unlocked(a.id) ? 1 : 2;
     const ordered = COLLECTION.catalog.slice().sort((x, y) => rank(x) - rank(y));
     const help = document.createElement("p");
     help.className = "panel-intro";
-    help.textContent = "Finish 3 Simple timer brushes to meet the next buddy, or take 3 adventures with a visitor to keep them and unlock their home.";
+    help.textContent = "Earn buddies by brushing, finding treasures, and following clues. Some friends are hidden on the trail or elsewhere in Toothpaws.";
     const grid = document.createElement("div");
     grid.className = "collection-grid";
-    grid.append(...ordered.map(a => buddyCard(a, current, visitor)));
+    grid.append(...ordered.map(a => buddyCard(a, current, visitor, experience === "adventure", metrics)));
     $("journal-buddies").replaceChildren(help, grid);
     $("journal-buddy-count").textContent = COLLECTION.available().length + "/" + COLLECTION.catalog.length;
   }
@@ -476,9 +560,20 @@
   document.addEventListener("bb:render", onRender);
   document.addEventListener("bb:reset", onReset);
   document.addEventListener("bb:finish", onFinish);
+  document.addEventListener("bb:progress-loaded", reconcileProgress);
+  document.addEventListener("bb:discovery-action", event => {
+    discover(ACHIEVEMENTS?.forAction(event.detail), window.BB_PROFILE_SCOPE || "");
+  });
+  window.addEventListener("load", reconcileProgress);
+  $("trail-encounter").addEventListener("click", () => {
+    if (!activeEncounter) return;
+    const { rule, scope } = activeEncounter;
+    discover(rule, scope);
+  });
 
   // Defer scripts run in order, so the markup exists by now.
   $("journal-open").addEventListener("click", () => openJournal());
+  $("simple-journal-open").addEventListener("click", () => openJournal("buddies"));
   $("journal-tab-stickers").addEventListener("click", () => showJournalTab("stickers"));
   $("journal-tab-buddies").addEventListener("click", () => showJournalTab("buddies"));
   $("journal-tab-stories").addEventListener("click", () => { renderStories(); showJournalTab("stories"); });
@@ -493,7 +588,8 @@
     $("journal-tab-" + next).focus();
   });
   $("journal-close").addEventListener("click", () => $("journal-dialog").close());
-  $("journal-dialog").addEventListener("close", () => $("journal-open").focus());
+  $("journal-dialog").addEventListener("close", () =>
+    $(api()?.snapshot().experience === "simple" ? "simple-journal-open" : "journal-open").focus());
   $("treasure-dialog").addEventListener("close", () => {
     if (!$("journal-dialog").open) $("start-button").focus();
   });
@@ -511,6 +607,11 @@
   });
   $("story-reader-dialog").addEventListener("click", e => {
     if (e.target === $("story-reader-dialog")) $("story-reader-dialog").close();
+  });
+  $("treasure-discovery").addEventListener("click", () => {
+    const rule = lastDiscovery;
+    $("treasure-dialog").close();
+    if (rule) void openDiscoveryStory(rule);
   });
   $("treasure-journal").addEventListener("click", () => {
     $("treasure-dialog").close();

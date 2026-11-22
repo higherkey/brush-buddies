@@ -96,7 +96,7 @@ By evening, the blanket was finished.
 
 Tobee carried it outside. The mouse wrapped it around his shoulders, and his whiskers lifted in a delighted smile.
 
-“It's perfect,” he said.
+“It's perfect,” he said. “I’m Milo, by the way.”
 
 Tobee looked back at her cozy cottage, where the yarn basket, sunny windowsill, and cushion nook glowed in the lamplight.
 

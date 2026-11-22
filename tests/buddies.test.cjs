@@ -112,40 +112,44 @@ test('daily uses local calendar date, stays stable after unlock and reload, pref
   assert.equal(fixture.api.daily(), 'dog');
 });
 
-test('Simple timer brushes unlock successive buddies and keep adventure visits separate', () => {
+test('new brushes count once in either mode and achievement unlocks stay scoped', () => {
   const { api, data, context } = setup();
-  api.setDaily('fox');
-  const target = api.nextSimpleBuddy().id;
-  assert.equal(target, 'koala');
-  for (let i = 1; i <= 3; i++) {
-    const id = 'brush-' + i;
-    const reward = api.completeSimpleInScope(id, '');
-    assert.equal(reward.buddy.id, target);
-    assert.equal(reward.brushes, i);
-    assert.equal(reward.unlocked, i === 3);
-    assert.equal(api.completeSimpleInScope(id, ''), null);
-  }
-  assert.equal(api.daily(), 'fox');
-  assert.equal(api.unlocked(target), true);
-  assert.equal(api.homeUnlocked(target), false);
-  assert.equal(api.load().visits[target], undefined);
-  assert.equal(api.complete('brush-3', 'fox').visits, 0);
-  assert.equal(api.nextSimpleBuddy().id, 'dog');
+  const journal = { sessions: 0, stickers: {} };
+  assert.equal(api.completeSimpleInScope('one', 'cat', ''), 'brush:one');
+  assert.equal(api.completeSimpleInScope('one', 'bunny', ''), null);
+  assert.equal(api.completeInScope('adventure:one', 'fox', ''), null);
+  for (const i of [2, 3, 4]) api.completeInScope('adventure:' + i, 'fox', '');
 
-  const reloaded = setup(data.get(key)).api;
-  reloaded.load();
-  assert.equal(reloaded.simpleBrushes(target), 3);
-  assert.equal(reloaded.unlocked(target), true);
-  assert.equal(reloaded.nextSimpleBuddy().id, 'dog');
-
-  api.completeInScope('profile-adventure', 'fox', 'owner:child');
-  assert.equal(api.completeSimpleInScope('profile-adventure', 'owner:child'), null);
-  api.completeSimpleInScope('profile-brush', 'owner:child');
+  const collection = api.load();
+  assert.equal(api.metrics(collection, journal).brushes, 4);
+  assert.equal(api.metrics(collection, journal).modes, 2);
+  assert.equal(api.homeUnlocked('fox'), true);
+  assert.equal(api.unlocked('fox'), false);
+  api.grantAchievements(['fox', 'dog', 'fox'], 'owner:child');
   assert.equal(context.BB_PROFILE_SCOPE || '', '');
-  assert.equal(api.simpleBrushes(target), 3);
+  assert.equal(api.unlocked('fox'), false);
   context.BB_PROFILE_SCOPE = 'owner:child';
-  assert.equal(api.simpleBrushes(target, api.load()), 1);
-  assert.equal(api.unlocked(target), false);
+  api.load();
+  assert.deepEqual(plain(api.available()), ['cat', 'bunny', 'dog', 'fox']);
+  assert.equal(api.metrics(api.load(), journal).brushes, 0);
+  assert.equal(api.homeUnlocked('fox'), false);
+  assert.deepEqual(plain(api.grantAchievements(['fox'], 'owner:child')), []);
+  assert.equal(setup(data.get(key)).api.unlocked('fox'), false);
+});
+
+test('legacy visitors and Simple rewards stay unlocked alongside the new records', () => {
+  const { api, data } = setup();
+  api.save({
+    visits: { fox: 4, otter: 3, beaver: 3 },
+    credits: { 'adventure:recent': 'fox', 'adventure:b1': 'beaver', 'adventure:b2': 'beaver', 'adventure:b3': 'beaver',
+      'simple:a': 'koala', 'simple:b': 'koala', 'simple:c': 'koala' },
+    completed: ['old-id', 'old-id']
+  });
+  const reloaded = setup(data.get(key)).api;
+  for (const id of ['fox', 'otter', 'koala']) assert.equal(reloaded.unlocked(id), true);
+  assert.equal(reloaded.unlocked('beaver'), false);
+  assert.equal(reloaded.homeUnlocked('beaver'), true);
+  assert.equal(reloaded.metrics(reloaded.load(), { sessions: 7 }).brushes, 8);
 });
 
 test('malformed storage is sanitized with allowlisted safe counts and durable session history', () => {

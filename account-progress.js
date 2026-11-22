@@ -85,8 +85,8 @@
       seen.add(sessionId);
       result.collection.completed.push(sessionId);
       result.collection.credits[sessionId] = buddyId;
-      // Simple brushes use the same event ledger, with no journal rewards.
-      if (sessionId.startsWith('simple:')) continue;
+      // Simple brushes and achievements use the same event ledger, with no journal rewards.
+      if (/^(?:simple|brush|achievement):/.test(sessionId)) continue;
       result.collection.visits[buddyId] = count((result.collection.visits[buddyId] || 0) + 1);
       result.journal.stickers[stickerId] = count((result.journal.stickers[stickerId] || 0) + 1);
       result.journal.sessions = count(result.journal.sessions + 1);

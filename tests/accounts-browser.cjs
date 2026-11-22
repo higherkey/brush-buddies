@@ -77,7 +77,7 @@ test('real sign-in, separate child profiles, offline queue and recovery on anoth
     await context.setOffline(true);
     await Promise.all([page.click('#start-button'),twin.click('#start-button')]);
     await Promise.all([page.waitForFunction(()=>BrushBuddies.snapshot().phase==='done'),twin.waitForFunction(()=>BrushBuddies.snapshot().phase==='done')]);
-    await twin.waitForFunction(()=>JSON.parse(localStorage.getItem('brushAccount:'+BB_PROFILE_SCOPE)).events.length===5);
+    await twin.waitForFunction(()=>JSON.parse(localStorage.getItem('brushAccount:'+BB_PROFILE_SCOPE)).events.filter(event => BB_BUDDIES.isVisitCredit(event.session_id)).length===5);
     await page.close();await context.setOffline(false);await twin.reload();await twin.click('#account-open');
     await twin.waitForFunction(()=>!document.querySelector('#account-profiles').hidden&&!document.querySelector('#account-profile').disabled);
     await twin.selectOption('#account-profile',fixture.profileId);await twin.waitForFunction(()=>document.querySelector('#account-status').textContent.includes('saved to your account'));

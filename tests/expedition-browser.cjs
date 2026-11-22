@@ -5,7 +5,7 @@ const path = require('node:path');
 const http = require('node:http');
 const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
 
-test('daily visitor, creek travel and three-session unlock progression', async () => {
+test('daily visitor, creek travel and three-session home progression', async () => {
   const root = path.resolve(__dirname, '..');
   const server = http.createServer((req, res) => {
     const pathname = new URL(req.url, 'http://localhost').pathname;
@@ -30,6 +30,7 @@ test('daily visitor, creek travel and three-session unlock progression', async (
       stages: [{ id: 'a', name: 'Top teeth', icon: 'A', tip: 'Gentle circles.', seconds: 5 }]
     })));
 
+    await page.evaluate(() => BB_BUDDIES.setDaily('rhinoceros'));
     await page.reload();
     await page.setViewportSize({width:390,height:844});
     assert.equal(await page.evaluate(()=>BB_BUDDIES.catalog.length),75);
@@ -104,7 +105,8 @@ test('daily visitor, creek travel and three-session unlock progression', async (
       await page.waitForSelector('#treasure-dialog[open]',{timeout:12000});await page.click('#treasure-close');
       assert.equal(await page.evaluate(id=>BB_BUDDIES.load().visits[id],guest),visit);
     }
-    assert.ok(await page.evaluate(id=>BB_BUDDIES.unlocked(id),guest));
+    assert.equal(await page.evaluate(id=>BB_BUDDIES.unlocked(id),guest), false, 'three trips open the home without earning the visitor');
+    assert.ok(await page.evaluate(id=>BB_BUDDIES.homeUnlocked(id),guest));
     await page.click('#settings-open');
     assert.ok(await page.locator('#backup-import').isVisible(),'restore backup uses a reachable native input');
     const downloadReady = page.waitForEvent('download');
