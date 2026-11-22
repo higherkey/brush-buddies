@@ -4,7 +4,7 @@
   const $ = id => document.getElementById(id);
 
   const LEGACY_ANIMALS = {
-    cat: ["🐱", "Kitty the Cat", "meow"],
+    cat: ["🐱", "Toebean the Cat", "meow"],
     bunny: ["🐰", "Bubbles the Bunny", "squeak"],
     koala: ["🐨", "Koko the Koala", "koala"],
     dog: ["🐶", "Scout the Puppy", "woof"],
@@ -317,7 +317,7 @@
     $("announcer").textContent = t;
   }
 
-  /* Adventure Mode listens to these events; Simple mode ignores them. */
+  /* The brushing experiences use these events to render and award progress. */
   function emit(name, detail) {
     document.dispatchEvent(new CustomEvent("bb:" + name, { detail }));
   }
@@ -830,7 +830,7 @@
     stageLeft = 0;
     dance(false);
     render();
-    say("Hooray! You finished brushing. High paw, " + animal()[1].split(" ")[0] + "!");
+    say("Hooray! You finished brushing. High paw, " + (COLLECTION?.nickname(selected) || animal()[1].split(" ")[0]) + "!");
     $("buddy-area").classList.add("celebrate");
     animalSound();
     victorySound();
@@ -1023,11 +1023,13 @@
 
   function populate() {
     if (COLLECTION) {
+      COLLECTION.load();
       const select = $("theme-select");
       select.replaceChildren(new Option("Surprise me (unlocked buddies)", "random"));
       COLLECTION.catalog.forEach(a => {
-        const option = new Option(a.name + (COLLECTION.unlocked(a.id) ? "" : " — complete 3 adventures to unlock"), a.id);
-        option.disabled = !COLLECTION.unlocked(a.id);
+        const unlocked = COLLECTION.unlocked(a.id);
+        const option = new Option(a.name + (unlocked ? "" : " (locked)"), a.id);
+        option.disabled = !unlocked;
         select.add(option);
       });
     }
@@ -1535,7 +1537,7 @@
     $("theme-select").value = selected;
     save();
     applyTheme();
-    say("Hello! I'm " + animal()[1] + "!");
+    say(selected === "cat" ? "Hello! I'm Toebean. You can call me Tobee!" : "Hello! I'm " + animal()[1] + "!");
     render();
   });
 

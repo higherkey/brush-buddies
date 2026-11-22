@@ -75,7 +75,7 @@
   });
   $('progress-daily').addEventListener('change', event => { daily = event.target.value; });
   $('progress-reroll').addEventListener('click', () => {
-    const locked = buddies.catalog.filter(animal => (draft.collection.visits[animal.id] || 0) < 3 && !buddies.starters.includes(animal.id) && animal.id !== daily);
+    const locked = buddies.catalog.filter(animal => !buddies.unlocked(animal.id, draft.collection) && animal.id !== daily);
     const pool = locked.length ? locked : buddies.catalog.filter(animal => animal.id !== daily);
     daily = pool[Math.floor(Math.random() * pool.length)].id;
     $('progress-daily').value = daily;

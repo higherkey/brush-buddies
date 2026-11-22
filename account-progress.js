@@ -83,9 +83,11 @@
       const stickerId = sticker(event.sticker_id);
       if (seen.has(sessionId)) continue;
       seen.add(sessionId);
-      result.collection.visits[buddyId] = count((result.collection.visits[buddyId] || 0) + 1);
       result.collection.completed.push(sessionId);
       result.collection.credits[sessionId] = buddyId;
+      // Simple brushes use the same event ledger, with no journal rewards.
+      if (sessionId.startsWith('simple:')) continue;
+      result.collection.visits[buddyId] = count((result.collection.visits[buddyId] || 0) + 1);
       result.journal.stickers[stickerId] = count((result.journal.stickers[stickerId] || 0) + 1);
       result.journal.sessions = count(result.journal.sessions + 1);
     }

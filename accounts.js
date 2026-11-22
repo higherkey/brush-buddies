@@ -107,7 +107,7 @@
             if (events.some(event => !saved.has(event.session_id))) pending = true;
           });
           if (!current()) return false;
-          message(pending ? 'Saving new expedition…' : 'Collection saved to your account · ' + selected.display_name);
+          message(pending ? 'Saving new brushing progress…' : 'Collection saved to your account · ' + selected.display_name);
         } while (pending && current());
         return current();
       } catch (error) {
@@ -280,7 +280,7 @@
       if (!cached?.profile) return;
       cached.events = [...new Map([...(cached.events || []), reward].map(item => [item.session_id, item])).values()];
       localStorage.setItem(key, JSON.stringify(cached));
-      message('Expedition kept for the previous profile. Select that profile to sync it.');
+      message('Brushing progress kept for the previous profile. Select that profile to sync it.');
       return;
     }
     events.push(reward);

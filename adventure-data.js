@@ -93,7 +93,7 @@ window.BB_ADVENTURE_DATA = Object.freeze({
       ] }
   ],
   homes: {
-    cat: { id: "home-cat", name: "Kitty's Yarn Cottage", emoji: "🏡", scene: "meadow",
+    cat: { id: "home-cat", name: "Tobee's Yarn Cottage", emoji: "🏡", scene: "meadow",
       backdrop: ["🧶", "🌸", "🐟"],
       stops: [
         { name: "Yarn Basket", icon: "🧶" },

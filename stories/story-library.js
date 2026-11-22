@@ -17,7 +17,7 @@
   // available after that buddy's Nth completed adventure, never before.
   // 'trail' chapters must match a trail route; 'home' chapters start on visit 4+.
   const authoredChapters = Object.freeze({
-    cat: [{ path: '01-kitty-yarn-cottage.md', title: 'Kitty and the Runaway Ball of Yarn', goal: 'Ball of Yarn', kind: 'home', unlockAfter: 4 }],
+    cat: [{ path: '01-kitty-yarn-cottage.md', title: 'Tobee and the Runaway Ball of Yarn', goal: 'Ball of Yarn', kind: 'home', unlockAfter: 4 }],
     bunny: [{ path: '02-bubbles-clover-burrow.md', title: 'Bubbles and the Lucky Clover', goal: 'Lucky Clover', kind: 'home', unlockAfter: 4 }],
     dog: [{ path: '03-scout-backyard-park.md', title: 'Scout and the Bouncy Ball Mystery', goal: 'Bouncy Ball', kind: 'home', unlockAfter: 4 }],
     fox: [{ path: '04-finn-maple-den.md', title: 'Finn and the Little Acorn', goal: 'Little Acorn', kind: 'home', unlockAfter: 4 }],
@@ -73,7 +73,7 @@
         stickers: shared.stickers };
     }
     function firstName(id) {
-      return byId.get(id).name.split(' ')[0];
+      return COLLECTION.nickname(id);
     }
     function trailStory(id) {
       const animal = byId.get(id);

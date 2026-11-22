@@ -25,7 +25,7 @@ test('every one of the 75 buddies has a distinct character bible and a first sto
     const chapters = stories.chaptersFor(animal.id);
     assert.equal(chapters[0].unlockAfter, 1);
     assert.equal(chapters[0].kind, 'trail');
-    assert.ok(chapters[0].title.includes(animal.name.split(' ')[0]));
+    assert.ok(chapters[0].title.includes(buddies.nickname(animal.id)));
     const words = chapters[0].text.split(/\s+/).length;
     assert.ok(words >= 550 && words <= 770, animal.id + ' read-aloud length ' + words);
   }

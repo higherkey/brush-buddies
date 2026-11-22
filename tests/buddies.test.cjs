@@ -44,7 +44,8 @@ test('profile scopes keep guest and sibling collections separate', () => {
 test('standalone Node and browser exports expose distinct animals and valid homes', () => {
   const api = require('../buddies.js');
   assert.ok(api.catalog.length >= 60);
-  assert.equal(api.get('cat').name,'Kitty the Cat');
+  assert.equal(api.get('cat').name,'Toebean the Cat');
+  assert.equal(api.nickname('cat'), 'Tobee');
   assert.equal(api.get('bunny').name,'Bubbles the Bunny');
   assert.equal(api.get('fox').name,'Finn the Fox');
   assert.ok(api.catalog.every(animal=>animal.name.includes(' the ')));
@@ -109,6 +110,42 @@ test('daily uses local calendar date, stays stable after unlock and reload, pref
   const visits = Object.fromEntries(fixture.api.catalog.map(b => [b.id, 3]));
   fixture.api.save({ visits });
   assert.equal(fixture.api.daily(), 'dog');
+});
+
+test('Simple timer brushes unlock successive buddies and keep adventure visits separate', () => {
+  const { api, data, context } = setup();
+  api.setDaily('fox');
+  const target = api.nextSimpleBuddy().id;
+  assert.equal(target, 'koala');
+  for (let i = 1; i <= 3; i++) {
+    const id = 'brush-' + i;
+    const reward = api.completeSimpleInScope(id, '');
+    assert.equal(reward.buddy.id, target);
+    assert.equal(reward.brushes, i);
+    assert.equal(reward.unlocked, i === 3);
+    assert.equal(api.completeSimpleInScope(id, ''), null);
+  }
+  assert.equal(api.daily(), 'fox');
+  assert.equal(api.unlocked(target), true);
+  assert.equal(api.homeUnlocked(target), false);
+  assert.equal(api.load().visits[target], undefined);
+  assert.equal(api.complete('brush-3', 'fox').visits, 0);
+  assert.equal(api.nextSimpleBuddy().id, 'dog');
+
+  const reloaded = setup(data.get(key)).api;
+  reloaded.load();
+  assert.equal(reloaded.simpleBrushes(target), 3);
+  assert.equal(reloaded.unlocked(target), true);
+  assert.equal(reloaded.nextSimpleBuddy().id, 'dog');
+
+  api.completeInScope('profile-adventure', 'fox', 'owner:child');
+  assert.equal(api.completeSimpleInScope('profile-adventure', 'owner:child'), null);
+  api.completeSimpleInScope('profile-brush', 'owner:child');
+  assert.equal(context.BB_PROFILE_SCOPE || '', '');
+  assert.equal(api.simpleBrushes(target), 3);
+  context.BB_PROFILE_SCOPE = 'owner:child';
+  assert.equal(api.simpleBrushes(target, api.load()), 1);
+  assert.equal(api.unlocked(target), false);
 });
 
 test('malformed storage is sanitized with allowlisted safe counts and durable session history', () => {

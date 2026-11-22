@@ -34,7 +34,7 @@
       for (const animal of collection.catalog) {
         const incoming = data.collection.visits?.[animal.id];
         if (Number.isSafeInteger(incoming) && incoming >= 0) {
-          const count = entries => Object.values(entries || {}).filter(id => id === animal.id).length;
+          const count = entries => Object.entries(entries || {}).filter(([session, id]) => id === animal.id && !collection.isSimpleCredit(session)).length;
           // shortcut: old backups lack session credits; preserve their largest snapshot until account migration.
           const legacy = Math.max(0, (current.visits[animal.id] || 0) - count(current.credits), incoming - count(credits));
           current.visits[animal.id] = legacy > 0 ? Math.max(current.visits[animal.id] || 0, incoming, count(mergedCredits)) : count(mergedCredits);

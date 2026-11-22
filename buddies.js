@@ -7,9 +7,11 @@
 
   const key = 'brushBuddiesCollectionV1';
   const storageKey = () => key + (root.BB_PROFILE_SCOPE ? ':' + root.BB_PROFILE_SCOPE : '');
+  const simplePrefix = 'simple:';
+  const simpleGoal = 3;
   const starters = Object.freeze(['cat', 'bunny']);
   const catalog = [
-    ['cat', '🐱', 'Kitty the Cat', 'meow', 'cottage'],
+    ['cat', '🐱', 'Toebean the Cat', 'meow', 'cottage'],
     ['bunny', '🐰', 'Bubbles the Bunny', 'squeak', 'meadow'],
     ['koala', '🐨', 'Koko the Koala', 'koala', 'eucalyptus'],
     ['dog', '🐶', 'Scout the Puppy', 'woof', 'cottage'],
@@ -63,7 +65,7 @@
     ['parrot', '🦜', 'Polly the Parrot', 'chirp', 'jungle'],
     ['peacock', '🦚', 'Percy the Peacock', 'chirp', 'jungle'],
     ['eagle', '🦅', 'Ember the Eagle', 'chirp', 'mountain'],
-    ['turkey', '🦃', 'Toby the Turkey', 'chirp', 'forest'],
+    ['turkey', '🦃', 'Gobbles the Turkey', 'chirp', 'forest'],
     ['chicken', '🐔', 'Chickpea the Chicken', 'chirp', 'meadow'],
     ['dove', '🕊️', 'Dottie the Dove', 'chirp', 'forest'],
     ['seal', '🦭', 'Splash the Seal', 'woof', 'polar'],
@@ -92,6 +94,8 @@
   let state, loadedScope;
 
   function get(id) { return byId.get(id); }
+  function nickname(id) { return id === 'cat' ? 'Tobee' : get(id)?.name.split(' ')[0]; }
+  function isSimpleCredit(id) { return id.startsWith(simplePrefix); }
   function sessionValid(id) { return typeof id === 'string' && id.trim().length > 0 && id.length <= 200; }
   function validate(value) {
     const clean = { visits: {}, daily: { date: '', buddy: '' }, completed: [] };
@@ -131,7 +135,17 @@
     return state;
   }
   function homeUnlocked(id) { return !!get(id) && (current().visits[id] || 0) >= 3; }
-  function unlocked(id) { return !!get(id) && (starters.includes(id) || homeUnlocked(id)); }
+  function simpleBrushes(id, collection = current()) {
+    let count = 0;
+    for (const [session, buddy] of Object.entries(collection.credits || {})) {
+      if (buddy === id && isSimpleCredit(session)) count++;
+    }
+    return count;
+  }
+  function unlocked(id, collection = current()) {
+    return !!get(id) && (starters.includes(id) || (collection.visits[id] || 0) >= 3 || simpleBrushes(id, collection) >= simpleGoal);
+  }
+  function nextSimpleBuddy() { return catalog.find(buddy => !unlocked(buddy.id)); }
   function available() { return catalog.filter(function (buddy) { return unlocked(buddy.id); }).map(function (buddy) { return buddy.id; }); }
   function daily() {
     const now = new Date();
@@ -156,9 +170,9 @@
     current().daily = value;
   }
   function complete(sessionId, buddyId) {
-    if (!sessionValid(sessionId) || !get(buddyId)) return null;
+    if (!sessionValid(sessionId) || isSimpleCredit(sessionId) || !get(buddyId)) return null;
     const collection = current();
-    if (!collection.completed.includes(sessionId)) {
+    if (!collection.completed.includes(sessionId) && !collection.completed.includes(simplePrefix + sessionId)) {
       collection.visits[buddyId] = Math.min(Number.MAX_SAFE_INTEGER, (collection.visits[buddyId] || 0) + 1);
       collection.completed.push(sessionId);
       collection.credits = { ...collection.credits, [sessionId]: buddyId };
@@ -166,16 +180,36 @@
     }
     return { buddy: buddyId, visits: current().visits[buddyId] || 0, unlocked: unlocked(buddyId), homeUnlocked: homeUnlocked(buddyId) };
   }
-  function completeInScope(sessionId, buddyId, scope) {
+  function inScope(scope, work) {
     const previous = root.BB_PROFILE_SCOPE;
     try {
       root.BB_PROFILE_SCOPE = scope;
       load();
-      return complete(sessionId, buddyId);
+      return work();
     } finally {
       root.BB_PROFILE_SCOPE = previous;
       load();
     }
+  }
+  function completeInScope(sessionId, buddyId, scope) {
+    return inScope(scope, () => complete(sessionId, buddyId));
+  }
+  function completeSimpleInScope(sessionId, scope) {
+    if (!sessionValid(sessionId) || isSimpleCredit(sessionId)) return null;
+    const creditId = simplePrefix + sessionId;
+    if (!sessionValid(creditId)) return null;
+    return inScope(scope, () => {
+      const collection = current();
+      if (collection.completed.includes(sessionId) || collection.completed.includes(creditId)) return null;
+      const buddy = nextSimpleBuddy();
+      if (!buddy) return null;
+      // Use the collection's session ledger so repeat finishes and backup imports count once.
+      collection.completed.push(creditId);
+      collection.credits = { ...collection.credits, [creditId]: buddy.id };
+      save(collection);
+      const brushes = simpleBrushes(buddy.id);
+      return { buddy, creditId, brushes, unlocked: brushes >= simpleGoal };
+    });
   }
 
   // Habitat templates use the scene vocabulary understood by Adventure Mode.
@@ -201,7 +235,7 @@
     if (!buddy) return undefined;
     const habitat = habitats[buddy.habitat];
     return {
-      id: 'home-' + id, name: buddy.name.split(" ")[0] + "'s Home", emoji: habitat[1], scene: habitat[0],
+      id: 'home-' + id, name: nickname(id) + "'s Home", emoji: habitat[1], scene: habitat[0],
       backdrop: habitat[2].slice(),
       stops: habitat[3].map(function (stop) { return { name: stop[0], icon: stop[1] }; }),
       stickers: habitat[3].slice(0, 3).map(function (stop, index) {
@@ -210,5 +244,6 @@
     };
   }
   return { catalog: catalog, starters: starters, get: get, load: load, save: save, unlocked: unlocked,
-    available: available, daily: daily, setDaily: setDaily, complete: complete, completeInScope: completeInScope, homeUnlocked: homeUnlocked, home: home };
+    available: available, daily: daily, setDaily: setDaily, complete: complete, completeInScope: completeInScope, homeUnlocked: homeUnlocked, home: home,
+    nickname, isSimpleCredit, simpleGoal, simpleBrushes, nextSimpleBuddy, completeSimpleInScope };
 }));
