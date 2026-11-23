@@ -83,6 +83,18 @@ test('Simple timer events survive sync without incrementing adventure visits or 
   assert.deepEqual(result.journal, { stickers: { leaf: 1 }, sessions: 1, last: '' });
 });
 
+test('modern Adventure, brush, and achievement events retain their distinct effects', () => {
+  const events = [
+    event('adventure:one', 'cat', 'cat-star'),
+    event('brush:two', 'cat', 'simple-brush'),
+    event('achievement:dog', 'dog', 'buddy-achievement')
+  ];
+  const result = materialize(snapshot(), [...events, ...events]);
+  assert.deepEqual(result.collection.visits, { cat: 1 });
+  assert.deepEqual(result.collection.credits, { 'adventure:one': 'cat', 'brush:two': 'cat', 'achievement:dog': 'dog' });
+  assert.deepEqual(result.journal, { stickers: { 'cat-star': 1 }, sessions: 1, last: '' });
+});
+
 test('unknown catalog animals, fields and malformed snapshots throw', () => {
   const unknown = snapshot();
   unknown.collection.visits.dragon = 1;

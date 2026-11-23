@@ -55,3 +55,12 @@ test('every animal in the catalog has a whole body', () => {
     assert.ok(group.children.length > 0, animal.id + ' draws a body');
   }
 });
+
+test('the trail keeps the duck facing the same way as its artwork', () => {
+  const group = new Node('g');
+  const rig = BB_AVATAR.build(group, 'duck', new Node('image'));
+  assert.equal(rig.sprite, true);
+  const [sprite] = group.children[0].children[0].children;
+  const scale = sprite.attributes.transform.match(/^scale\(([^)]+)\)$/)?.[1];
+  assert.ok(Number(scale) > 0, 'sprite uses a positive, uniform scale');
+});

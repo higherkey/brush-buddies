@@ -7,8 +7,10 @@
 
   const key = 'brushBuddiesCollectionV1';
   const storageKey = () => key + (root.BB_PROFILE_SCOPE ? ':' + root.BB_PROFILE_SCOPE : '');
-  const simplePrefix = 'simple:';
-  const simpleGoal = 3;
+  // Prefixes share the existing session ledger and account event table.
+  const adventurePrefix = 'adventure:';
+  const brushPrefix = 'brush:';
+  const achievementPrefix = 'achievement:';
   const starters = Object.freeze(['cat', 'bunny']);
   const catalog = [
     ['cat', '🐱', 'Toebean the Cat', 'meow', 'cottage'],
@@ -95,7 +97,9 @@
 
   function get(id) { return byId.get(id); }
   function nickname(id) { return id === 'cat' ? 'Tobee' : get(id)?.name.split(' ')[0]; }
-  function isSimpleCredit(id) { return id.startsWith(simplePrefix); }
+  function isSimpleCredit(id) { return id.startsWith(brushPrefix) || id.startsWith('simple:'); }
+  function isAchievementCredit(id) { return id.startsWith(achievementPrefix); }
+  function isVisitCredit(id) { return !isSimpleCredit(id) && !isAchievementCredit(id); }
   function sessionValid(id) { return typeof id === 'string' && id.trim().length > 0 && id.length <= 200; }
   function validate(value) {
     const clean = { visits: {}, daily: { date: '', buddy: '' }, completed: [] };
@@ -135,18 +139,44 @@
     return state;
   }
   function homeUnlocked(id) { return !!get(id) && (current().visits[id] || 0) >= 3; }
-  function simpleBrushes(id, collection = current()) {
+  function newAdventureVisits(id, collection = current()) {
     let count = 0;
     for (const [session, buddy] of Object.entries(collection.credits || {})) {
-      if (buddy === id && isSimpleCredit(session)) count++;
+      if (buddy === id && session.startsWith(adventurePrefix)) count++;
     }
     return count;
   }
   function unlocked(id, collection = current()) {
-    return !!get(id) && (starters.includes(id) || (collection.visits[id] || 0) >= 3 || simpleBrushes(id, collection) >= simpleGoal);
+    if (!get(id)) return false;
+    const credits = collection.credits || {};
+    if (starters.includes(id) || credits[achievementPrefix + id] === id) return true;
+    // Keep previously earned visitors and the buddies earned by the earlier Simple timer.
+    if ((collection.visits[id] || 0) >= 3 + newAdventureVisits(id, collection)) return true;
+    let legacyBrushes = 0;
+    for (const [session, buddy] of Object.entries(credits)) {
+      if (buddy === id && session.startsWith('simple:') && ++legacyBrushes === 3) return true;
+    }
+    return false;
   }
-  function nextSimpleBuddy() { return catalog.find(buddy => !unlocked(buddy.id)); }
-  function available() { return catalog.filter(function (buddy) { return unlocked(buddy.id); }).map(function (buddy) { return buddy.id; }); }
+  function available() { return catalog.filter(buddy => unlocked(buddy.id)).map(buddy => buddy.id); }
+  function metrics(collection, journal) {
+    const sessions = new Set([...collection.completed, ...Object.keys(collection.credits || {})]);
+    let simple = 0, adventures = 0;
+    for (const id of sessions) {
+      if (isSimpleCredit(id)) simple++;
+      else if (isVisitCredit(id)) adventures++;
+    }
+    const visits = Object.values(collection.visits);
+    return {
+      brushes: simple + adventures,
+      simple,
+      adventures,
+      modes: Number(simple > 0) + Number(adventures > 0),
+      homes: visits.filter(count => count >= 3).length,
+      trailBuddies: visits.filter(count => count > 0).length,
+      stickers: Object.values(journal.stickers || {}).filter(count => count > 0).length
+    };
+  }
   function daily() {
     const now = new Date();
     const date = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
@@ -170,9 +200,12 @@
     current().daily = value;
   }
   function complete(sessionId, buddyId) {
-    if (!sessionValid(sessionId) || isSimpleCredit(sessionId) || !get(buddyId)) return null;
+    if (!sessionValid(sessionId) || !isVisitCredit(sessionId) || !get(buddyId)) return null;
     const collection = current();
-    if (!collection.completed.includes(sessionId) && !collection.completed.includes(simplePrefix + sessionId)) {
+    const original = sessionId.startsWith(adventurePrefix) ? sessionId.slice(adventurePrefix.length) : sessionId;
+    const credited = hasCompleted(collection, original);
+    if (credited && sessionId.startsWith(adventurePrefix)) return null;
+    if (!credited) {
       collection.visits[buddyId] = Math.min(Number.MAX_SAFE_INTEGER, (collection.visits[buddyId] || 0) + 1);
       collection.completed.push(sessionId);
       collection.credits = { ...collection.credits, [sessionId]: buddyId };
@@ -194,21 +227,36 @@
   function completeInScope(sessionId, buddyId, scope) {
     return inScope(scope, () => complete(sessionId, buddyId));
   }
-  function completeSimpleInScope(sessionId, scope) {
-    if (!sessionValid(sessionId) || isSimpleCredit(sessionId)) return null;
-    const creditId = simplePrefix + sessionId;
+  function hasCompleted(collection, sessionId) {
+    return [sessionId, brushPrefix + sessionId, 'simple:' + sessionId, adventurePrefix + sessionId]
+      .some(id => collection.completed.includes(id) || Object.hasOwn(collection.credits || {}, id));
+  }
+  function completeSimpleInScope(sessionId, buddyId, scope) {
+    if (!sessionValid(sessionId) || !get(buddyId)) return null;
+    const creditId = brushPrefix + sessionId;
     if (!sessionValid(creditId)) return null;
     return inScope(scope, () => {
       const collection = current();
-      if (collection.completed.includes(sessionId) || collection.completed.includes(creditId)) return null;
-      const buddy = nextSimpleBuddy();
-      if (!buddy) return null;
-      // Use the collection's session ledger so repeat finishes and backup imports count once.
+      if (hasCompleted(collection, sessionId)) return null;
       collection.completed.push(creditId);
-      collection.credits = { ...collection.credits, [creditId]: buddy.id };
+      collection.credits = { ...collection.credits, [creditId]: buddyId };
       save(collection);
-      const brushes = simpleBrushes(buddy.id);
-      return { buddy, creditId, brushes, unlocked: brushes >= simpleGoal };
+      return creditId;
+    });
+  }
+  function grantAchievements(ids, scope) {
+    return inScope(scope, () => {
+      const collection = current();
+      const earned = [...new Set(ids)].filter(id => get(id) && !unlocked(id));
+      if (!earned.length) return [];
+      collection.credits ||= {};
+      const grants = earned.map(id => ({ id, creditId: achievementPrefix + id }));
+      for (const grant of grants) {
+        collection.completed.push(grant.creditId);
+        collection.credits[grant.creditId] = grant.id;
+      }
+      save(collection);
+      return grants;
     });
   }
 
@@ -245,5 +293,5 @@
   }
   return { catalog: catalog, starters: starters, get: get, load: load, save: save, unlocked: unlocked,
     available: available, daily: daily, setDaily: setDaily, complete: complete, completeInScope: completeInScope, homeUnlocked: homeUnlocked, home: home,
-    nickname, isSimpleCredit, simpleGoal, simpleBrushes, nextSimpleBuddy, completeSimpleInScope };
+    nickname, isVisitCredit, newAdventureVisits, metrics, inScope, completeSimpleInScope, grantAchievements };
 }));

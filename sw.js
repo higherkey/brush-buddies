@@ -1,13 +1,13 @@
 "use strict";
 
-const CACHE_NAME = "brush-buddies-shell-v18";
+const CACHE_NAME = "brush-buddies-shell-v20";
 const APP_SHELL = [
   "./home.css?v=0.8.3",
   "./brand.css?v=0.9.0",
   "./move-home.js?v=0.9.1",
   "./fonts/fredoka-latin-wght.woff2",
   "./fonts/nunito-latin-wght.woff2",
-  "./progress-tools.js?v=0.12.0",
+  "./progress-tools.js?v=0.13.0",
   "./progress-tools.css?v=0.8.3",
   "./",
   "./index.html",
@@ -88,20 +88,21 @@ const APP_SHELL = [
   "./animals/snail.svg",
   "./adventure-habitats.js?v=0.11.0",
   "./adventure-habitats.css?v=0.11.0",
-  "./account-progress.js?v=0.12.0",
+  "./account-progress.js?v=0.13.0",
   "./neon-config.js?v=0.8.0",
   "./neon-api.js?v=0.8.3",
-  "./accounts.js?v=0.12.0",
-  "./buddies.js?v=0.12.0",
-  "./adventure-avatar.js?v=0.11.0",
+  "./accounts.js?v=0.13.0",
+  "./buddies.js?v=0.13.0",
+  "./achievements.js?v=0.13.0",
+  "./adventure-avatar.js?v=0.13.1",
   "./adventure-sections.js?v=0.11.0",
   "./adventure-scene.js?v=0.11.0",
   "./adventure-scene.css?v=0.11.0",
-  "./expedition.css?v=0.12.0",
-  "./collection-backup.js?v=0.12.0",
+  "./expedition.css?v=0.13.0",
+  "./collection-backup.js?v=0.13.0",
   "./styles.css?v=0.8.2",
   "./adventure-data.js?v=0.12.0",
-  "./adventure.js?v=0.12.0",
+  "./adventure.js?v=0.13.1",
   "./stories/characters.js?v=1",
   "./stories/story-library.js?v=0.12.0",
   "./stories/storybook.css?v=1",
@@ -110,7 +111,7 @@ const APP_SHELL = [
   "./stories/03-scout-backyard-park.md",
   "./stories/04-finn-maple-den.md",
   "./stories/05-pebble-ice-caves.md",
-  "./app.js?v=0.12.0",
+  "./app.js?v=0.13.0",
   "./camera-helper.js?v=0.8.0",
   "./camera-worker.js?v=0.8.0",
   "./camera-motion.js",
@@ -127,7 +128,7 @@ const APP_SHELL = [
 self.addEventListener("install", event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(APP_SHELL))
+      .then(cache => cache.addAll(APP_SHELL.map(url => new Request(url, { cache: "reload" }))))
       .then(() => self.skipWaiting())
   );
 });

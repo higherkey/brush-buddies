@@ -322,7 +322,12 @@
     document.dispatchEvent(new CustomEvent("bb:" + name, { detail }));
   }
 
+  function discoverAction(action) {
+    emit("discovery-action", action);
+  }
+
   function snapshot() {
+    const duration = total();
     return {
       phase,
       pausedFrom,
@@ -337,7 +342,7 @@
       buddyEmoji: animal()[0],
       sessionId,
       profileScope: window.BB_PROFILE_SCOPE || '',
-      progress: total() ? Math.max(0, Math.min(1, 1 - settings.stages.reduce((sum, stage, i) => sum + (i === stageIndex ? stageLeft : leftOf(i)), 0) / total())) : 0,
+      progress: duration ? Math.max(0, Math.min(1, (duration - remaining()) / duration)) : 0,
       experience: settings.experience,
       storyText: settings.storyText,
       calm: !settings.animations || settings.reducedMotion || window.matchMedia("(prefers-reduced-motion: reduce)").matches
@@ -1075,6 +1080,7 @@
   }
 
   function saveUI() {
+    const previous = { ...settings };
     const old = settings.theme;
     settings.theme = $("theme-select").value;
     settings.song = $("song-select").value;
@@ -1099,6 +1105,16 @@
     renderStages();
     if (sessionSettings() !== settingsBeforeDialog) reset();
     else render();
+    if (!previous.reducedMotion && settings.reducedMotion) discoverAction("gentle");
+    if (previous.breakSeconds !== 10 && settings.breakSeconds === 10) discoverAction("long-break");
+    if (settings.song === "custom" && settings.customMelody !== DEFAULTS.customMelody &&
+        !parseMelody(settings.customMelody).error) discoverAction("custom-song");
+    if (previous.song !== settings.song) {
+      if (settings.song === "moonlight") discoverAction("moonlight");
+      if (settings.song === "bubble") discoverAction("bubble-song");
+    }
+    if ((previous.animalSounds || previous.uiSounds) && !settings.animalSounds && !settings.uiSounds) discoverAction("quiet");
+
   }
 
   function openSettings(tab = "buddy-panel") {
@@ -1500,6 +1516,7 @@
 
   $("appearance-select").addEventListener("change", () => {
     settings.appearance = $("appearance-select").value;
+    if (settings.appearance === "dark") discoverAction("dark");
     save();
     applyAppearance();
   });
@@ -1509,6 +1526,7 @@
   $("experience-select").addEventListener("change", () => setExperience($("experience-select").value));
   $("story-text").addEventListener("change", () => {
     settings.storyText = $("story-text").checked;
+    if (settings.storyText) discoverAction("story-text");
     save();
     render();
   });
@@ -1543,7 +1561,7 @@
 
   document.addEventListener("bb:choose", event => {
     // Today's visitor can always be picked again, even before it is unlocked.
-    const visitor = COLLECTION?.daily() === event.detail;
+    const visitor = settings.experience === "adventure" && COLLECTION?.daily() === event.detail;
     if (!COLLECTION?.unlocked(event.detail) && !visitor) return;
     selected = event.detail;
     // A visitor is only here for today, so it never becomes the saved buddy.
@@ -1569,9 +1587,17 @@
   $("buddy").addEventListener("animationend", e => {
     if (e.target === e.currentTarget) e.currentTarget.classList.remove("poked");
   });
-  $("motion-toggle").addEventListener("click", () => (motionOn ? stopCamera(true) : startCamera()));
+  $("motion-toggle").addEventListener("click", () => {
+    if (motionOn) stopCamera(true);
+    else {
+      discoverAction("camera");
+      startCamera();
+    }
+  });
+  $("studio-link").addEventListener("click", () => discoverAction("footer"));
   $("motion-calibrate").addEventListener("click", () => {
     if (!motionOn) return;
+    discoverAction("calibrate");
     cameraCalibrating = true;
     if (cameraPauses() && phase === "running") pauseNoMotion();
     cameraHelper?.calibrate();
@@ -1580,6 +1606,7 @@
   for (const id of ["motion-sensitivity", "motion-region", "motion-target", "motion-target-x", "motion-target-y", "motion-target-size", "motion-auto-pause", "motion-brush-type"]) {
     $(id).addEventListener("change", () => {
       readCameraSettings();
+      if (id === "motion-brush-type" && settings.motionBrushType === "electric") discoverAction("electric");
       save();
       cameraCalibrating = false;
       cameraHelper?.configure(cameraOptions());

@@ -65,3 +65,35 @@ html[data-scheme="dark"] .app[data-mode="adventure"] { --accent-text: oklch(88% 
 .app[data-mode="adventure"] .buddy-area { min-block-size: clamp(380px, 52svh, 480px); padding: .5rem; }
 .app[data-mode="adventure"] .speech { font-size: .8rem; }
 .settings-dialog { margin-block-start: auto; margin-block-end: 0; max-block-size: 88dvh; inline-size: min(100%, var(--app-max-width)); overscroll-behavior: contain; }
+
+.experience-bar #simple-journal-open { margin-inline-start: .5rem; }
+#unlock-status:empty { display: none; }
+#unlock-status {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: .45rem .75rem;
+  border-radius: .75rem;
+  background: var(--accent-soft);
+  color: var(--ink);
+  font-size: .875rem;
+  font-weight: 700;
+  text-align: center;
+}
+#trail-encounter {
+  position: absolute;
+  z-index: 2;
+  inset-inline-end: 12%;
+  inset-block-end: 17%;
+  inline-size: 48px;
+  block-size: 48px;
+  padding: 6px;
+  background: transparent;
+  border: 0;
+  border-radius: 50%;
+  pointer-events: auto;
+  cursor: pointer;
+}
+#trail-encounter[data-perch="1"] { inset-inline-end: auto; inset-inline-start: 14%; inset-block-end: 12%; }
+#trail-encounter[data-perch="2"] { inset-inline-end: 22%; inset-block-end: 42%; }
+#trail-encounter:hover, #trail-encounter:focus-visible { background: var(--accent-soft); }
+#trail-encounter img { display: block; filter: drop-shadow(0 2px 1px rgb(0 0 0 / .35)); }

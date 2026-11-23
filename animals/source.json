@@ -45,7 +45,7 @@
     },
     "elephant": {
       "codepoint": "1f418",
-      "sha256": "b23f4d2146dcf07d2dc7fc72d206788581f0ec8c5979a2704ad93d772bc83682"
+      "sha256": "74de02992daeb9013e23a220a594705248b3996c2ccaf7e0d2b71bab62eec2a0"
     },
     "bear": {
       "codepoint": "1f43b",
@@ -57,7 +57,7 @@
     },
     "unicorn": {
       "codepoint": "1f984",
-      "sha256": "6063b1ca7021881784eb5a8110997357026fb7376785e639850335a9c422a639"
+      "sha256": "ad8f050650f7956d22e5d8c172b8bd001e34b4669c1bebea73e7ddff8e4f91f4"
     },
     "tiger": {
       "codepoint": "1f42f",
@@ -89,23 +89,23 @@
     },
     "badger": {
       "codepoint": "1f9a1",
-      "sha256": "8a961350b2aa6d013d189bee9319e655ecf691df25e790716129167f2e8272c3"
+      "sha256": "67854de61f704b8e1393377f7c16ec8a7a9a0f07cd8801ac4e6eabdb1f24e606"
     },
     "skunk": {
       "codepoint": "1f9a8",
-      "sha256": "fb8e434cda82690fffb6f02ee0bb22a4d21d2dbda578b9b72b150a82ebbcec07"
+      "sha256": "a173ecf143a0c0ac99d8115a59b2a9cd61c756f26cdfe0c16c7d52485d3a1124"
     },
     "beaver": {
       "codepoint": "1f9ab",
-      "sha256": "5ddc891c223ba6fed66f266f79c1a586b780d3695e8019e131b927ee41fc4d3f"
+      "sha256": "92f41f2432e8e8c8c9b8516c127192acf3dab2b6301e7a274dae912c4d2aad7f"
     },
     "squirrel": {
       "codepoint": "1f43f",
-      "sha256": "1b2d9e432ccea3989d41fc52d731e0b0a8aefb21861313c2f7a02951d0d8426b"
+      "sha256": "49cabe1bfae43b5fe1cc15a48cfa92fa81c8eab4739e650d84a999959ff2b706"
     },
     "otter": {
       "codepoint": "1f9a6",
-      "sha256": "d4400baf49fb861405b3a05b33969384a396d2451bbc5b7d07b158c64aaab2e3"
+      "sha256": "3aa43c6d3099b8a78829abc217ee4a4ad74a1207b5db64248122e89f32d35c7e"
     },
     "bat": {
       "codepoint": "1f987",
@@ -117,7 +117,7 @@
     },
     "monkey": {
       "codepoint": "1f412",
-      "sha256": "b4544110be26cf10e8b486633f7cf5e5c7483373deb740de5ce131dfc014c6a6"
+      "sha256": "02ba50d13c1610eea11e048592b3a4c89f53b2a4f9448e944d1b30b0b4e44c46"
     },
     "orangutan": {
       "codepoint": "1f9a7",
@@ -125,7 +125,7 @@
     },
     "leopard": {
       "codepoint": "1f406",
-      "sha256": "f7bed20ca8eb7c35fb2f4677b9af3820bd9d5c0341a0dcca339bd9448d0eefa4"
+      "sha256": "3ee88edc9db18d390c78a586d5bdc06134c2b94468a61e70c75ce28b619064bf"
     },
     "gorilla": {
       "codepoint": "1f98d",
@@ -133,31 +133,31 @@
     },
     "hippopotamus": {
       "codepoint": "1f99b",
-      "sha256": "ba1ec3adcaa959a1423dd6a7f88cfa0a1c92da239228687285c54be2659d88d5"
+      "sha256": "43976b41fe0c39f38fad4bb2f6b0fe4d3407b91d3b75a0314abd33ee77234fef"
     },
     "rhinoceros": {
       "codepoint": "1f98f",
-      "sha256": "96263ede0ffc9902a34bdd7cca8210fa419b8306105cbbe52251ac361ddaa151"
+      "sha256": "5a9c2f7168faf2719734cf93310c06164d15a36876e3e55d2ffdb3016fdb42dc"
     },
     "zebra": {
       "codepoint": "1f993",
-      "sha256": "303de99b0b43eeaf599b59598588e5805f0c59ced55462bb128f93030172185a"
+      "sha256": "21a95d0fe7a1413729229b28bc33bb1a5f08f767f87fd9236aa160f6a1489f9e"
     },
     "camel": {
       "codepoint": "1f42a",
-      "sha256": "5aa547209a11b2ef5fa49b194177854e7a035b635a565e2b076037526fc72125"
+      "sha256": "7d0234a0a01287b192af92122b1808005c38c027a89474f31af180ed5140aeef"
     },
     "kangaroo": {
       "codepoint": "1f998",
-      "sha256": "b8d61f1e5d5aa393302e4f3845bb912e6a1168878e24341476ad0dc0c8a626f4"
+      "sha256": "12534d5a3a54af47711e6b21e6f7f4e558739e798044a8dfcbaf7cc900e098bb"
     },
     "giraffe": {
       "codepoint": "1f992",
-      "sha256": "07a63c7cec7bf62f111d9967e3fd519a90c5148204e1cd99fc1811bba48ce9a9"
+      "sha256": "7d2c3a60be295678638e5d1d610616c4d5ac32d9ace8c82bf293131ab8f6942f"
     },
     "horse": {
       "codepoint": "1f434",
-      "sha256": "34f4c592c77acedc68f523aedd30c7d1cf04937e722db1956b46e731b6190189"
+      "sha256": "163a48fc851a6913402d65bcbd0281809f45e7fafe3061aefcd03f5d9cb5f0f8"
     },
     "cow": {
       "codepoint": "1f42e",
@@ -165,7 +165,7 @@
     },
     "donkey": {
       "codepoint": "1facf",
-      "sha256": "6132a68972376788802b9d6423ea2d2b4736cdca4346cefb60be3cdba8e05537"
+      "sha256": "84caa4bc7c649297239710f019094407b21741682acf10b95c5c17626253ddc5"
     },
     "pig": {
       "codepoint": "1f437",
@@ -173,23 +173,23 @@
     },
     "goat": {
       "codepoint": "1f410",
-      "sha256": "818b0c0ae7322fec7e3db3499dbd7b78dc5a3fec41813b2147ad67251bd74212"
+      "sha256": "842348229adf02c3e97a25656b2d2480b8784ec27bf625bbac17c479f8234635"
     },
     "llama": {
       "codepoint": "1f999",
-      "sha256": "4a1765f4c6b434bb74cc8fcf1aff0b2cf71a533d2ff84ec80aaaec4da7a1c438"
+      "sha256": "3f33db2de149adef6a657ba3903e185fd4bb70a583b4f1b45b8906a28dd065fd"
     },
     "bison": {
       "codepoint": "1f9ac",
-      "sha256": "fc0e1d4877d343a4cbcd4e52173c685753f66b772c6fc8a726502c541ee2521d"
+      "sha256": "c4c915b5ba4f5a7eda14e6d947909285e3e2479a68e4b67e4af1ad660f3f82fd"
     },
     "duck": {
       "codepoint": "1f986",
-      "sha256": "74114f0e02acbd2a91b55f72e597c27d5c8da1fe2d03910ccd17a5180102c89b"
+      "sha256": "44d15624872205ca40fd61d351e976b87cc687ed81943a72f0901270f662549e"
     },
     "sheep": {
       "codepoint": "1f411",
-      "sha256": "23d57bfbd45dd5c58a6762db275b4eade1a98b613b34f04877128ad2dfecf36b"
+      "sha256": "116d93cf85db8e2bbb9b4326f889d357ec27b5cb2e1a76bd26c42b3505f6649e"
     },
     "boar": {
       "codepoint": "1f417",
@@ -197,19 +197,19 @@
     },
     "goose": {
       "codepoint": "1fabf",
-      "sha256": "b6d265b709cd214aa77d955c45efc827d50ff314935ae79d1ed3aef690b39022"
+      "sha256": "5af95e38bcbd8918d9f33dfd7d84ddf59e079c85260d38c8fc5358882a4ce418"
     },
     "swan": {
       "codepoint": "1f9a2",
-      "sha256": "fe56a4a7f9ab3267cef021fcf1316d6fa5053c9497c6f43dc3bd270b570511d8"
+      "sha256": "2f06fa19e5b7a8171083539ccb804893aac7a2db04277f752fa29ec154b12dc8"
     },
     "flamingo": {
       "codepoint": "1f9a9",
-      "sha256": "df7e3f837657268451b7bbff123254f520050c4ab336955b6fcac1782aad63fc"
+      "sha256": "cfc8ede407f2b991ccb5abbeb49389e5c787eec6cca6411516a03b56cee04483"
     },
     "parrot": {
       "codepoint": "1f99c",
-      "sha256": "6ca5357a83bea09872817fb4f6f24f0b287e9f5dff221f0e6be733a342a84c5f"
+      "sha256": "85acd07e8346e6c5a8d36ab8ae3db07fcd987b46c1d82d942ca82069a66f7481"
     },
     "peacock": {
       "codepoint": "1f99a",
@@ -217,11 +217,11 @@
     },
     "eagle": {
       "codepoint": "1f985",
-      "sha256": "70d3f8b904079499625475ec4758f178378983f9b569481e08c3fc8e243f7a75"
+      "sha256": "f369531342ad9255c889681f256180ccd738737800a09e477df201e13ac5cf41"
     },
     "turkey": {
       "codepoint": "1f983",
-      "sha256": "ea158b235aadb6f8feac7f6d55455ea355de54d697910be1b317c1a566f1afec"
+      "sha256": "618e4d6d76db93af1ffa860cf79737e783e0e0f55575d595e358bfc1037bf745"
     },
     "chicken": {
       "codepoint": "1f414",
@@ -229,15 +229,15 @@
     },
     "dove": {
       "codepoint": "1f54a",
-      "sha256": "c0d31764848cc9f3873efce6f159f1a917fd9540d01e396e417bad653a23c118"
+      "sha256": "72d1cfcffed4554daae2d613da503abacd75bc9f9ebd7c509e82208a039891ab"
     },
     "seal": {
       "codepoint": "1f9ad",
-      "sha256": "8efa52a65d66715b3334d30bb04440a2b57063a3d3f28687ea6dccee42d4507d"
+      "sha256": "352c7ad1c7630e456370397b2461b4157d35e8eea7f420f8f862b0a1a0ded697"
     },
     "whale": {
       "codepoint": "1f40b",
-      "sha256": "8ef657c5e310650e105b56ca7b9a38d2f3af5ab2684077df5ace79ab67ba4dda"
+      "sha256": "4cf44885a54a3b2557a13681035239448722b493783a02f910c43645d71f2e81"
     },
     "octopus": {
       "codepoint": "1f419",
@@ -245,7 +245,7 @@
     },
     "shark": {
       "codepoint": "1f988",
-      "sha256": "accb7bae5d222c1610528269fbfb44a75d7a96e955a8526334fc7c2153a0edca"
+      "sha256": "3790716c0ba52f3a1aa6e6a7a988f9a19e17f86032b899153a9af2345e790246"
     },
     "squid": {
       "codepoint": "1f991",
@@ -257,7 +257,7 @@
     },
     "dolphin": {
       "codepoint": "1f42c",
-      "sha256": "94eba04777cdb147a9359132effa6bf8b0ebccd8c08ba1a6eec4e17e5acd2ac6"
+      "sha256": "df1e9c10d77e40a55241e76b3b01791b11681a2318b3e899e8a0d3761bc932db"
     },
     "lobster": {
       "codepoint": "1f99e",
@@ -265,7 +265,7 @@
     },
     "shrimp": {
       "codepoint": "1f990",
-      "sha256": "154400268f8a187f34a8b9fef7a43016e585a6f0a115e96e589049d842f29be9"
+      "sha256": "bce809cd1837e365941ff97502c219f4abd20f75d345c2d96b1875986737c4ca"
     },
     "jellyfish": {
       "codepoint": "1fabc",
@@ -273,19 +273,19 @@
     },
     "turtle": {
       "codepoint": "1f422",
-      "sha256": "c79bb7aa13c847aead252a730ab44f5e631d8409569717b963d1f0f476252342"
+      "sha256": "e7a4e8a6859cefe9c8054dabc4460bc4725a7018f0e3aa625bde1ce15d0ce995"
     },
     "crocodile": {
       "codepoint": "1f40a",
-      "sha256": "8acb7dfd69ceb853d57eeaaf63b2b3237ae8dfdf9d770c0637e20bb9c0331b3c"
+      "sha256": "7385b7ea15e070e39a45c89ee4182a3f91592ac54f0d6dde94bdc705a3c9b20f"
     },
     "snake": {
       "codepoint": "1f40d",
-      "sha256": "0b5464f87e1571fffee05d254c8fe1cf1f880c20d8a8c100b942537606dab54b"
+      "sha256": "2353ef353673909d3534d9d005cde7d84e8778d2f01ab9a87819246b131534e7"
     },
     "lizard": {
       "codepoint": "1f98e",
-      "sha256": "e6def08ca112ef70631be14be4425ec4aec800eaeccc6a76d6c38e48f72b2f50"
+      "sha256": "d22fd6b012594b638fb754acedc87b8a1f006405867e36d742fd27ae0a42d67c"
     },
     "butterfly": {
       "codepoint": "1f98b",
@@ -301,7 +301,7 @@
     },
     "snail": {
       "codepoint": "1f40c",
-      "sha256": "2ea85c06c823529e21d018820d1b1326eb7ae30d118a7f252fb35315e3e512a1"
+      "sha256": "f64f6bc2a3e42d36d0894a3c3d2da7b5dc2827e3c479fe587a51f5589e194110"
     }
   }
 }
