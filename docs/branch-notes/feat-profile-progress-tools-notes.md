@@ -7,6 +7,8 @@
 - Current-profile editing uses Neon owner RLS, column-limited PATCH, revision CAS and server revision trigger. Preserve credited sessions during edits/undo; fresh baseline on sync carries changes across devices. Migration 002 applied to the verified dedicated project.
 - Home now prioritizes the visitor, scene and timer: single Settings header action, compact mode switch, clearer visitor/unlock copy, smaller buttons, subtle camera/music row, backups in Settings and collapsible credits. Mobile cap remains 430px.
 - Verified 72 unit tests, four local browser suites (including 40 camera assertions), and live Neon API/browser ownership, cross-device edit/undo, stale revision and offline rejection checks. Independent security and mobile design reviewers report no remaining actionable defects.
+- Follow-up: permanent buddies are earned through achievements and discoveries. Both modes show the next brushing milestone, while three Adventure trips still open the buddy's home route.
+- Mirrored 39 shared animal illustrations and removed the trail's second flip. Verified the follow-up with 93 unit tests and the achievements, progress tools, and expedition browser suites.
 
 ## 2. Blockers & Risks (4a)
 - Physical-phone/PWA cookie checks remain manual. No configured SonarCloud or PR CI; runtime suites and Pages deployment are the gates.

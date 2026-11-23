@@ -386,12 +386,9 @@
   /* Build an animal into `group` (cleared first). The head image keeps the
      existing class and 64px size. Returns { pose(distance, moving), hover }. */
   /* Animals whose Twemoji art is only a face get a drawn body (above). The rest
-     are already whole animals, so the art itself is the body and moves as one.
-     Most whole animals in Twemoji face left; they are mirrored to walk right. */
+     are already whole animals, with direction set in the shared SVG artwork. */
   const FACES = new Set(["cat", "bunny", "koala", "dog", "fox", "bear", "panda", "lion", "frog", "tiger", "unicorn", "mouse",
     "hamster", "wolf", "raccoon", "deer", "moose", "gorilla", "orangutan", "boar", "cow", "pig", "horse"]);
-  const FRONT = new Set(["owl", "penguin", "bat", "chicken", "hedgehog", "peacock", "octopus", "squid", "crab", "lobster",
-    "jellyfish", "butterfly", "bee", "ladybug", "sloth", "otter", "dove"]);
   // How a whole-animal sprite moves, by body plan.
   const SPRITE_MOTION = { hop: "hop", waddle: "waddle", wader: "waddle", fly: "fly", flutter: "fly", swim: "swim",
     ceph: "pulse", jelly: "pulse", crab: "shuffle", snake: "slither", snail: "slither", turtle: "walk", seal: "walk" };
@@ -440,7 +437,7 @@
       const size = Math.max(0.85, Math.min(1.5, scale * 1.15));
       const motion = SPRITE_MOTION[plan] || "walk";
       const hover = (SPRITE_HOVER[motion] || 0) * size;
-      const holder = el(breathe, "g", { class: "avatar-sprite", transform: `scale(${FRONT.has(id) ? size : -size} ${size})` });
+      const holder = el(breathe, "g", { class: "avatar-sprite", transform: `scale(${size})` });
       head.setAttribute("x", -32);
       head.setAttribute("y", -62);
       holder.appendChild(head);

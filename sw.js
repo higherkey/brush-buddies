@@ -1,6 +1,6 @@
 "use strict";
 
-const CACHE_NAME = "brush-buddies-shell-v19";
+const CACHE_NAME = "brush-buddies-shell-v20";
 const APP_SHELL = [
   "./home.css?v=0.8.3",
   "./brand.css?v=0.9.0",
@@ -94,7 +94,7 @@ const APP_SHELL = [
   "./accounts.js?v=0.13.0",
   "./buddies.js?v=0.13.0",
   "./achievements.js?v=0.13.0",
-  "./adventure-avatar.js?v=0.11.0",
+  "./adventure-avatar.js?v=0.13.1",
   "./adventure-sections.js?v=0.11.0",
   "./adventure-scene.js?v=0.11.0",
   "./adventure-scene.css?v=0.11.0",
@@ -102,7 +102,7 @@ const APP_SHELL = [
   "./collection-backup.js?v=0.13.0",
   "./styles.css?v=0.8.2",
   "./adventure-data.js?v=0.12.0",
-  "./adventure.js?v=0.13.0",
+  "./adventure.js?v=0.13.1",
   "./stories/characters.js?v=1",
   "./stories/story-library.js?v=0.12.0",
   "./stories/storybook.css?v=1",
@@ -128,7 +128,7 @@ const APP_SHELL = [
 self.addEventListener("install", event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(APP_SHELL))
+      .then(cache => cache.addAll(APP_SHELL.map(url => new Request(url, { cache: "reload" }))))
       .then(() => self.skipWaiting())
   );
 });

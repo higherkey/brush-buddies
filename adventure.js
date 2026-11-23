@@ -161,13 +161,9 @@
       renderScene(s);
       renderEncounter(s);
       if (COLLECTION) {
-        const visits = COLLECTION.load().visits[s.buddy] || 0;
         $("buddy-name").textContent = s.buddyName;
         const visiting = s.buddy === COLLECTION.daily();
         $('visitor-label').textContent = visiting ? "Today's visitor" : 'Your adventure buddy';
-        $("buddy-status").textContent = COLLECTION.homeUnlocked(s.buddy)
-          ? firstName(s) + '’s home is open.'
-          : visits + '/3 trips to open ' + firstName(s) + '’s home.';
       }
       document.querySelectorAll(".zone").forEach((button, i) => {
         if (!button.dataset.baseLabel) button.dataset.baseLabel = button.getAttribute("aria-label");
@@ -178,9 +174,9 @@
       if (pendingTreasure && !treasureTimer) showTreasure(pendingTreasure);
     } else {
       activeEncounter = null;
-      renderSimpleProgress();
       document.querySelectorAll(".zone[data-base-label]").forEach(button => button.setAttribute("aria-label", button.dataset.baseLabel));
     }
+    renderBuddyProgress();
   }
 
   function onReset() {
@@ -193,7 +189,7 @@
     activeEncounter = null;
   }
 
-  function renderSimpleProgress() {
+  function renderBuddyProgress() {
     if (!COLLECTION || !ACHIEVEMENTS) return;
     const collection = COLLECTION.load();
     const total = COLLECTION.metrics(collection, loadStore()).brushes;
@@ -247,8 +243,8 @@
     const s = api()?.snapshot();
     if (!s || s.profileScope !== scope) return;
     if (names.length) $("unlock-status").textContent = 'New ' + (names.length === 1 ? 'buddy' : 'buddies') + ' · ' + newFriends(names);
-    if (s.experience === "simple") renderSimpleProgress();
-    else renderEncounter(s);
+    renderBuddyProgress();
+    if (s.experience === "adventure") renderEncounter(s);
     if (names.length && $("journal-dialog").open) openJournal();
   }
 

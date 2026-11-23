@@ -76,6 +76,7 @@ test('timer milestones, hidden actions, trail taps, and collectible stories work
     await waitUnlocked('eagle');
 
     await page.click('#mode-toggle');
+    assert.match(await page.textContent('#buddy-status'), /^5\/15 brushes for /);
     await page.click('#start-button');
     assert.ok(await page.locator('#trail-encounter').isHidden());
     await page.clock.runFor(1200);
@@ -85,6 +86,7 @@ test('timer milestones, hidden actions, trail taps, and collectible stories work
     await waitUnlocked('ladybug');
     await page.clock.runFor(5000);
     await page.click('#treasure-close');
+    assert.match(await page.textContent('#buddy-status'), /^6\/15 brushes for /);
     for (let trip = 2; trip <= 4; trip++) {
       await finish();
       await page.clock.runFor(800);
